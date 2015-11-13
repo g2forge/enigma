@@ -22,7 +22,8 @@ public class TempDirectory extends AGuaranteeClose {
 		super(autodelete);
 		try {
 			if (parent != null) Files.createDirectories(parent);
-			path = Files.createTempDirectory(parent, prefix == null ? getClass().getSimpleName() : prefix);
+			final String actualPrefix = prefix == null ? getClass().getSimpleName() : prefix;
+			path = parent == null ? Files.createTempDirectory(actualPrefix) : Files.createTempDirectory(parent, actualPrefix);
 		} catch (IOException exception) {
 			throw new RuntimeIOException(exception);
 		}
