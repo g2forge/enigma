@@ -4,3 +4,4 @@
 /.classpath
 /dependency-reduced-pom.xml
 *.jar
+/.factorypath
