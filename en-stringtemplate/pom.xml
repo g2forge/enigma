@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>en-javagen</artifactId>
+	<artifactId>en-stringtemplate</artifactId>
 
 	<parent>
 		<groupId>com.g2forge.enigma</groupId>
@@ -13,9 +13,14 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.g2forge.enigma</groupId>
-			<artifactId>en-stringtemplate</artifactId>
-			<version>${enigma.version}</version>
+			<groupId>com.g2forge.alexandria</groupId>
+			<artifactId>ax-java</artifactId>
+			<version>${alexandria.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>stringtemplate</artifactId>
+			<version>${stringtemplate.version}</version>
 		</dependency>
 	</dependencies>
 </project>
