@@ -12,7 +12,7 @@ public class TestEmbeddedTemplateRenderer {
 	@AllArgsConstructor
 	@NoArgsConstructor
 	public static class TestTemplate {
-		public static final String TEMPLATE = "foobar<a><b>";
+		protected static final String TEMPLATE = "foobar<a><b>";
 
 		protected String a;
 

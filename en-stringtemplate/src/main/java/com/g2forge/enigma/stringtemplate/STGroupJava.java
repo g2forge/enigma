@@ -27,6 +27,7 @@ public class STGroupJava extends STGroup {
 	public STGroupJava(String encoding, char delimiterStartChar, char delimiterStopChar) {
 		super(delimiterStartChar, delimiterStopChar);
 		this.encoding = encoding;
+		this.registerRenderer(Object.class, new JavaStringRenderer(this));
 	}
 
 	public ST getInstanceOf(Class<?> type) {
@@ -59,7 +60,9 @@ public class STGroupJava extends STGroup {
 		else {
 			try {
 				final String arguments = Stream.of(type.getDeclaredFields()).filter(field -> !Modifier.isStatic(field.getModifiers())).map(Field::getName).collect(Collectors.joining(", "));
-				final String string = template.get().get(null).toString();
+				final Field field = template.get();
+				field.setAccessible(true);
+				final String string = field.get(null).toString();
 				final String complete = name + "(" + arguments + ") ::= <<\n" + string + "\n>>";
 				stream = new ByteArrayInputStream(complete.getBytes(encoding));
 			} catch (Throwable throwable) {
@@ -80,6 +83,7 @@ public class STGroupJava extends STGroup {
 	public String render(Object object) {
 		final Class<? extends Object> type = object.getClass();
 		final ST retVal = getInstanceOf(type);
+		if (retVal == null) throw new IllegalArgumentException("Template could not be found in either a file or field for " + type);
 		Stream.of(type.getDeclaredFields()).filter(field -> !Modifier.isStatic(field.getModifiers())).forEach(field -> {
 			field.setAccessible(true);
 			final Object value;
