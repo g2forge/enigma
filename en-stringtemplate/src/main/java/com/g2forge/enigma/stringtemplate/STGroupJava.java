@@ -17,6 +17,8 @@ import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.compiler.CompiledST;
 
 import com.g2forge.alexandria.java.StreamHelpers;
+import com.g2forge.alexandria.java.reflection.JavaScope;
+import com.g2forge.alexandria.java.reflection.ReflectionHelpers;
 
 /**
  * @see #render(Object)
@@ -55,11 +57,11 @@ public class STGroupJava extends STGroup {
 
 		final InputStream stream;
 
-		final Optional<Field> template = Stream.of(type.getDeclaredFields()).filter(field -> "TEMPLATE".equals(field.getName())).filter(field -> Modifier.isStatic(field.getModifiers())).collect(StreamHelpers.toOptional());
+		final Optional<Field> template = ReflectionHelpers.getFields(type, JavaScope.Static, null).filter(field -> "TEMPLATE".equals(field.getName())).collect(StreamHelpers.toOptional());
 		if (template == null) stream = type.getResourceAsStream(fileName);
 		else {
 			try {
-				final String arguments = Stream.of(type.getDeclaredFields()).filter(field -> !Modifier.isStatic(field.getModifiers())).map(Field::getName).collect(Collectors.joining(", "));
+				final String arguments = ReflectionHelpers.getFields(type, JavaScope.Inherited, null).map(Field::getName).collect(Collectors.joining(", "));
 				final Field field = template.get();
 				field.setAccessible(true);
 				final String string = field.get(null).toString();
@@ -84,7 +86,7 @@ public class STGroupJava extends STGroup {
 		final Class<? extends Object> type = object.getClass();
 		final ST retVal = getInstanceOf(type);
 		if (retVal == null) throw new IllegalArgumentException("Template could not be found in either a file or field for " + type);
-		Stream.of(type.getDeclaredFields()).filter(field -> !Modifier.isStatic(field.getModifiers())).forEach(field -> {
+		ReflectionHelpers.getFields(type, JavaScope.Inherited, null).forEach(field -> {
 			field.setAccessible(true);
 			final Object value;
 			try {
