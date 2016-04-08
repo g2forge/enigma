@@ -16,5 +16,5 @@ public class JavaClass {
 
 	protected String name;
 
-	protected Collection<JavaField> members;
+	protected Collection<IJavaMember> members;
 }

@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class JavaField implements IJavaMember {
-	protected static final String TEMPLATE = "<protection;format=\"java\"><type;format=\"java\"> <name>;";
+public class JavaMethod implements IJavaMember {
+	protected static final String TEMPLATE = "<protection;format=\"java\"><type;format=\"java\"> <name>(){}";
 
 	protected JavaProtection protection;
 
