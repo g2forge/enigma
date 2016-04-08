@@ -27,7 +27,7 @@ public class Record {
 		if (properties == null) {
 			properties = new LinkedHashMap<>();
 			properties.putAll(ReflectionHelpers.getFields(type, JavaScope.Inherited, null).map(FieldProperty::new).collect(Collectors.toMap(IProperty::getName, Function.identity())));
-			properties.putAll(ReflectionHelpers.getMethods(type, JavaScope.Inherited, null).filter(method -> method.getName().startsWith("get") && (method.getParameterCount() == 0) && !Void.TYPE.equals(method.getGenericReturnType())).map(GetterProperty::new).collect(Collectors.toMap(IProperty::getName, Function.identity())));
+			properties.putAll(ReflectionHelpers.getMethods(type, JavaScope.Inherited, null).filter(GetterProperty::isGetter).collect(Collectors.toList()).stream().map(GetterProperty::new).collect(Collectors.toMap(IProperty::getName, Function.identity())));
 		}
 		return properties.values();
 	}

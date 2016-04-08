@@ -40,6 +40,7 @@ public class STGroupJava extends STGroup {
 	}
 
 	public ST getInstanceOf(Class<?> type) {
+		if (!type.isEnum() && Enum.class.isAssignableFrom(type)) type = type.getSuperclass();
 		final String name = getTemplateName(type);
 
 		final Class<?> prior = types.get(name);
@@ -65,7 +66,7 @@ public class STGroupJava extends STGroup {
 		final InputStream stream;
 
 		final Optional<Field> template = ReflectionHelpers.getFields(type, JavaScope.Static, null).filter(field -> "TEMPLATE".equals(field.getName())).collect(StreamHelpers.toOptional());
-		if (template == null) stream = type.getResourceAsStream(fileName);
+		if ((template == null) || !template.isPresent()) stream = type.getResourceAsStream(fileName);
 		else {
 			try {
 				final String arguments = new Record(type).getProperties().stream().map(IProperty::getName).collect(Collectors.joining(", "));
