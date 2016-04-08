@@ -10,7 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class JavaClass {
-	protected static final String TEMPLATE = "class <name> {<if(members)>\n\t<members:{member | <member;format=\"java\">};separator=\"\\n\\n\">\n<endif>}";
+	protected static final String TEMPLATE = "<protection;format=\"java\">class <name> {<if(members)>\n\t<members:{member | <member;format=\"java\">};separator=\"\\n\\n\">\n<endif>}";
+
+	protected JavaProtection protection;
 
 	protected String name;
 

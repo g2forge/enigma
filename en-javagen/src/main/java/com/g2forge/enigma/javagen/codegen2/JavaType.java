@@ -15,6 +15,12 @@ public class JavaType {
 	protected Type type;
 
 	protected String getString() {
+		if (type instanceof Class) {
+			final Class<?> klass = (Class<?>) type;
+			if (klass.isPrimitive()) return klass.toString();
+			if ("java.lang".equals(klass.getPackage().getName())) return klass.getSimpleName();
+			return klass.getName();
+		}
 		return type.toString();
 	}
 }

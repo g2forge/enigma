@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class JavaField {
-	protected static final String TEMPLATE = "<type;format=\"java\"> <name>;";
+	protected static final String TEMPLATE = "<protection;format=\"java\"><type;format=\"java\"> <name>;";
+
+	protected JavaProtection protection;
 
 	protected JavaType type;
 
