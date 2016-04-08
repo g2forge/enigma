@@ -13,7 +13,7 @@ public class TestCodegen2 {
 	@Test
 	public void testClassFields() {
 		Assert.assertEquals("class MyClass {}", renderer.render(new JavaClass("MyClass", null)));
-		Assert.assertEquals("class MyClass {\n\tMyClass a;\n}", renderer.render(new JavaClass("MyClass", Arrays.asList(new JavaField("MyClass", "a")))));
-		Assert.assertEquals("class MyClass {\n\tString foo;\n\n\tint bar;\n}", renderer.render(new JavaClass("MyClass", Arrays.asList(new JavaField("String", "foo"), new JavaField("int", "bar")))));
+		Assert.assertEquals("class MyClass {\n\t" + TestCodegen2.class.toString() + " a;\n}", renderer.render(new JavaClass("MyClass", Arrays.asList(new JavaField(new JavaType(TestCodegen2.class), "a")))));
+		Assert.assertEquals("class MyClass {\n\tString foo;\n\n\tint bar;\n}", renderer.render(new JavaClass("MyClass", Arrays.asList(new JavaField(new JavaType(String.class), "foo"), new JavaField(new JavaType(Integer.TYPE), "bar")))));
 	}
 }
