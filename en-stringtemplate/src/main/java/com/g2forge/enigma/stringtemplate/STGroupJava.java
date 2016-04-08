@@ -1,19 +1,27 @@
 package com.g2forge.enigma.stringtemplate;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.antlr.runtime.ANTLRInputStream;
+import org.stringtemplate.v4.AutoIndentWriter;
 import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STErrorListener;
 import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STWriter;
 import org.stringtemplate.v4.compiler.CompiledST;
 
 import com.g2forge.alexandria.java.StreamHelpers;
@@ -24,12 +32,46 @@ import com.g2forge.alexandria.java.reflection.ReflectionHelpers;
  * @see #render(Object)
  */
 public class STGroupJava extends STGroup {
+	protected static class STJava extends ST {
+		protected final String lineSeparator;
+
+		public STJava(ST proto, String lineSeparator) {
+			super(proto);
+			this.lineSeparator = lineSeparator;
+		}
+
+		protected STWriter createAutoIndentWriter(int lineWidth, final Writer out) {
+			final STWriter retVal = new AutoIndentWriter(out, lineSeparator);
+			retVal.setLineWidth(lineWidth);
+			return retVal;
+		}
+
+		public String render(Locale locale, int lineWidth) {
+			final StringWriter retVal = new StringWriter();
+			write(createAutoIndentWriter(lineWidth, retVal), locale);
+			return retVal.toString();
+		}
+
+		public int write(File outputFile, STErrorListener listener, String encoding, Locale locale, int lineWidth) throws IOException {
+			try (final Writer bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile), encoding))) {
+				return write(createAutoIndentWriter(lineWidth, bufferedWriter), locale, listener);
+			}
+		}
+	}
+
 	protected final Map<String, Class<?>> types = new HashMap<>();
 
-	public STGroupJava(String encoding, char delimiterStartChar, char delimiterStopChar) {
+	protected final String lineSeparator;
+
+	public STGroupJava(String encoding, char delimiterStartChar, char delimiterStopChar, String lineSeparator) {
 		super(delimiterStartChar, delimiterStopChar);
 		this.encoding = encoding;
 		this.registerRenderer(Object.class, new JavaStringRenderer(this));
+		this.lineSeparator = lineSeparator;
+	}
+
+	public ST createStringTemplate(CompiledST impl) {
+		return new STJava(super.createStringTemplate(impl), lineSeparator);
 	}
 
 	public ST getInstanceOf(Class<?> type) {
