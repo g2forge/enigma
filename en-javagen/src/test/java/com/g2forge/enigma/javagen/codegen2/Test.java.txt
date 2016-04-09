@@ -1,0 +1,10 @@
+package foo;
+
+import foo.Other;
+
+class Test {
+	public String toString(){
+		@String
+		final String retVal;
+	}
+}

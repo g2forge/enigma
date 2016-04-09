@@ -12,15 +12,14 @@ import lombok.NoArgsConstructor;
 public class JavaType {
 	protected static final String TEMPLATE = "<string>";
 
-	protected Type type;
+	protected String string;
 
-	protected String getString() {
+	public JavaType(Type type) {
 		if (type instanceof Class) {
 			final Class<?> klass = (Class<?>) type;
-			if (klass.isPrimitive()) return klass.toString();
-			if ("java.lang".equals(klass.getPackage().getName())) return klass.getSimpleName();
-			return klass.getName();
-		}
-		return type.toString();
+			if (klass.isPrimitive()) this.string = klass.toString();
+			else if ("java.lang".equals(klass.getPackage().getName())) this.string = klass.getSimpleName();
+			else this.string = klass.getName();
+		} else this.string = type.toString();
 	}
 }

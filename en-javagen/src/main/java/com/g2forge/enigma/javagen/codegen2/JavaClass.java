@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class JavaClass implements IJavaAnnotated {
+public class JavaClass implements IJavaTypeDeclaration {
 	protected static final String TEMPLATE = TEMPLATE_ANNOTATIONS + "<protection>class <name> {<if(members)>\n\t<members;separator=\"\\n\\n\">\n<endif>}";
 
 	protected Collection<JavaAnnotation> annotations;
