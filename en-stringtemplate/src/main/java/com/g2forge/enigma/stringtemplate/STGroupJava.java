@@ -15,6 +15,8 @@ import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.compiler.CompiledST;
 
 import com.g2forge.alexandria.java.StreamHelpers;
+import com.g2forge.alexandria.java.associative.cache.Cache;
+import com.g2forge.alexandria.java.associative.cache.LRUCacheEvictionPolicy;
 import com.g2forge.alexandria.java.reflection.JavaScope;
 import com.g2forge.alexandria.java.reflection.ReflectionHelpers;
 import com.g2forge.enigma.stringtemplate.record.IProperty;
@@ -27,6 +29,8 @@ public class STGroupJava extends STGroup {
 	protected final Map<String, Class<?>> types = new HashMap<>();
 
 	protected final String lineSeparator;
+
+	protected final Cache<Class<?>, Record> recordCache = new Cache<>(Record::new, new LRUCacheEvictionPolicy<>(30));
 
 	public STGroupJava(String encoding, char delimiterStartChar, char delimiterStopChar, String lineSeparator) {
 		super(delimiterStartChar, delimiterStopChar);
@@ -69,7 +73,7 @@ public class STGroupJava extends STGroup {
 		if ((template == null) || !template.isPresent()) stream = type.getResourceAsStream(fileName);
 		else {
 			try {
-				final String arguments = new Record(type).getProperties().stream().map(IProperty::getName).collect(Collectors.joining(", "));
+				final String arguments = recordCache.apply(type).getProperties().stream().map(IProperty::getName).collect(Collectors.joining(", "));
 				final Field field = template.get();
 				field.setAccessible(true);
 				final String string = field.get(null).toString();
@@ -79,6 +83,7 @@ public class STGroupJava extends STGroup {
 				return null;
 			}
 		}
+		if (stream == null) return null;
 
 		final ANTLRInputStream fs;
 		try {
@@ -93,8 +98,8 @@ public class STGroupJava extends STGroup {
 	public String render(Object object) {
 		final Class<? extends Object> type = object.getClass();
 		final ST retVal = getInstanceOf(type);
-		if (retVal == null) throw new IllegalArgumentException("Template could not be found in either a file or field for " + type);
-		new Record(type).getProperties().forEach(property -> retVal.add(property.getName(), property.getValue(object)));
+		if (retVal == null) throw new NoTemplateException("Template could not be found in either a file or field for " + type);
+		recordCache.apply(type).getProperties().forEach(property -> retVal.add(property.getName(), property.getValue(object)));
 		return retVal.render();
 	}
 }
