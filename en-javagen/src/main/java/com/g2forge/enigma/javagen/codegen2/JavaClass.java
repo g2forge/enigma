@@ -9,8 +9,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class JavaClass {
-	protected static final String TEMPLATE = "<protection>class <name> {<if(members)>\n\t<members:{member | <member>};separator=\"\\n\\n\">\n<endif>}";
+public class JavaClass implements IJavaAnnotated {
+	protected static final String TEMPLATE = TEMPLATE_ANNOTATIONS + "<protection>class <name> {<if(members)>\n\t<members;separator=\"\\n\\n\">\n<endif>}";
+
+	protected Collection<JavaAnnotation> annotations;
 
 	protected JavaProtection protection;
 
