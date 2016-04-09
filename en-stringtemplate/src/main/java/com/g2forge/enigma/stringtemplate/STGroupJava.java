@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 import org.antlr.runtime.ANTLRInputStream;
 import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STAdvanced;
+import org.stringtemplate.v4.STAttributeGenerator;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.compiler.CompiledST;
 
@@ -40,7 +42,7 @@ public class STGroupJava extends STGroup {
 	}
 
 	public ST createStringTemplate(CompiledST impl) {
-		return new STJava(super.createStringTemplate(impl), lineSeparator);
+		return new STAdvanced(super.createStringTemplate(impl), lineSeparator);
 	}
 
 	public ST getInstanceOf(Class<?> type) {
@@ -99,7 +101,7 @@ public class STGroupJava extends STGroup {
 		final Class<? extends Object> type = object.getClass();
 		final ST retVal = getInstanceOf(type);
 		if (retVal == null) throw new NoTemplateException("Template could not be found in either a file or field for " + type);
-		recordCache.apply(type).getProperties().forEach(property -> retVal.add(property.getName(), property.getValue(object)));
+		recordCache.apply(type).getProperties().forEach(property -> retVal.add(property.getName(), (STAttributeGenerator) () -> property.getValue(object)));
 		return retVal.render();
 	}
 }

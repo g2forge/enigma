@@ -11,7 +11,7 @@ public class TestEmbeddedTemplateRenderer {
 	@Data
 	@AllArgsConstructor
 	@NoArgsConstructor
-	public static class TestTemplate {
+	public static class Template {
 		protected static final String TEMPLATE = "foobar<a><b><c>";
 
 		protected String a;
@@ -26,6 +26,6 @@ public class TestEmbeddedTemplateRenderer {
 	@Test
 	public void test() {
 		final EmbeddedTemplateRenderer renderer = new EmbeddedTemplateRenderer();
-		Assert.assertEquals("foobar1juanhello", renderer.render(new TestTemplate("1", "juan")));
+		Assert.assertEquals("foobar1juanhello", renderer.render(new Template("1", "juan")));
 	}
 }
