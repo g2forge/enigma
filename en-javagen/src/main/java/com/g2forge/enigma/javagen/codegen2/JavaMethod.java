@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class JavaMethod implements IJavaMember {
-	protected static final String TEMPLATE = "<protection;format=\"java\"><type;format=\"java\"> <name>(){}";
+	protected static final String TEMPLATE = "<protection><type> <name>(){}";
 
 	protected JavaProtection protection;
 

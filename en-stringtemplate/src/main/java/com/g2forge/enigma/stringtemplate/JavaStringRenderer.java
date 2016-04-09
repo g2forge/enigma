@@ -12,8 +12,10 @@ public class JavaStringRenderer extends StringRenderer {
 
 	@Override
 	public String toString(Object o, String formatString, Locale locale) {
-		if (!("java".equals(formatString))) return super.toString(o, formatString, locale);
-
-		return group.render(o);
+		try {
+			return group.render(o);
+		} catch (NoTemplateException exception) {
+			return super.toString(o, formatString, locale);
+		}
 	}
 }
