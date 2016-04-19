@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.g2forge.alexandria.java.reflection.JavaClass;
 import com.g2forge.alexandria.java.reflection.JavaScope;
-import com.g2forge.alexandria.java.reflection.ReflectionHelpers;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -26,8 +26,9 @@ public class Record {
 	public Collection<IProperty> getProperties() {
 		if (properties == null) {
 			properties = new LinkedHashMap<>();
-			properties.putAll(ReflectionHelpers.getFields(type, JavaScope.Inherited, null).map(FieldProperty::new).collect(Collectors.toMap(IProperty::getName, Function.identity())));
-			properties.putAll(ReflectionHelpers.getMethods(type, JavaScope.Inherited, null).filter(GetterProperty::isGetter).collect(Collectors.toList()).stream().map(GetterProperty::new).collect(Collectors.toMap(IProperty::getName, Function.identity())));
+			final JavaClass<?> reflection = new JavaClass<>(type);
+			properties.putAll(reflection.getFields(JavaScope.Inherited, null).map(FieldProperty::new).collect(Collectors.toMap(IProperty::getName, Function.identity())));
+			properties.putAll(reflection.getMethods(JavaScope.Inherited, null).filter(GetterProperty::isGetter).collect(Collectors.toList()).stream().map(GetterProperty::new).collect(Collectors.toMap(IProperty::getName, Function.identity())));
 		}
 		return properties.values();
 	}

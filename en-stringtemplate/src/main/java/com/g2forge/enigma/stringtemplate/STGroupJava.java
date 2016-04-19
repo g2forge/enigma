@@ -19,8 +19,8 @@ import org.stringtemplate.v4.compiler.CompiledST;
 import com.g2forge.alexandria.java.StreamHelpers;
 import com.g2forge.alexandria.java.associative.cache.Cache;
 import com.g2forge.alexandria.java.associative.cache.LRUCacheEvictionPolicy;
+import com.g2forge.alexandria.java.reflection.JavaClass;
 import com.g2forge.alexandria.java.reflection.JavaScope;
-import com.g2forge.alexandria.java.reflection.ReflectionHelpers;
 import com.g2forge.enigma.stringtemplate.record.IProperty;
 import com.g2forge.enigma.stringtemplate.record.Record;
 
@@ -71,7 +71,7 @@ public class STGroupJava extends STGroup {
 
 		final InputStream stream;
 
-		final Optional<Field> template = ReflectionHelpers.getFields(type, JavaScope.Static, null).filter(field -> "TEMPLATE".equals(field.getName())).collect(StreamHelpers.toOptional());
+		final Optional<Field> template = new JavaClass<>(type).getFields(JavaScope.Static, null).filter(field -> "TEMPLATE".equals(field.getName())).collect(StreamHelpers.toOptional());
 		if ((template == null) || !template.isPresent()) stream = type.getResourceAsStream(fileName);
 		else {
 			try {
