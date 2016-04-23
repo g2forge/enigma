@@ -1,12 +1,15 @@
-package com.g2forge.enigma.stringtemplate.record;
+package com.g2forge.enigma.stringtemplate.record.reflection;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import com.g2forge.alexandria.java.StringHelpers;
+import com.g2forge.enigma.stringtemplate.record.IPropertyType;
+
 import lombok.Data;
 
 @Data
-public class GetterProperty implements IProperty {
+class GetterPropertyType implements IPropertyType {
 	public static boolean isGetter(Method method) {
 		if (method.getParameterCount() != 0) return false;
 
@@ -18,17 +21,14 @@ public class GetterProperty implements IProperty {
 
 	protected final Method getter;
 
-	public GetterProperty(Method getter) {
+	public GetterPropertyType(Method getter) {
 		this.getter = getter;
 		getGetter().setAccessible(true);
 	}
 
 	@Override
 	public String getName() {
-		final String name = getGetter().getName();
-		if (name.startsWith("get")) return name.substring(3, 4).toLowerCase() + name.substring(4);
-		if (name.startsWith("is")) return name.substring(2, 3).toLowerCase() + name.substring(3);
-		return name;
+		return StringHelpers.lowercase(StringHelpers.stripPrefix(getGetter().getName(), "get", "is"));
 	}
 
 	@Override

@@ -21,8 +21,9 @@ import com.g2forge.alexandria.java.associative.cache.Cache;
 import com.g2forge.alexandria.java.associative.cache.LRUCacheEvictionPolicy;
 import com.g2forge.alexandria.java.reflection.JavaClass;
 import com.g2forge.alexandria.java.reflection.JavaScope;
-import com.g2forge.enigma.stringtemplate.record.IProperty;
-import com.g2forge.enigma.stringtemplate.record.Record;
+import com.g2forge.enigma.stringtemplate.record.IPropertyType;
+import com.g2forge.enigma.stringtemplate.record.IRecordType;
+import com.g2forge.enigma.stringtemplate.record.reflection.ReflectedRecordType;
 
 /**
  * @see #render(Object)
@@ -32,7 +33,7 @@ public class STGroupJava extends STGroup {
 
 	protected final String lineSeparator;
 
-	protected final Cache<Class<?>, Record> recordCache = new Cache<>(Record::new, new LRUCacheEvictionPolicy<>(30));
+	protected final Cache<Class<?>, IRecordType> recordCache = new Cache<>(ReflectedRecordType::new, new LRUCacheEvictionPolicy<>(30));
 
 	public STGroupJava(String encoding, char delimiterStartChar, char delimiterStopChar, String lineSeparator) {
 		super(delimiterStartChar, delimiterStopChar);
@@ -75,7 +76,7 @@ public class STGroupJava extends STGroup {
 		if ((template == null) || !template.isPresent()) stream = type.getResourceAsStream(fileName);
 		else {
 			try {
-				final String arguments = recordCache.apply(type).getProperties().stream().map(IProperty::getName).collect(Collectors.joining(", "));
+				final String arguments = recordCache.apply(type).getProperties().stream().map(IPropertyType::getName).collect(Collectors.joining(", "));
 				final Field field = template.get();
 				field.setAccessible(true);
 				final String string = field.get(null).toString();
