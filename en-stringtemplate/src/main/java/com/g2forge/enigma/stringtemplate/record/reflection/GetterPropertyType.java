@@ -39,4 +39,9 @@ class GetterPropertyType implements IPropertyType {
 			throw new RuntimeException(exception);
 		}
 	}
+
+	@Override
+	public void setValue(Object object, Object value) {
+		throw new UnsupportedOperationException();
+	}
 }
