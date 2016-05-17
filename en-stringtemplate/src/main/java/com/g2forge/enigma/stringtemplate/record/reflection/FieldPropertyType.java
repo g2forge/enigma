@@ -2,6 +2,7 @@ package com.g2forge.enigma.stringtemplate.record.reflection;
 
 import java.lang.reflect.Field;
 
+import com.g2forge.alexandria.java.reflection.RuntimeReflectionException;
 import com.g2forge.enigma.stringtemplate.record.IPropertyType;
 
 import lombok.Data;
@@ -25,7 +26,7 @@ class FieldPropertyType implements IPropertyType {
 		try {
 			return getField().get(object);
 		} catch (IllegalArgumentException | IllegalAccessException exception) {
-			throw new RuntimeException(exception);
+			throw new RuntimeReflectionException(exception);
 		}
 	}
 
@@ -34,7 +35,7 @@ class FieldPropertyType implements IPropertyType {
 		try {
 			getField().set(object, value);
 		} catch (IllegalArgumentException | IllegalAccessException exception) {
-			throw new RuntimeException(exception);
+			throw new RuntimeReflectionException(exception);
 		}
 	}
 }

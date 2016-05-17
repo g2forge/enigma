@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import com.g2forge.alexandria.java.StringHelpers;
+import com.g2forge.alexandria.java.reflection.RuntimeReflectionException;
 import com.g2forge.enigma.stringtemplate.record.IPropertyType;
 
 import lombok.Data;
@@ -36,7 +37,7 @@ class GetterPropertyType implements IPropertyType {
 		try {
 			return getGetter().invoke(object);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException exception) {
-			throw new RuntimeException(exception);
+			throw new RuntimeReflectionException(exception);
 		}
 	}
 
