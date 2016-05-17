@@ -21,9 +21,9 @@ import com.g2forge.alexandria.java.associative.cache.Cache;
 import com.g2forge.alexandria.java.associative.cache.LRUCacheEvictionPolicy;
 import com.g2forge.alexandria.java.reflection.JavaClass;
 import com.g2forge.alexandria.java.reflection.JavaScope;
-import com.g2forge.enigma.stringtemplate.record.IPropertyType;
-import com.g2forge.enigma.stringtemplate.record.IRecordType;
-import com.g2forge.enigma.stringtemplate.record.reflection.ReflectedRecordType;
+import com.g2forge.alexandria.record.IPropertyType;
+import com.g2forge.alexandria.record.IRecordType;
+import com.g2forge.alexandria.record.reflection.ReflectedRecordType;
 
 /**
  * @see #render(Object)
