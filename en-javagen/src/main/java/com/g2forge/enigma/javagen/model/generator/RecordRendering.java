@@ -1,11 +1,11 @@
 package com.g2forge.enigma.javagen.model.generator;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import com.g2forge.alexandria.java.CollectionHelpers;
 import com.g2forge.alexandria.java.TreeHelpers;
 import com.g2forge.enigma.javagen.codegen.JavaAnnotation;
 import com.g2forge.enigma.javagen.codegen.JavaClass;
@@ -33,7 +33,7 @@ public class RecordRendering {
 		final Stream<Record> records = TreeHelpers.dfs(record, Record::getParents, true);
 
 		{ // Generate the implementation class for this record
-			final List<JavaAnnotation> annotations = Arrays.asList(new JavaAnnotation(new JavaType(Data.class.getName())), new JavaAnnotation(new JavaType(AllArgsConstructor.class.getName())));
+			final List<JavaAnnotation> annotations = CollectionHelpers.asList(new JavaAnnotation(new JavaType(Data.class.getName())), new JavaAnnotation(new JavaType(AllArgsConstructor.class.getName())));
 			final JavaClass implementation = new JavaClass(annotations, JavaProtection.Public, record.getName(), new ArrayList<>());
 			records.flatMap(r -> r.getProperties().stream()).forEach(property -> {
 				implementation.getMembers().add(new JavaField(null, JavaProtection.Protected, types.apply(property.getType()), property.getName()));
