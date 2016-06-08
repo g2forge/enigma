@@ -5,7 +5,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.g2forge.alexandria.java.CollectionHelpers;
+import com.g2forge.alexandria.java.core.helpers.CollectionHelpers;
 import com.g2forge.enigma.javagen.codegen.AJavaMember;
 import com.g2forge.enigma.javagen.codegen.JavaAnnotation;
 import com.g2forge.enigma.javagen.codegen.JavaAssignment;

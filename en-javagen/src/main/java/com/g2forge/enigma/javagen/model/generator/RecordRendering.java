@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import com.g2forge.alexandria.java.CollectionHelpers;
-import com.g2forge.alexandria.java.TreeHelpers;
+import com.g2forge.alexandria.java.core.helpers.CollectionHelpers;
+import com.g2forge.alexandria.java.core.helpers.TreeHelpers;
 import com.g2forge.enigma.javagen.codegen.JavaAnnotation;
 import com.g2forge.enigma.javagen.codegen.JavaClass;
 import com.g2forge.enigma.javagen.codegen.JavaField;

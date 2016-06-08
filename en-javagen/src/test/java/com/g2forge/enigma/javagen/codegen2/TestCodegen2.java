@@ -6,7 +6,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.g2forge.alexandria.java.CollectionHelpers;
+import com.g2forge.alexandria.java.core.helpers.CollectionHelpers;
 import com.g2forge.alexandria.test.ResourceHelpers;
 import com.g2forge.enigma.stringtemplate.EmbeddedTemplateRenderer;
 

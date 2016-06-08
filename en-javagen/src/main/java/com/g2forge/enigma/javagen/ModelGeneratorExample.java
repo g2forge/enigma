@@ -2,7 +2,7 @@ package com.g2forge.enigma.javagen;
 
 import java.nio.file.Paths;
 
-import com.g2forge.alexandria.java.CollectionHelpers;
+import com.g2forge.alexandria.java.core.helpers.CollectionHelpers;
 import com.g2forge.enigma.javagen.codegen.JavaType;
 import com.g2forge.enigma.javagen.model.Property;
 import com.g2forge.enigma.javagen.model.Record;
