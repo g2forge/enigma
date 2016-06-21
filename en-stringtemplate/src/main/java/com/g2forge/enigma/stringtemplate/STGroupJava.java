@@ -16,11 +16,11 @@ import org.stringtemplate.v4.STAttributeGenerator;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.compiler.CompiledST;
 
+import com.g2forge.alexandria.generic.type.java.structure.JavaScope;
 import com.g2forge.alexandria.java.associative.cache.Cache;
 import com.g2forge.alexandria.java.associative.cache.LRUCacheEvictionPolicy;
 import com.g2forge.alexandria.java.core.helpers.StreamHelpers;
 import com.g2forge.alexandria.java.reflection.JavaClass;
-import com.g2forge.alexandria.java.reflection.JavaScope;
 import com.g2forge.alexandria.record.IPropertyType;
 import com.g2forge.alexandria.record.IRecordType;
 import com.g2forge.alexandria.record.reflection.ReflectedRecordType;
