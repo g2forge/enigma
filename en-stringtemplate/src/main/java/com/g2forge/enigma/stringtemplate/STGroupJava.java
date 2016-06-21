@@ -3,7 +3,6 @@ package com.g2forge.enigma.stringtemplate;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -20,10 +19,11 @@ import com.g2forge.alexandria.generic.type.java.structure.JavaScope;
 import com.g2forge.alexandria.java.associative.cache.Cache;
 import com.g2forge.alexandria.java.associative.cache.LRUCacheEvictionPolicy;
 import com.g2forge.alexandria.java.core.helpers.StreamHelpers;
-import com.g2forge.alexandria.java.reflection.JavaClass;
-import com.g2forge.alexandria.record.IPropertyType;
-import com.g2forge.alexandria.record.IRecordType;
-import com.g2forge.alexandria.record.reflection.ReflectedRecordType;
+import com.g2forge.alexandria.reflection.object.IJavaFieldReflection;
+import com.g2forge.alexandria.reflection.object.ReflectionHelpers;
+import com.g2forge.alexandria.reflection.record.v2.IPropertyType;
+import com.g2forge.alexandria.reflection.record.v2.IRecordType;
+import com.g2forge.alexandria.reflection.record.v2.reflection.ReflectedRecordType;
 
 /**
  * @see #render(Object)
@@ -72,14 +72,13 @@ public class STGroupJava extends STGroup {
 
 		final InputStream stream;
 
-		final Optional<Field> template = new JavaClass<>(type).getFields(JavaScope.Static, null).filter(field -> "TEMPLATE".equals(field.getName())).collect(StreamHelpers.toOptional());
+		final Optional<IJavaFieldReflection<?, ?>> template = ReflectionHelpers.toReflection(type).getFields(JavaScope.Static, null).filter(field -> "TEMPLATE".equals(field.getType().getName())).collect(StreamHelpers.toOptional());
 		if ((template == null) || !template.isPresent()) stream = type.getResourceAsStream(fileName);
 		else {
 			try {
 				final String arguments = recordCache.apply(type).getProperties().stream().map(IPropertyType::getName).collect(Collectors.joining(", "));
-				final Field field = template.get();
-				field.setAccessible(true);
-				final String string = field.get(null).toString();
+				final IJavaFieldReflection<?, ?> field = template.get();
+				final String string = field.getAccessor(null).get0().toString();
 				final String complete = name + "(" + arguments + ") ::= <<\n" + string + "\n>>";
 				stream = new ByteArrayInputStream(complete.getBytes(encoding));
 			} catch (Throwable throwable) {
