@@ -1,6 +1,12 @@
 package com.g2forge.enigma.stringtemplate;
 
 public class EmbeddedTemplateRenderer {
+	protected final static EmbeddedTemplateRenderer singleton = new EmbeddedTemplateRenderer(System.lineSeparator());
+
+	public static String toString(Object object) {
+		return singleton.render(object);
+	}
+
 	protected final STGroupJava group;
 
 	public EmbeddedTemplateRenderer() {
