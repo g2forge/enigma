@@ -72,14 +72,18 @@ public class TestRecordGen {
 
 		final Record<String, JavaType> record = new Record<>(Arrays.asList(new Property<>(new Name("Property"), new Type(new JavaType(String.class)))), new Type(new JavaType("org.Foo")));
 
+		final Context context = new Context(Context.Usage.Field);
 		final Collection<IJavaMember> members = new ArrayList<>();
 		for (IProperty<String, JavaType> property : record.getProperties()) {
-			final Context context = new Context(Context.Usage.Field);
 			members.add(new JavaField(property.getType().getLanguageType(context), property.getName().getLanguageName(context)).setProtection(JavaProtection.Protected));
 		}
 
+		// TODO: Move this "break" functionality into JavaType?
 		final ITuple2G_<String, String> type = breakTypeName(record.getLanguageType(new Context(Context.Usage.Declaration)).getString());
+		// TODO: Automatically import types
+		// TODO: For imported types, render them with their simple names (ideally should handle wildcards too!)
 		final JavaType data = new JavaType(Data.class);
+		// TODO: @AllArgsConstructor, @NoArgsConstructor, @Accessors(chain = true)
 		final JavaClass javaClass = new JavaClass(null, JavaProtection.Public, type.get1(), members).setAnnotations(Arrays.asList(new JavaAnnotation(new JavaType("Data"))));
 		System.out.println(renderer.render(new JavaFile(new JavaPackageSpecifier(type.get0()), Arrays.asList(new JavaImport(data)), CollectionHelpers.asList(javaClass))));
 	}
