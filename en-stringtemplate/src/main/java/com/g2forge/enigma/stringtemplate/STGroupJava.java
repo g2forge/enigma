@@ -3,17 +3,24 @@ package com.g2forge.enigma.stringtemplate;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import org.antlr.runtime.ANTLRInputStream;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STAdvanced;
 import org.stringtemplate.v4.STAttributeGenerator;
+import org.stringtemplate.v4.STErrorListener;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.compiler.CompiledST;
+import org.stringtemplate.v4.misc.ErrorBuffer;
+import org.stringtemplate.v4.misc.ErrorManager;
+import org.stringtemplate.v4.misc.STMessage;
 
 import com.g2forge.alexandria.generic.type.java.structure.JavaScope;
 import com.g2forge.alexandria.java.associative.cache.Cache;
@@ -24,6 +31,8 @@ import com.g2forge.alexandria.reflection.object.ReflectionHelpers;
 import com.g2forge.alexandria.reflection.record.v2.IPropertyType;
 import com.g2forge.alexandria.reflection.record.v2.IRecordType;
 import com.g2forge.alexandria.reflection.record.v2.reflection.ReflectedRecordType;
+
+import lombok.Data;
 
 /**
  * @see #render(Object)
@@ -94,7 +103,45 @@ public class STGroupJava extends STGroup {
 		} catch (IOException exception) {
 			return null;
 		}
-		return loadTemplateFile("", fileName, fs);
+
+		final ErrorBuffer buffer = new ErrorBuffer();
+		final ErrorManager prior = this.errMgr;
+		try {
+			this.errMgr = new ErrorManager(new ProxySTErrorListener(Arrays.asList(buffer, prior.listener)));
+			return loadTemplateFile("", fileName, fs);
+		} finally {
+			this.errMgr = prior;
+			if (!buffer.errors.isEmpty()) throw new RuntimeException("One or more ST errors while loading the template \"" + name + "\"!");
+		}
+	}
+
+	@Data
+	protected static class ProxySTErrorListener implements STErrorListener {
+		protected final Collection<STErrorListener> delegates;
+
+		protected void proxy(BiConsumer<? super STErrorListener, ? super STMessage> method, final STMessage msg) {
+			delegates.forEach(delegate -> method.accept(delegate, msg));
+		}
+
+		@Override
+		public void compileTimeError(STMessage msg) {
+			proxy(STErrorListener::compileTimeError, msg);
+		}
+
+		@Override
+		public void runTimeError(STMessage msg) {
+			proxy(STErrorListener::runTimeError, msg);
+		}
+
+		@Override
+		public void IOError(STMessage msg) {
+			proxy(STErrorListener::IOError, msg);
+		}
+
+		@Override
+		public void internalError(STMessage msg) {
+			proxy(STErrorListener::internalError, msg);
+		}
 	}
 
 	public String render(Object object) {

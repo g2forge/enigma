@@ -1,4 +1,4 @@
-package com.g2forge.enigma.javagen.codegen2;
+package com.g2forge.enigma.javagen.core;
 
 public enum JavaModifier {
 	Final,
