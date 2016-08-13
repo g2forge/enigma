@@ -18,7 +18,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @Accessors(chain = true)
 public class JavaField implements IJavaMember, IJavaVariable {
-	protected static final String TEMPLATE = TEMPLATE_ANNOTATIONS + "<protection><type> <name>;";
+	protected static final String TEMPLATE = TEMPLATE_ANNOTATIONS + "<protection><modifiers:{modifier|<modifier> }><type> <name><if(initializer)> = <initializer><endif>;";
 
 	protected Collection<JavaAnnotation> annotations;
 
