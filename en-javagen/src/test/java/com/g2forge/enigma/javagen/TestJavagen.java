@@ -30,8 +30,8 @@ public class TestJavagen {
 	@Test
 	public void testClassFields() {
 		Assert.assertEquals("public class MyClass {}", renderString.render(new JavaClass(null, JavaProtection.Public, "MyClass", null)));
-		Assert.assertEquals("class MyClass {\n\t" + TestJavagen.class.getName() + " a;\n}", renderString.render(new JavaClass(null, JavaProtection.Unspecified, "MyClass", CollectionHelpers.asList(new JavaField(null, JavaProtection.Unspecified, new JavaType(TestJavagen.class), "a")))));
-		Assert.assertEquals("class MyClass {\n\tprotected String foo;\n\n\tprivate int bar;\n}", renderString.render(new JavaClass(null, JavaProtection.Unspecified, "MyClass", CollectionHelpers.asList(new JavaField(null, JavaProtection.Protected, new JavaType(String.class), "foo"), new JavaField(null, JavaProtection.Private, new JavaType(Integer.TYPE), "bar")))));
+		Assert.assertEquals("class MyClass {\n\t" + TestJavagen.class.getName() + " a;\n}", renderString.render(new JavaClass(null, JavaProtection.Unspecified, "MyClass", CollectionHelpers.asList(new JavaField(new JavaType(TestJavagen.class), "a")))));
+		Assert.assertEquals("class MyClass {\n\tprotected String foo;\n\n\tprivate int bar;\n}", renderString.render(new JavaClass(null, JavaProtection.Unspecified, "MyClass", CollectionHelpers.asList(new JavaField(null, JavaProtection.Protected, null, new JavaType(String.class), "foo", null), new JavaField(null, JavaProtection.Private, null, new JavaType(Integer.TYPE), "bar", null)))));
 	}
 
 	@Test
@@ -48,7 +48,7 @@ public class TestJavagen {
 	public void testMethod() {
 		final JavaType string = new JavaType(String.class);
 		final List<JavaAnnotation> annotations = CollectionHelpers.asList(new JavaAnnotation(string));
-		Assert.assertEquals("@String\nclass MyClass {\n\t@String\n\tpublic String toString(){}\n}", renderString.render(new JavaClass(annotations, JavaProtection.Unspecified, "MyClass", CollectionHelpers.asList(new JavaMethod(annotations, JavaProtection.Public, string, "toString", null)))));
+		Assert.assertEquals("@String\nclass MyClass {\n\t@String\n\tpublic String toString() {}\n}", renderString.render(new JavaClass(annotations, JavaProtection.Unspecified, "MyClass", CollectionHelpers.asList(new JavaMethod(annotations, JavaProtection.Public, string, "toString", null)))));
 	}
 
 	@Test

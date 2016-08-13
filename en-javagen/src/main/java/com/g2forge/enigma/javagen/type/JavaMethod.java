@@ -15,7 +15,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @Accessors(chain = true)
 public class JavaMethod implements IJavaMember {
-	protected static final String TEMPLATE = TEMPLATE_ANNOTATIONS + "<protection><type> <name>(){<if(statements)>\n\t<statements;separator=\"\\n\">\n<endif>}";
+	protected static final String TEMPLATE = TEMPLATE_ANNOTATIONS + "<protection><type> <name>() {<if(statements)>\n\t<statements;separator=\"\\n\">\n<endif>}";
 
 	protected Collection<JavaAnnotation> annotations;
 

@@ -3,7 +3,7 @@ package com.g2forge.enigma.javagen.statement;
 import java.util.Collection;
 import java.util.Set;
 
-import com.g2forge.enigma.javagen.core.IJavaAnnotated;
+import com.g2forge.enigma.javagen.core.IJavaVariable;
 import com.g2forge.enigma.javagen.core.JavaAnnotation;
 import com.g2forge.enigma.javagen.core.JavaModifier;
 import com.g2forge.enigma.javagen.expression.IJavaExpression;
@@ -18,7 +18,7 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class JavaVariable implements IJavaAnnotated, IJavaStatement {
+public class JavaVariable implements IJavaVariable {
 	protected static final String TEMPLATE = TEMPLATE_ANNOTATIONS + "<modifiers:{modifier|<modifier> }><type> <name><if(initializer)> = <initializer><endif>;";
 
 	protected Collection<JavaAnnotation> annotations;

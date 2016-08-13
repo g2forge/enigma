@@ -1,8 +1,12 @@
 package com.g2forge.enigma.javagen.type;
 
 import java.util.Collection;
+import java.util.Set;
 
+import com.g2forge.enigma.javagen.core.IJavaVariable;
 import com.g2forge.enigma.javagen.core.JavaAnnotation;
+import com.g2forge.enigma.javagen.core.JavaModifier;
+import com.g2forge.enigma.javagen.expression.IJavaExpression;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,14 +17,22 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class JavaField implements IJavaMember {
+public class JavaField implements IJavaMember, IJavaVariable {
 	protected static final String TEMPLATE = TEMPLATE_ANNOTATIONS + "<protection><type> <name>;";
 
 	protected Collection<JavaAnnotation> annotations;
 
 	protected JavaProtection protection;
 
+	protected Set<JavaModifier> modifiers;
+
 	protected JavaType type;
 
 	protected String name;
+
+	protected IJavaExpression initializer;
+
+	public JavaField(JavaType type, String name) {
+		this(null, JavaProtection.Unspecified, null, type, name, null);
+	}
 }

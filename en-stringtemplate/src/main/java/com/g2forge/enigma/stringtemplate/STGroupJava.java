@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.antlr.runtime.ANTLRInputStream;
@@ -23,14 +24,11 @@ import org.stringtemplate.v4.misc.ErrorManager;
 import org.stringtemplate.v4.misc.STMessage;
 
 import com.g2forge.alexandria.generic.type.java.structure.JavaScope;
-import com.g2forge.alexandria.java.associative.cache.Cache;
-import com.g2forge.alexandria.java.associative.cache.LRUCacheEvictionPolicy;
 import com.g2forge.alexandria.java.core.helpers.StreamHelpers;
 import com.g2forge.alexandria.reflection.object.IJavaFieldReflection;
 import com.g2forge.alexandria.reflection.object.ReflectionHelpers;
 import com.g2forge.alexandria.reflection.record.v2.IPropertyType;
 import com.g2forge.alexandria.reflection.record.v2.IRecordType;
-import com.g2forge.alexandria.reflection.record.v2.reflection.ReflectedRecordType;
 
 import lombok.Data;
 
@@ -38,17 +36,47 @@ import lombok.Data;
  * @see #render(Object)
  */
 public class STGroupJava extends STGroup {
+	@Data
+	protected static class ProxySTErrorListener implements STErrorListener {
+		protected final Collection<STErrorListener> delegates;
+
+		@Override
+		public void compileTimeError(STMessage msg) {
+			proxy(STErrorListener::compileTimeError, msg);
+		}
+
+		@Override
+		public void internalError(STMessage msg) {
+			proxy(STErrorListener::internalError, msg);
+		}
+
+		@Override
+		public void IOError(STMessage msg) {
+			proxy(STErrorListener::IOError, msg);
+		}
+
+		protected void proxy(BiConsumer<? super STErrorListener, ? super STMessage> method, final STMessage msg) {
+			delegates.forEach(delegate -> method.accept(delegate, msg));
+		}
+
+		@Override
+		public void runTimeError(STMessage msg) {
+			proxy(STErrorListener::runTimeError, msg);
+		}
+	}
+
 	protected final Map<String, Class<?>> types = new HashMap<>();
 
 	protected final String lineSeparator;
 
-	protected final Cache<Class<?>, IRecordType> recordCache = new Cache<>(ReflectedRecordType::new, new LRUCacheEvictionPolicy<>(30));
+	protected final Function<? super Class<?>, ? extends IRecordType> recordFunction;
 
-	public STGroupJava(String encoding, char delimiterStartChar, char delimiterStopChar, String lineSeparator) {
+	public STGroupJava(String encoding, char delimiterStartChar, char delimiterStopChar, String lineSeparator, Function<? super Class<?>, ? extends IRecordType> recordFunction) {
 		super(delimiterStartChar, delimiterStopChar);
 		this.encoding = encoding;
 		this.registerRenderer(Object.class, new JavaStringRenderer(this));
 		this.lineSeparator = lineSeparator;
+		this.recordFunction = recordFunction;
 	}
 
 	public ST createStringTemplate(CompiledST impl) {
@@ -85,7 +113,7 @@ public class STGroupJava extends STGroup {
 		if ((template == null) || !template.isPresent()) stream = type.getResourceAsStream(fileName);
 		else {
 			try {
-				final String arguments = recordCache.apply(type).getProperties().stream().map(IPropertyType::getName).collect(Collectors.joining(", "));
+				final String arguments = recordFunction.apply(type).getProperties().stream().map(IPropertyType::getName).collect(Collectors.joining(", "));
 				final IJavaFieldReflection<?, ?> field = template.get();
 				final String string = field.getAccessor(null).get0().toString();
 				final String complete = name + "(" + arguments + ") ::= <<\n" + string + "\n>>";
@@ -115,40 +143,11 @@ public class STGroupJava extends STGroup {
 		}
 	}
 
-	@Data
-	protected static class ProxySTErrorListener implements STErrorListener {
-		protected final Collection<STErrorListener> delegates;
-
-		protected void proxy(BiConsumer<? super STErrorListener, ? super STMessage> method, final STMessage msg) {
-			delegates.forEach(delegate -> method.accept(delegate, msg));
-		}
-
-		@Override
-		public void compileTimeError(STMessage msg) {
-			proxy(STErrorListener::compileTimeError, msg);
-		}
-
-		@Override
-		public void runTimeError(STMessage msg) {
-			proxy(STErrorListener::runTimeError, msg);
-		}
-
-		@Override
-		public void IOError(STMessage msg) {
-			proxy(STErrorListener::IOError, msg);
-		}
-
-		@Override
-		public void internalError(STMessage msg) {
-			proxy(STErrorListener::internalError, msg);
-		}
-	}
-
 	public String render(Object object) {
 		final Class<? extends Object> type = object.getClass();
 		final ST retVal = getInstanceOf(type);
 		if (retVal == null) throw new NoTemplateException("Template could not be found in either a file or field for " + type);
-		recordCache.apply(type).getProperties().forEach(property -> retVal.add(property.getName(), (STAttributeGenerator) () -> property.getValue(object)));
+		recordFunction.apply(type).getProperties().forEach(property -> retVal.add(property.getName(), (STAttributeGenerator) () -> property.getValue(object)));
 		return retVal.render();
 	}
 }
