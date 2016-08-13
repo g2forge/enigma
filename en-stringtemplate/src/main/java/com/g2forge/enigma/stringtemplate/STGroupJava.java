@@ -88,7 +88,7 @@ public class STGroupJava extends STGroup {
 		final String name = getTemplateName(type);
 
 		final Class<?> prior = types.get(name);
-		if (prior == null) types.put(type.getSimpleName(), type);
+		if (prior == null) types.put("/" + type.getSimpleName(), type);
 		else if (!prior.equals(type)) throw new Error("Cannot process two classes with the same simple name");
 
 		return this.getInstanceOf(type.getSimpleName());
@@ -105,10 +105,10 @@ public class STGroupJava extends STGroup {
 	@Override
 	protected CompiledST load(String name) {
 		final Class<?> type = getTemplateType(name);
-		final String fileName = type.getSimpleName() + ".st";
+		if (type == null) throw new NullPointerException("Failed to load template \"" + name + "\", there was an internal error!");
+		final String fileName = type.getSimpleName() + ".st", templateName = type.getSimpleName();
 
 		final InputStream stream;
-
 		final Optional<IJavaFieldReflection<?, ?>> template = ReflectionHelpers.toReflection(type).getFields(JavaScope.Static, null).filter(field -> "TEMPLATE".equals(field.getType().getName())).collect(StreamHelpers.toOptional());
 		if ((template == null) || !template.isPresent()) stream = type.getResourceAsStream(fileName);
 		else {
@@ -116,7 +116,7 @@ public class STGroupJava extends STGroup {
 				final String arguments = recordFunction.apply(type).getProperties().stream().map(IPropertyType::getName).collect(Collectors.joining(", "));
 				final IJavaFieldReflection<?, ?> field = template.get();
 				final String string = field.getAccessor(null).get0().toString();
-				final String complete = name + "(" + arguments + ") ::= <<\n" + string + "\n>>";
+				final String complete = templateName + "(" + arguments + ") ::= <<\n" + string + "\n>>";
 				stream = new ByteArrayInputStream(complete.getBytes(encoding));
 			} catch (Throwable throwable) {
 				return null;
@@ -136,10 +136,10 @@ public class STGroupJava extends STGroup {
 		final ErrorManager prior = this.errMgr;
 		try {
 			this.errMgr = new ErrorManager(new ProxySTErrorListener(Arrays.asList(buffer, prior.listener)));
-			return loadTemplateFile("", fileName, fs);
+			return loadTemplateFile("/", fileName, fs);
 		} finally {
 			this.errMgr = prior;
-			if (!buffer.errors.isEmpty()) throw new RuntimeException("One or more ST errors while loading the template \"" + name + "\"!");
+			if (!buffer.errors.isEmpty()) { throw new RuntimeException("One or more ST errors while loading the template \"" + templateName + "\"!"); }
 		}
 	}
 

@@ -54,10 +54,12 @@ public class STAdvanced extends ST {
 	}
 
 	public int write(STWriter out, Locale locale) {
-		return createInterpreter(locale, impl.nativeGroup.errMgr).exec(out, this);
+		final InstanceScope scope = new InstanceScope(null, this);
+		return createInterpreter(locale, impl.nativeGroup.errMgr).exec(out, scope);
 	}
 
 	public int write(STWriter out, Locale locale, STErrorListener listener) {
-		return createInterpreter(locale, new ErrorManager(listener)).exec(out, this);
+		final InstanceScope scope = new InstanceScope(null, this);
+		return createInterpreter(locale, new ErrorManager(listener)).exec(out, scope);
 	}
 }

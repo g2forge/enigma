@@ -14,7 +14,7 @@
 	</parent>
 
 	<properties>
-		<stringtemplate.version>4.0.2</stringtemplate.version>
+		<stringtemplate.version>4.0.8</stringtemplate.version>
 		
 		<enigma.version>0.0.1-SNAPSHOT</enigma.version>
 	</properties>
