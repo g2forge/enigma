@@ -15,7 +15,8 @@
 
 	<properties>
 		<stringtemplate.version>4.0.8</stringtemplate.version>
-		
+		<antlr.version>4.5.3</antlr.version>
+
 		<enigma.version>0.0.1-SNAPSHOT</enigma.version>
 		
 		<enigma.organization>g2forge</enigma.organization>

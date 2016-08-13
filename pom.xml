@@ -16,5 +16,6 @@
 		<module>en-project</module>
 		<module>en-stringtemplate</module>
 		<module>en-javagen</module>
+		<module>en-record</module>
 	</modules>
 </project>
