@@ -7,7 +7,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.g2forge.alexandria.java.core.helpers.CollectionHelpers;
-import com.g2forge.alexandria.test.ResourceHelpers;
+import com.g2forge.alexandria.java.core.helpers.ResourceHelpers;
 import com.g2forge.enigma.javagen.core.JavaAnnotation;
 import com.g2forge.enigma.javagen.core.JavaModifier;
 import com.g2forge.enigma.javagen.core.JavaPackageSpecifier;
