@@ -17,6 +17,8 @@ import lombok.experimental.Accessors;
 public class JavaMethod implements IJavaMember {
 	protected static final String TEMPLATE = TEMPLATE_ANNOTATIONS + "<protection><type> <name>() {<if(statements)>\n\t<statements;separator=\"\\n\">\n<endif>}";
 
+	public static final JavaMethod STANDARD = new JavaMethod(null, JavaProtection.Public, null, null, null);
+
 	protected Collection<JavaAnnotation> annotations;
 
 	protected JavaProtection protection;
@@ -27,7 +29,11 @@ public class JavaMethod implements IJavaMember {
 
 	protected Collection<IJavaStatement> statements;
 
+	public JavaMethod(JavaMethod base, JavaType type, String name) {
+		this(base.getAnnotations(), base.getProtection(), type, name, base.getStatements());
+	}
+
 	public JavaMethod(JavaType type, String name) {
-		this(null, JavaProtection.Public, type, name, null);
+		this(STANDARD, type, name);
 	}
 }

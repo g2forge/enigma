@@ -27,15 +27,17 @@ public class TestJavagen {
 
 	@Test
 	public void testClassFields() {
+		final JavaClass base = new JavaClass(null, JavaProtection.Unspecified, null, null);
+
 		Assert.assertEquals("public class MyClass {}", renderString.render(new JavaClass("MyClass")));
-		Assert.assertEquals("class MyClass {\n\t" + TestJavagen.class.getName() + " a;\n}", renderString.render(new JavaClass(null, JavaProtection.Unspecified, "MyClass", CollectionHelpers.asList(new JavaField(new JavaType(TestJavagen.class), "a")))));
-		Assert.assertEquals("class MyClass {\n\tprotected String foo;\n\n\tprivate int bar;\n}", renderString.render(new JavaClass(null, JavaProtection.Unspecified, "MyClass", CollectionHelpers.asList(new JavaField(null, JavaProtection.Protected, null, new JavaType(String.class), "foo", null), new JavaField(null, JavaProtection.Private, null, new JavaType(Integer.TYPE), "bar", null)))));
+		Assert.assertEquals("class MyClass {\n\t" + TestJavagen.class.getName() + " a;\n}", renderString.render(new JavaClass(base, "MyClass").setMembers(CollectionHelpers.asList(new JavaField(new JavaType(TestJavagen.class), "a")))));
+		Assert.assertEquals("class MyClass {\n\tprotected String foo;\n\n\tprivate int bar;\n}", renderString.render(new JavaClass(base, "MyClass").setMembers(CollectionHelpers.asList(new JavaField(null, JavaProtection.Protected, null, new JavaType(String.class), "foo", null), new JavaField(null, JavaProtection.Private, null, new JavaType(Integer.TYPE), "bar", null)))));
 	}
 
 	@Test
 	public void testFile() {
 		final JavaType string = new JavaType(String.class);
-		final JavaMethod method = new JavaMethod(string, "toString").setStatements(CollectionHelpers.asList(new JavaVariable(string, "retVal").setAnnotations(CollectionHelpers.asList(new JavaAnnotation(string)))));
+		final JavaMethod method = new JavaMethod(string, "toString").setStatements(CollectionHelpers.asList(new JavaVariable(JavaVariable.STANDARD, string, "retVal").setAnnotations(CollectionHelpers.asList(new JavaAnnotation(string)))));
 		final String actual = renderFile.render(new JavaFile(new JavaPackageSpecifier("foo"), CollectionHelpers.asList(new JavaImport(new JavaType("foo.Other"))), CollectionHelpers.asList(new JavaClass(null, JavaProtection.Unspecified, "Test", CollectionHelpers.asList(method)))));
 
 		final String expected = ResourceHelpers.read(getClass(), "Test.java.txt");

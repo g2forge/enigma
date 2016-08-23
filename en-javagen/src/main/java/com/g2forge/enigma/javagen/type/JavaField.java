@@ -20,6 +20,8 @@ import lombok.experimental.Accessors;
 public class JavaField implements IJavaMember, IJavaVariable {
 	protected static final String TEMPLATE = TEMPLATE_ANNOTATIONS + "<protection><modifiers:{modifier|<modifier> }><type> <name><if(initializer)> = <initializer><endif>;";
 
+	public static final JavaField STANDARD = new JavaField(null, JavaProtection.Unspecified, null, null, null, null);
+
 	protected Collection<JavaAnnotation> annotations;
 
 	protected JavaProtection protection;
@@ -33,6 +35,10 @@ public class JavaField implements IJavaMember, IJavaVariable {
 	protected IJavaExpression initializer;
 
 	public JavaField(JavaType type, String name) {
-		this(null, JavaProtection.Unspecified, null, type, name, null);
+		this(STANDARD, type, name);
+	}
+
+	public JavaField(JavaField base, JavaType type, String name) {
+		this(base.getAnnotations(), base.getProtection(), base.getModifiers(), type, name, base.getInitializer());
 	}
 }

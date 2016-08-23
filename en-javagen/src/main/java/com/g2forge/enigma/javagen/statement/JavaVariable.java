@@ -1,6 +1,7 @@
 package com.g2forge.enigma.javagen.statement;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -22,6 +23,8 @@ import lombok.experimental.Accessors;
 public class JavaVariable implements IJavaVariable {
 	protected static final String TEMPLATE = TEMPLATE_ANNOTATIONS + "<modifiers:{modifier|<modifier> }><type> <name><if(initializer)> = <initializer><endif>;";
 
+	public static final JavaVariable STANDARD = new JavaVariable(null, Collections.unmodifiableSet(EnumSet.of(JavaModifier.Final)), null, null, null);
+
 	protected Collection<JavaAnnotation> annotations;
 
 	protected Set<JavaModifier> modifiers;
@@ -32,7 +35,11 @@ public class JavaVariable implements IJavaVariable {
 
 	protected IJavaExpression initializer;
 
+	public JavaVariable(JavaVariable base, JavaType type, String name) {
+		this(base.getAnnotations(), base.getModifiers(), type, name, base.getInitializer());
+	}
+
 	public JavaVariable(JavaType type, String name) {
-		this(null, EnumSet.of(JavaModifier.Final), type, name, null);
+		this(STANDARD, type, name);
 	}
 }

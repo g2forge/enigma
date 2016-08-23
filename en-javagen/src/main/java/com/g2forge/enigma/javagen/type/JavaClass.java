@@ -16,6 +16,8 @@ import lombok.experimental.Accessors;
 public class JavaClass implements IJavaTypeDeclaration {
 	protected static final String TEMPLATE = TEMPLATE_ANNOTATIONS + "<protection>class <name> {<if(members)>\n\t<members;separator=\"\\n\\n\">\n<endif>}";
 
+	public static final JavaClass STANDARD = new JavaClass(null, JavaProtection.Public, null, null);
+
 	protected Collection<JavaAnnotation> annotations;
 
 	protected JavaProtection protection;
@@ -25,6 +27,10 @@ public class JavaClass implements IJavaTypeDeclaration {
 	protected Collection<IJavaMember> members;
 
 	public JavaClass(String name) {
-		this(null, JavaProtection.Public, name, null);
+		this(STANDARD, name);
+	}
+
+	public JavaClass(JavaClass base, String name) {
+		this(base.getAnnotations(), base.getProtection(), name, base.getMembers());
 	}
 }
