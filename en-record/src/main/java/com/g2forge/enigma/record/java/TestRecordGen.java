@@ -13,7 +13,7 @@ import com.g2forge.enigma.javagen.core.JavaPackageSpecifier;
 import com.g2forge.enigma.javagen.file.JavaFile;
 import com.g2forge.enigma.javagen.file.JavaImport;
 import com.g2forge.enigma.javagen.type.IJavaMember;
-import com.g2forge.enigma.javagen.type.JavaClass;
+import com.g2forge.enigma.javagen.type.JavaTypeDeclaration;
 import com.g2forge.enigma.javagen.type.JavaField;
 import com.g2forge.enigma.javagen.type.JavaProtection;
 import com.g2forge.enigma.javagen.type.JavaType;
@@ -84,7 +84,7 @@ public class TestRecordGen {
 		// TODO: For imported types, render them with their simple names (ideally should handle wildcards too!)
 		final JavaType data = new JavaType(Data.class);
 		// TODO: @AllArgsConstructor, @NoArgsConstructor, @Accessors(chain = true)
-		final JavaClass javaClass = new JavaClass(null, JavaProtection.Public, type.get1(), members).setAnnotations(Arrays.asList(new JavaAnnotation(new JavaType("Data"))));
+		final JavaTypeDeclaration javaClass = new JavaTypeDeclaration(type.get1()).setMembers(members).setAnnotations(Arrays.asList(new JavaAnnotation(new JavaType("Data"))));
 		System.out.println(renderer.render(new JavaFile(new JavaPackageSpecifier(type.get0()), Arrays.asList(new JavaImport(data)), CollectionHelpers.asList(javaClass))));
 	}
 }
