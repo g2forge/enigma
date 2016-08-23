@@ -26,4 +26,8 @@ public class JavaMethod implements IJavaMember {
 	protected String name;
 
 	protected Collection<IJavaStatement> statements;
+
+	public JavaMethod(JavaType type, String name) {
+		this(null, JavaProtection.Public, type, name, null);
+	}
 }

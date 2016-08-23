@@ -1,6 +1,7 @@
 package com.g2forge.enigma.javagen.statement;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.Set;
 
 import com.g2forge.enigma.javagen.core.IJavaVariable;
@@ -32,6 +33,6 @@ public class JavaVariable implements IJavaVariable {
 	protected IJavaExpression initializer;
 
 	public JavaVariable(JavaType type, String name) {
-		this(null, null, type, name, null);
+		this(null, EnumSet.of(JavaModifier.Final), type, name, null);
 	}
 }

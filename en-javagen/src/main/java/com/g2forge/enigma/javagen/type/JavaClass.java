@@ -23,4 +23,8 @@ public class JavaClass implements IJavaTypeDeclaration {
 	protected String name;
 
 	protected Collection<IJavaMember> members;
+
+	public JavaClass(String name) {
+		this(null, JavaProtection.Public, name, null);
+	}
 }
