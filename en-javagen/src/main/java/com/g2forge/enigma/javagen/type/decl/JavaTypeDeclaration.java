@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.g2forge.enigma.javagen.core.JavaAnnotation;
 import com.g2forge.enigma.javagen.core.JavaModifier;
+import com.g2forge.enigma.javagen.type.expression.JavaType;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
