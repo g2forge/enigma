@@ -7,7 +7,7 @@ import java.util.Collection;
 import com.g2forge.alexandria.java.core.helpers.CollectionHelpers;
 import com.g2forge.alexandria.java.core.helpers.StringHelpers;
 import com.g2forge.alexandria.java.tuple.ITuple2G_;
-import com.g2forge.alexandria.java.tuple.Tuple2G_;
+import com.g2forge.alexandria.java.tuple.implementations.Tuple2G_O;
 import com.g2forge.enigma.javagen.core.JavaAnnotation;
 import com.g2forge.enigma.javagen.core.JavaPackageSpecifier;
 import com.g2forge.enigma.javagen.file.JavaFile;
@@ -63,8 +63,8 @@ public class TestRecordGen {
 
 	public static ITuple2G_<String, String> breakTypeName(String string) {
 		final int lastDot = string.lastIndexOf('.');
-		if (lastDot >= 0) return new Tuple2G_<>(string.substring(0, lastDot), string.substring(lastDot + 1));
-		return new Tuple2G_<>(null, string);
+		if (lastDot >= 0) return new Tuple2G_O<>(string.substring(0, lastDot), string.substring(lastDot + 1));
+		return new Tuple2G_O<>(null, string);
 	}
 
 	public static void main(String[] args) {
