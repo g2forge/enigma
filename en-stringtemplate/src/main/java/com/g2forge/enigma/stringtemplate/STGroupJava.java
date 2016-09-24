@@ -24,7 +24,7 @@ import org.stringtemplate.v4.misc.ErrorManager;
 import org.stringtemplate.v4.misc.STMessage;
 
 import com.g2forge.alexandria.generic.type.java.structure.JavaScope;
-import com.g2forge.alexandria.java.core.helpers.HStream;
+import com.g2forge.alexandria.java.core.helpers.HCollector;
 import com.g2forge.alexandria.reflection.object.IJavaFieldReflection;
 import com.g2forge.alexandria.reflection.object.HReflection;
 import com.g2forge.alexandria.reflection.record.v2.IPropertyType;
@@ -112,7 +112,7 @@ public class STGroupJava extends STGroup {
 		final String fileName = type.getSimpleName() + ".st", templateName = type.getSimpleName();
 
 		final InputStream stream;
-		final Optional<IJavaFieldReflection<?, ?>> template = HReflection.toReflection(type).getFields(JavaScope.Static, null).filter(field -> "TEMPLATE".equals(field.getType().getName())).collect(HStream.toOptional());
+		final Optional<IJavaFieldReflection<?, ?>> template = HReflection.toReflection(type).getFields(JavaScope.Static, null).filter(field -> "TEMPLATE".equals(field.getType().getName())).collect(HCollector.toOptional());
 		if ((template == null) || !template.isPresent()) stream = type.getResourceAsStream(fileName);
 		else {
 			try {
