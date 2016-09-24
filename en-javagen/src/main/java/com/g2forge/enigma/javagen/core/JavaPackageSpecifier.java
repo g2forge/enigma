@@ -2,7 +2,7 @@ package com.g2forge.enigma.javagen.core;
 
 import java.util.Collection;
 
-import com.g2forge.alexandria.java.core.helpers.CollectionHelpers;
+import com.g2forge.alexandria.java.core.helpers.HCollection;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,6 +19,6 @@ public class JavaPackageSpecifier {
 	protected Collection<String> name;
 
 	public JavaPackageSpecifier(String... name) {
-		this(CollectionHelpers.asList(name));
+		this(HCollection.asList(name));
 	}
 }
