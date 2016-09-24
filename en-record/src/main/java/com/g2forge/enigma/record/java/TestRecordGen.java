@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-import com.g2forge.alexandria.java.core.helpers.CollectionHelpers;
-import com.g2forge.alexandria.java.core.helpers.StringHelpers;
+import com.g2forge.alexandria.java.core.helpers.HCollection;
+import com.g2forge.alexandria.java.core.helpers.HString;
 import com.g2forge.alexandria.java.tuple.ITuple2G_;
 import com.g2forge.alexandria.java.tuple.implementations.Tuple2G_O;
 import com.g2forge.enigma.javagen.core.JavaAnnotation;
@@ -41,7 +41,7 @@ public class TestRecordGen {
 			switch (context.getUsage()) {
 				case Field:
 				case Argument:
-					return StringHelpers.lowercase(getName());
+					return HString.lowercase(getName());
 				case Return:
 					return "retVal";
 				default:
@@ -85,6 +85,6 @@ public class TestRecordGen {
 		final JavaType data = new JavaType(Data.class);
 		// TODO: @AllArgsConstructor, @NoArgsConstructor, @Accessors(chain = true)
 		final JavaTypeDeclaration javaClass = new JavaTypeDeclaration(type.get1()).setMembers(members).setAnnotations(Arrays.asList(new JavaAnnotation(new JavaType("Data"))));
-		System.out.println(renderer.render(new JavaFile(new JavaPackageSpecifier(type.get0()), Arrays.asList(new JavaImport(data)), CollectionHelpers.asList(javaClass))));
+		System.out.println(renderer.render(new JavaFile(new JavaPackageSpecifier(type.get0()), Arrays.asList(new JavaImport(data)), HCollection.asList(javaClass))));
 	}
 }
