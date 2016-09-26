@@ -68,7 +68,7 @@ public class TestJavagen extends ATestJavagen {
 	public void testMethod() {
 		final JavaType string = new JavaType(String.class);
 		final List<JavaAnnotation> annotations = HCollection.asList(new JavaAnnotation(string));
-		Assert.assertEquals("@String\nclass MyClass {\n\t@String\n\tpublic String toString() {}\n}", renderString.render(new JavaTypeDeclaration(annotations, JavaProtection.Unspecified, null, JavaMetaType.Class, "MyClass", null, null, null, HCollection.asList(new JavaMethod(string, "toString").setAnnotations(annotations).setStatements(HCollection.getEmpty())))));
+		Assert.assertEquals("@String\nclass MyClass {\n\t@String\n\tpublic String toString() {}\n}", renderString.render(new JavaTypeDeclaration(annotations, JavaProtection.Unspecified, null, JavaMetaType.Class, "MyClass", null, null, null, HCollection.asList(new JavaMethod(string, "toString").setAnnotations(annotations).setStatements(HCollection.emptyList())))));
 		Assert.assertEquals("interface MyInterface {\n\tpublic String toString();\n}", renderString.render(new JavaTypeDeclaration(null, JavaProtection.Unspecified, null, JavaMetaType.Interface, "MyInterface", null, null, null, HCollection.asList(new JavaMethod(string, "toString")))));
 	}
 
