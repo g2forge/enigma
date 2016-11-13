@@ -17,7 +17,34 @@
 		<stringtemplate.version>4.0.8</stringtemplate.version>
 		
 		<enigma.version>0.0.1-SNAPSHOT</enigma.version>
+		
+		<enigma.organization>g2forge</enigma.organization>
+		<enigma.name>Enigma</enigma.name>
+		<enigma.repository>enigma</enigma.repository>
 	</properties>
+
+	<name>${enigma.name} Project</name>
+	<description>Parent project for ${enigma.name}.</description>
+	<url>https://github.com/${enigma.organization}/${enigma.repository}/tree/${project.version}/${project.artifactId}</url>
+	<developers>
+		<developer>
+			<name>Greg Gibeling</name>
+			<email>gdgib@outlook.com</email>
+			<organization>G2Forge</organization>
+			<organizationUrl>http://www.g2forge.com</organizationUrl>
+		</developer>
+	</developers>
+	<licenses>
+		<license>
+			<name>The Apache License, Version 2.0</name>
+			<url>https://github.com/${enigma.organization}/${enigma.repository}/blob/${project.version}/LICENSE</url>
+		</license>
+	</licenses>
+	<scm>
+		<connection>scm:git:git://github.com/${enigma.organization}/${enigma.repository}.git</connection>
+		<developerConnection>scm:git:ssh://github.com:${enigma.organization}/${enigma.repository}.git</developerConnection>
+		<url>http://github.com/${enigma.organization}/${enigma.repository}/tree/${project.version}</url>
+	</scm>
 
 	<dependencies>
 		<dependency>
