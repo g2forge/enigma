@@ -7,10 +7,10 @@ import com.g2forge.alexandria.java.associative.cache.LRUCacheEvictionPolicy;
 import com.g2forge.alexandria.reflection.record.v2.reflection.ReflectedRecordType;
 
 public class EmbeddedTemplateRenderer {
-	protected final static EmbeddedTemplateRenderer singleton = new EmbeddedTemplateRenderer(System.lineSeparator());
+	protected final static EmbeddedTemplateRenderer DEFAULT = new EmbeddedTemplateRenderer(System.lineSeparator());
 
 	public static String toString(Object object) {
-		return singleton.render(object);
+		return DEFAULT.render(object);
 	}
 
 	protected final STGroupJava group;
