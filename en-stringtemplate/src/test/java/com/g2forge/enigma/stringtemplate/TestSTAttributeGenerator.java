@@ -28,7 +28,7 @@ public class TestSTAttributeGenerator {
 
 	@Test
 	public void call() {
-		final EmbeddedTemplateRenderer renderer = new EmbeddedTemplateRenderer();
+		final EmbeddedTemplateRenderer renderer = EmbeddedTemplateRenderer.DEFAULT;
 		final Template template = new Template(true, false, "foo");
 		Assert.assertEquals("foo", renderer.render(template));
 		Assert.assertTrue(template.isCalled());
@@ -36,7 +36,7 @@ public class TestSTAttributeGenerator {
 
 	@Test
 	public void skip() {
-		final EmbeddedTemplateRenderer renderer = new EmbeddedTemplateRenderer();
+		final EmbeddedTemplateRenderer renderer = EmbeddedTemplateRenderer.DEFAULT;
 		final Template template = new Template(false, false, "foo");
 		Assert.assertEquals("", renderer.render(template));
 		Assert.assertFalse(template.isCalled());

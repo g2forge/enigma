@@ -7,7 +7,9 @@ import com.g2forge.alexandria.java.associative.cache.LRUCacheEvictionPolicy;
 import com.g2forge.alexandria.reflection.record.v2.reflection.ReflectedRecordType;
 
 public class EmbeddedTemplateRenderer {
-	protected final static EmbeddedTemplateRenderer DEFAULT = new EmbeddedTemplateRenderer(System.lineSeparator());
+	public final static EmbeddedTemplateRenderer DEFAULT = new EmbeddedTemplateRenderer();
+
+	public final static EmbeddedTemplateRenderer STRING = new EmbeddedTemplateRenderer("\n");
 
 	public static String toString(Object object) {
 		return DEFAULT.render(object);
@@ -16,7 +18,7 @@ public class EmbeddedTemplateRenderer {
 	protected final STGroupJava group;
 
 	public EmbeddedTemplateRenderer() {
-		this(System.getProperty("line.separator"));
+		this(System.lineSeparator());
 	}
 
 	protected EmbeddedTemplateRenderer(char delimiterStartChar, char delimiterStopChar, String lineSeparator, Function<? super Object, ? extends Object> adapter) {

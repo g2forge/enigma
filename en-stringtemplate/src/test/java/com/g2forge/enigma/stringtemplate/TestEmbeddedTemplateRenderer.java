@@ -25,7 +25,6 @@ public class TestEmbeddedTemplateRenderer {
 
 	@Test
 	public void test() {
-		final EmbeddedTemplateRenderer renderer = new EmbeddedTemplateRenderer();
-		Assert.assertEquals("foobar1juanhello", renderer.render(new Template("1", "juan")));
+		Assert.assertEquals("foobar1juanhello", EmbeddedTemplateRenderer.DEFAULT.render(new Template("1", "juan")));
 	}
 }
