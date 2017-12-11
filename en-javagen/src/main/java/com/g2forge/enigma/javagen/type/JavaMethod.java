@@ -17,7 +17,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @Accessors(chain = true)
 public class JavaMethod implements IJavaMember {
-	protected static final String TEMPLATE = TEMPLATE_ANNOTATIONS + "<protection>" + TEMPLATE_MODIFIERS + "<type> <name>() {<if(statements)>\n\t<statements;separator=\"\\n\">\n<endif>}";
+	protected static final String TEMPLATE = TEMPLATE_ANNOTATIONS + "<protection>" + TEMPLATE_MODIFIERS + "<type> <name>()<if(body)> {<if(statements)>\n\t<statements;separator=\"\\n\">\n<endif>}<else>;<endif>";
 
 	public static final JavaMethod STANDARD = new JavaMethod(null, JavaProtection.Public, null, null, null, null);
 
@@ -39,5 +39,9 @@ public class JavaMethod implements IJavaMember {
 
 	public JavaMethod(JavaType type, String name) {
 		this(STANDARD, type, name);
+	}
+	
+	protected boolean isBody() {
+		return getStatements() != null;
 	}
 }
