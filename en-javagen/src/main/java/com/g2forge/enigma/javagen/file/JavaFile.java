@@ -3,7 +3,7 @@ package com.g2forge.enigma.javagen.file;
 import java.util.Collection;
 
 import com.g2forge.enigma.javagen.core.JavaPackageSpecifier;
-import com.g2forge.enigma.javagen.type.IJavaTypeDeclaration;
+import com.g2forge.enigma.javagen.type.decl.IJavaTypeDeclaration;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

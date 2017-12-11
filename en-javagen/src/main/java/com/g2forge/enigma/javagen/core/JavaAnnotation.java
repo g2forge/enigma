@@ -1,6 +1,6 @@
 package com.g2forge.enigma.javagen.core;
 
-import com.g2forge.enigma.javagen.type.JavaType;
+import com.g2forge.enigma.javagen.type.expression.JavaType;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

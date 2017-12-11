@@ -1,4 +1,4 @@
-package com.g2forge.enigma.javagen.type;
+package com.g2forge.enigma.javagen.type.decl;
 
 import com.g2forge.enigma.javagen.core.IJavaAnnotated;
 import com.g2forge.enigma.javagen.core.IJavaModified;

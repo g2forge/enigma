@@ -1,4 +1,4 @@
-package com.g2forge.enigma.javagen.statement;
+package com.g2forge.enigma.javagen.imperative.statement;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -8,8 +8,8 @@ import java.util.Set;
 import com.g2forge.enigma.javagen.core.IJavaVariable;
 import com.g2forge.enigma.javagen.core.JavaAnnotation;
 import com.g2forge.enigma.javagen.core.JavaModifier;
-import com.g2forge.enigma.javagen.expression.IJavaExpression;
-import com.g2forge.enigma.javagen.type.JavaType;
+import com.g2forge.enigma.javagen.imperative.expression.IJavaExpression;
+import com.g2forge.enigma.javagen.type.expression.JavaType;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.g2forge.enigma.javagen.type;
+package com.g2forge.enigma.javagen.type.decl;
 
 public enum JavaMetaType {
 	Class,

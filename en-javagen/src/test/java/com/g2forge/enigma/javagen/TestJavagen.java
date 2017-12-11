@@ -11,17 +11,17 @@ import com.g2forge.alexandria.java.core.helpers.ResourceHelpers;
 import com.g2forge.enigma.javagen.core.JavaAnnotation;
 import com.g2forge.enigma.javagen.core.JavaModifier;
 import com.g2forge.enigma.javagen.core.JavaPackageSpecifier;
-import com.g2forge.enigma.javagen.expression.JavaNull;
 import com.g2forge.enigma.javagen.file.JavaFile;
 import com.g2forge.enigma.javagen.file.JavaImport;
-import com.g2forge.enigma.javagen.statement.JavaVariable;
-import com.g2forge.enigma.javagen.type.JavaElement;
-import com.g2forge.enigma.javagen.type.JavaField;
-import com.g2forge.enigma.javagen.type.JavaMetaType;
-import com.g2forge.enigma.javagen.type.JavaMethod;
-import com.g2forge.enigma.javagen.type.JavaProtection;
-import com.g2forge.enigma.javagen.type.JavaType;
-import com.g2forge.enigma.javagen.type.JavaTypeDeclaration;
+import com.g2forge.enigma.javagen.imperative.expression.JavaNull;
+import com.g2forge.enigma.javagen.imperative.statement.JavaVariable;
+import com.g2forge.enigma.javagen.type.decl.JavaElement;
+import com.g2forge.enigma.javagen.type.decl.JavaField;
+import com.g2forge.enigma.javagen.type.decl.JavaMetaType;
+import com.g2forge.enigma.javagen.type.decl.JavaMethod;
+import com.g2forge.enigma.javagen.type.decl.JavaProtection;
+import com.g2forge.enigma.javagen.type.decl.JavaTypeDeclaration;
+import com.g2forge.enigma.javagen.type.expression.JavaType;
 import com.g2forge.enigma.stringtemplate.EmbeddedTemplateRenderer;
 
 public class TestJavagen {

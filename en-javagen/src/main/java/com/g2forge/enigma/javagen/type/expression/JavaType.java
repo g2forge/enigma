@@ -1,4 +1,4 @@
-package com.g2forge.enigma.javagen.type;
+package com.g2forge.enigma.javagen.type.expression;
 
 import java.lang.reflect.Type;
 
