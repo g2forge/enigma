@@ -1,11 +1,13 @@
 package com.g2forge.enigma.frontend;
 
 import com.g2forge.alexandria.java.core.error.NotYetImplementedError;
+import com.g2forge.alexandria.java.marker.Helpers;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 
+@Helpers
 @UtilityClass
 public class HString {
 	@AllArgsConstructor
