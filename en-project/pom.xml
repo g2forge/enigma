@@ -15,10 +15,10 @@
 
 	<properties>
 		<stringtemplate.version>4.0.8</stringtemplate.version>
-		<antlr.version>4.5.3</antlr.version>
+		<antlr.version>4.7</antlr.version>
 
 		<enigma.version>0.0.2-SNAPSHOT</enigma.version>
-		
+
 		<enigma.organization>g2forge</enigma.organization>
 		<enigma.name>Enigma</enigma.name>
 		<enigma.repository>enigma</enigma.repository>
@@ -46,13 +46,26 @@
 		<developerConnection>scm:git:ssh://github.com:${enigma.organization}/${enigma.repository}.git</developerConnection>
 		<url>http://github.com/${enigma.organization}/${enigma.repository}/tree/${project.version}</url>
 	</scm>
-
-	<dependencies>
-		<dependency>
-			<groupId>com.g2forge.alexandria</groupId>
-			<artifactId>ax-test</artifactId>
-			<version>${alexandria.version}</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.antlr</groupId>
+				<artifactId>antlr4-maven-plugin</artifactId>
+				<version>${antlr.version}</version>
+				<executions>
+					<execution>
+						<id>antlr</id>
+						<goals>
+							<goal>antlr4</goal>
+						</goals>
+						<configuration>
+							<visitor>true</visitor>
+							<sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
