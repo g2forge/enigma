@@ -11,10 +11,6 @@
 		<relativePath>../en-project/pom.xml</relativePath>
 	</parent>
 
-	<properties>
-		<antlr.version>4.7</antlr.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.antlr</groupId>
