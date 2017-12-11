@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import com.g2forge.enigma.javagen.TreeHelpers;
+import com.g2forge.alexandria.java.TreeHelpers;
 import com.g2forge.enigma.javagen.codegen.JavaAnnotation;
 import com.g2forge.enigma.javagen.codegen.JavaClass;
 import com.g2forge.enigma.javagen.codegen.JavaField;

@@ -1,4 +1,4 @@
-package com.g2forge.enigma.javagen.codegen;
+package com.g2forge.enigma.javagen;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -6,9 +6,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.g2forge.enigma.javagen.codegen.AJavaMember;
+import com.g2forge.enigma.javagen.codegen.JavaAnnotation;
+import com.g2forge.enigma.javagen.codegen.JavaAssignment;
+import com.g2forge.enigma.javagen.codegen.JavaClass;
+import com.g2forge.enigma.javagen.codegen.JavaField;
+import com.g2forge.enigma.javagen.codegen.JavaFile;
+import com.g2forge.enigma.javagen.codegen.JavaMethod;
+import com.g2forge.enigma.javagen.codegen.JavaProtection;
+import com.g2forge.enigma.javagen.codegen.JavaReference;
+import com.g2forge.enigma.javagen.codegen.JavaRenderer;
+import com.g2forge.enigma.javagen.codegen.JavaType;
+import com.g2forge.enigma.javagen.codegen.JavaVariable;
+
 import lombok.Data;
 
-public class Hello {
+public class CodeGenExample {
 	public static void main(String[] args) {
 		final JavaRenderer renderer = new JavaRenderer();
 		final Path root = Paths.get(System.getProperty("user.dir"), "src/main/java");

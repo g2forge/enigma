@@ -1,8 +1,6 @@
 package com.g2forge.enigma.javagen.model.generator;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -18,13 +16,6 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class ModelGenerator<PropertyFeature> {
-	public static void main(String[] args) {
-		final ModelGenerator<Object> generator = new ModelGenerator<>(type -> new JavaType(((Class<?>) type.getType()).getName()), (property, feature) -> property.getName());
-		final Record parent = new Record("Parent", null, Arrays.asList(new Property(new Type(Integer.TYPE), "number")));
-		generator.add(new Record("Child", Arrays.asList(parent), Arrays.asList(new Property(new Type(String.class), "string"))));
-		generator.render(Paths.get(System.getProperty("user.dir"), "src/main/java"));
-	}
-
 	protected final Function<? super Type, ? extends JavaType> types;
 
 	protected final BiFunction<? super Property, ? super PropertyFeature, ? extends String> namer;
