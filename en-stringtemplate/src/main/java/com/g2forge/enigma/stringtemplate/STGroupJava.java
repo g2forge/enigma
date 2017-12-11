@@ -69,13 +69,16 @@ public class STGroupJava extends STGroup {
 
 	protected final String lineSeparator;
 
+	protected final Function<? super Object, ? extends Object> adapter;
+
 	protected final Function<? super Class<?>, ? extends IRecordType> recordFunction;
 
-	public STGroupJava(String encoding, char delimiterStartChar, char delimiterStopChar, String lineSeparator, Function<? super Class<?>, ? extends IRecordType> recordFunction) {
+	public STGroupJava(String encoding, char delimiterStartChar, char delimiterStopChar, String lineSeparator, Function<? super Object, ? extends Object> adapter, Function<? super Class<?>, ? extends IRecordType> recordFunction) {
 		super(delimiterStartChar, delimiterStopChar);
 		this.encoding = encoding;
 		this.registerRenderer(Object.class, new JavaStringRenderer(this));
 		this.lineSeparator = lineSeparator;
+		this.adapter = adapter == null ? Function.identity() : adapter;
 		this.recordFunction = recordFunction;
 	}
 
@@ -143,11 +146,13 @@ public class STGroupJava extends STGroup {
 		}
 	}
 
-	public String render(Object object) {
-		final Class<? extends Object> type = object.getClass();
+	public String render(Object raw) {
+		final Object adapted = adapter.apply(raw);
+
+		final Class<? extends Object> type = adapted.getClass();
 		final ST retVal = getInstanceOf(type);
 		if (retVal == null) throw new NoTemplateException("Template could not be found in either a file or field for " + type);
-		recordFunction.apply(type).getProperties().forEach(property -> retVal.add(property.getName(), (STAttributeGenerator) () -> property.getValue(object)));
+		recordFunction.apply(type).getProperties().forEach(property -> retVal.add(property.getName(), (STAttributeGenerator) () -> property.getValue(adapted)));
 		return retVal.render();
 	}
 }

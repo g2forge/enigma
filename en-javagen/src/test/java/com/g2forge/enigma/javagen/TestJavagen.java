@@ -22,13 +22,8 @@ import com.g2forge.enigma.javagen.type.decl.JavaMethod;
 import com.g2forge.enigma.javagen.type.decl.JavaProtection;
 import com.g2forge.enigma.javagen.type.decl.JavaTypeDeclaration;
 import com.g2forge.enigma.javagen.type.expression.JavaType;
-import com.g2forge.enigma.stringtemplate.EmbeddedTemplateRenderer;
 
-public class TestJavagen {
-	protected static final EmbeddedTemplateRenderer renderString = new EmbeddedTemplateRenderer("\n");
-
-	protected static final EmbeddedTemplateRenderer renderFile = new EmbeddedTemplateRenderer();
-
+public class TestJavagen extends ATestJavagen {
 	@Test
 	public void testClassFields() {
 		final JavaTypeDeclaration base = new JavaTypeDeclaration(null, JavaProtection.Unspecified, null, JavaMetaType.Class, null, null, null, null, null);

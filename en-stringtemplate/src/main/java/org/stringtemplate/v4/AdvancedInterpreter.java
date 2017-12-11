@@ -14,6 +14,12 @@ import org.stringtemplate.v4.misc.ErrorType;
 import org.stringtemplate.v4.misc.Misc;
 import org.stringtemplate.v4.misc.STNoSuchAttributeException;
 
+/**
+ * Subclass to add support for {@link STAttributeGenerator}
+ * 
+ * @author gdgib
+ *
+ */
 public class AdvancedInterpreter extends Interpreter {
 	public AdvancedInterpreter(STGroup group, boolean debug) {
 		super(group, debug);
@@ -34,7 +40,7 @@ public class AdvancedInterpreter extends Interpreter {
 	protected Object process(Object operand) {
 		return STAttributeGenerator.unwrap(operand);
 	}
-	
+
 	protected int _exec(STWriter out, InstanceScope scope) {
 		final ST self = scope.st;
 		int start = out.index(); // track char we're about to write
@@ -47,29 +53,28 @@ public class AdvancedInterpreter extends Interpreter {
 		Object o, left, right;
 		ST st;
 		Object[] options;
-		byte[] code = self.impl.instrs;        // which code block are we executing
+		byte[] code = self.impl.instrs; // which code block are we executing
 		int ip = 0;
-		while ( ip < self.impl.codeSize ) {
-			if ( trace || debug ) trace(scope, ip);
+		while (ip < self.impl.codeSize) {
+			if (trace || debug) trace(scope, ip);
 			short opcode = code[ip];
-			//count[opcode]++;
+			// count[opcode]++;
 			scope.ip = ip;
-			ip++; //jump to next instruction or first byte of operand
+			ip++; // jump to next instruction or first byte of operand
 			switch (opcode) {
-				case Bytecode.INSTR_LOAD_STR :
+				case Bytecode.INSTR_LOAD_STR:
 					// just testing...
-					load_str(self,ip);
+					load_str(self, ip);
 					ip += Bytecode.OPND_SIZE_IN_BYTES;
 					break;
-				case Bytecode.INSTR_LOAD_ATTR :
+				case Bytecode.INSTR_LOAD_ATTR:
 					nameIndex = getShort(code, ip);
 					ip += Bytecode.OPND_SIZE_IN_BYTES;
 					name = self.impl.strings[nameIndex];
 					try {
 						o = getAttribute(scope, name);
-						if ( o==ST.EMPTY_ATTR ) o = null;
-					}
-					catch (STNoSuchAttributeException nsae) {
+						if (o == ST.EMPTY_ATTR) o = null;
+					} catch (STNoSuchAttributeException nsae) {
 						errMgr.runTimeError(this, scope, ErrorType.NO_SUCH_ATTRIBUTE, name);
 						o = null;
 					}
@@ -79,22 +84,22 @@ public class AdvancedInterpreter extends Interpreter {
 					int valueIndex = getShort(code, ip);
 					ip += Bytecode.OPND_SIZE_IN_BYTES;
 					o = self.locals[valueIndex];
-					if ( o==ST.EMPTY_ATTR ) o = null;
+					if (o == ST.EMPTY_ATTR) o = null;
 					operands[++sp] = process(o);
 					break;
-				case Bytecode.INSTR_LOAD_PROP :
+				case Bytecode.INSTR_LOAD_PROP:
 					nameIndex = getShort(code, ip);
 					ip += Bytecode.OPND_SIZE_IN_BYTES;
 					o = operands[sp--];
 					name = self.impl.strings[nameIndex];
 					operands[++sp] = process(getObjectProperty(out, scope, o, name));
 					break;
-				case Bytecode.INSTR_LOAD_PROP_IND :
+				case Bytecode.INSTR_LOAD_PROP_IND:
 					Object propName = operands[sp--];
 					o = operands[sp];
 					operands[sp] = process(getObjectProperty(out, scope, o, propName));
 					break;
-				case Bytecode.INSTR_NEW :
+				case Bytecode.INSTR_NEW:
 					nameIndex = getShort(code, ip);
 					ip += Bytecode.OPND_SIZE_IN_BYTES;
 					name = self.impl.strings[nameIndex];
@@ -111,18 +116,18 @@ public class AdvancedInterpreter extends Interpreter {
 				case Bytecode.INSTR_NEW_IND:
 					nargs = getShort(code, ip);
 					ip += Bytecode.OPND_SIZE_IN_BYTES;
-					name = (String)operands[sp-nargs];
+					name = (String) operands[sp - nargs];
 					st = self.groupThatCreatedThisInstance.getEmbeddedInstanceOf(this, scope, name);
 					storeArgs(scope, nargs, st);
 					sp -= nargs;
 					sp--; // pop template name
 					operands[++sp] = st;
 					break;
-				case Bytecode.INSTR_NEW_BOX_ARGS : {
+				case Bytecode.INSTR_NEW_BOX_ARGS: {
 					nameIndex = getShort(code, ip);
 					ip += Bytecode.OPND_SIZE_IN_BYTES;
 					name = self.impl.strings[nameIndex];
-					Map<String, Object> attrs = (ArgumentsMap)operands[sp--];
+					Map<String, Object> attrs = (ArgumentsMap) operands[sp--];
 					// look up in original hierarchy not enclosing template (variable group)
 					// see TestSubtemplates.testEvalSTFromAnotherGroup()
 					st = self.groupThatCreatedThisInstance.getEmbeddedInstanceOf(this, scope, name);
@@ -131,7 +136,7 @@ public class AdvancedInterpreter extends Interpreter {
 					operands[++sp] = st;
 					break;
 				}
-				case Bytecode.INSTR_SUPER_NEW :
+				case Bytecode.INSTR_SUPER_NEW:
 					nameIndex = getShort(code, ip);
 					ip += Bytecode.OPND_SIZE_IN_BYTES;
 					name = self.impl.strings[nameIndex];
@@ -139,19 +144,19 @@ public class AdvancedInterpreter extends Interpreter {
 					ip += Bytecode.OPND_SIZE_IN_BYTES;
 					super_new(scope, name, nargs);
 					break;
-				case Bytecode.INSTR_SUPER_NEW_BOX_ARGS : {
+				case Bytecode.INSTR_SUPER_NEW_BOX_ARGS: {
 					nameIndex = getShort(code, ip);
 					ip += Bytecode.OPND_SIZE_IN_BYTES;
 					name = self.impl.strings[nameIndex];
-					Map<String, Object> attrs = (ArgumentsMap)operands[sp--];
+					Map<String, Object> attrs = (ArgumentsMap) operands[sp--];
 					super_new(scope, name, attrs);
 					break;
 				}
 				case Bytecode.INSTR_STORE_OPTION:
 					int optionIndex = getShort(code, ip);
 					ip += Bytecode.OPND_SIZE_IN_BYTES;
-					o = operands[sp--];    // value to store
-					options = (Object[])operands[sp]; // get options
+					o = operands[sp--]; // value to store
+					options = (Object[]) operands[sp]; // get options
 					options[optionIndex] = o; // store value into options on stack
 					break;
 				case Bytecode.INSTR_STORE_ARG: {
@@ -159,173 +164,169 @@ public class AdvancedInterpreter extends Interpreter {
 					name = self.impl.strings[nameIndex];
 					ip += Bytecode.OPND_SIZE_IN_BYTES;
 					o = operands[sp--];
-					Map<String, Object> attrs = (ArgumentsMap)operands[sp];
+					Map<String, Object> attrs = (ArgumentsMap) operands[sp];
 					attrs.put(name, o); // leave attrs on stack
 					break;
 				}
-				case Bytecode.INSTR_WRITE :
+				case Bytecode.INSTR_WRITE:
 					o = operands[sp--];
 					int n1 = writeObjectNoOptions(out, scope, o);
 					n += n1;
 					nwline += n1;
 					break;
-				case Bytecode.INSTR_WRITE_OPT :
-					options = (Object[])operands[sp--]; // get options
-					o = operands[sp--];                 // get option to write
+				case Bytecode.INSTR_WRITE_OPT:
+					options = (Object[]) operands[sp--]; // get options
+					o = operands[sp--]; // get option to write
 					int n2 = writeObjectWithOptions(out, scope, o, options);
 					n += n2;
 					nwline += n2;
 					break;
-				case Bytecode.INSTR_MAP :
-					st = (ST)operands[sp--]; // get prototype off stack
-					o = operands[sp--];		 // get object to map prototype across
-					map(scope,o,st);
+				case Bytecode.INSTR_MAP:
+					st = (ST) operands[sp--]; // get prototype off stack
+					o = operands[sp--]; // get object to map prototype across
+					map(scope, o, st);
 					break;
-				case Bytecode.INSTR_ROT_MAP :
+				case Bytecode.INSTR_ROT_MAP:
 					int nmaps = getShort(code, ip);
 					ip += Bytecode.OPND_SIZE_IN_BYTES;
 					List<ST> templates = new ArrayList<ST>();
-					for (int i=nmaps-1; i>=0; i--) templates.add((ST)operands[sp-i]);
+					for (int i = nmaps - 1; i >= 0; i--)
+						templates.add((ST) operands[sp - i]);
 					sp -= nmaps;
 					o = operands[sp--];
-					if ( o!=null ) rot_map(scope,o,templates);
+					if (o != null) rot_map(scope, o, templates);
 					break;
 				case Bytecode.INSTR_ZIP_MAP:
-					st = (ST)operands[sp--];
+					st = (ST) operands[sp--];
 					nmaps = getShort(code, ip);
 					ip += Bytecode.OPND_SIZE_IN_BYTES;
 					List<Object> exprs = new ObjectList();
-					for (int i=nmaps-1; i>=0; i--) exprs.add(operands[sp-i]);
+					for (int i = nmaps - 1; i >= 0; i--)
+						exprs.add(operands[sp - i]);
 					sp -= nmaps;
 					operands[++sp] = zip_map(scope, exprs, st);
 					break;
-				case Bytecode.INSTR_BR :
+				case Bytecode.INSTR_BR:
 					ip = getShort(code, ip);
 					break;
-				case Bytecode.INSTR_BRF :
+				case Bytecode.INSTR_BRF:
 					addr = getShort(code, ip);
 					ip += Bytecode.OPND_SIZE_IN_BYTES;
 					o = operands[sp--]; // <if(expr)>...<endif>
-					if ( !testAttributeTrue(o) ) ip = addr; // jump
+					if (!testAttributeTrue(o)) ip = addr; // jump
 					break;
-				case Bytecode.INSTR_OPTIONS :
+				case Bytecode.INSTR_OPTIONS:
 					operands[++sp] = new Object[Compiler.NUM_OPTIONS];
 					break;
 				case Bytecode.INSTR_ARGS:
 					operands[++sp] = new ArgumentsMap();
 					break;
-				case Bytecode.INSTR_PASSTHRU : {
+				case Bytecode.INSTR_PASSTHRU: {
 					nameIndex = getShort(code, ip);
 					ip += Bytecode.OPND_SIZE_IN_BYTES;
 					name = self.impl.strings[nameIndex];
-					Map<String, Object> attrs = (ArgumentsMap)operands[sp];
+					Map<String, Object> attrs = (ArgumentsMap) operands[sp];
 					passthru(scope, name, attrs);
 					break;
 				}
-				case Bytecode.INSTR_LIST :
+				case Bytecode.INSTR_LIST:
 					operands[++sp] = new ObjectList();
 					break;
-				case Bytecode.INSTR_ADD : {
-					o = operands[sp--];             // pop value
-					List<Object> list = (ObjectList)operands[sp]; // don't pop list
+				case Bytecode.INSTR_ADD: {
+					o = operands[sp--]; // pop value
+					List<Object> list = (ObjectList) operands[sp]; // don't pop list
 					addToList(scope, list, o);
 					break;
 				}
-				case Bytecode.INSTR_TOSTR :
+				case Bytecode.INSTR_TOSTR:
 					// replace with string value; early eval
 					operands[sp] = toString(out, scope, operands[sp]);
 					break;
-				case Bytecode.INSTR_FIRST  :
+				case Bytecode.INSTR_FIRST:
 					operands[sp] = process(first(scope, operands[sp]));
 					break;
-				case Bytecode.INSTR_LAST   :
+				case Bytecode.INSTR_LAST:
 					operands[sp] = process(last(scope, operands[sp]));
 					break;
-				case Bytecode.INSTR_REST   :
+				case Bytecode.INSTR_REST:
 					operands[sp] = process(rest(scope, operands[sp]));
 					break;
-				case Bytecode.INSTR_TRUNC  :
+				case Bytecode.INSTR_TRUNC:
 					operands[sp] = process(trunc(scope, operands[sp]));
 					break;
-				case Bytecode.INSTR_STRIP  :
+				case Bytecode.INSTR_STRIP:
 					operands[sp] = process(strip(scope, operands[sp]));
 					break;
-				case Bytecode.INSTR_TRIM   :
+				case Bytecode.INSTR_TRIM:
 					o = operands[sp--];
-					if ( o.getClass() == String.class ) {
-						operands[++sp] = ((String)o).trim();
-					}
-					else {
+					if (o.getClass() == String.class) {
+						operands[++sp] = ((String) o).trim();
+					} else {
 						errMgr.runTimeError(this, scope, ErrorType.EXPECTING_STRING, "trim", o.getClass().getName());
 						operands[++sp] = process(o);
 					}
 					break;
-				case Bytecode.INSTR_LENGTH :
+				case Bytecode.INSTR_LENGTH:
 					operands[sp] = length(operands[sp]);
 					break;
-				case Bytecode.INSTR_STRLEN :
+				case Bytecode.INSTR_STRLEN:
 					o = operands[sp--];
-					if ( o.getClass() == String.class ) {
-						operands[++sp] = ((String)o).length();
-					}
-					else {
+					if (o.getClass() == String.class) {
+						operands[++sp] = ((String) o).length();
+					} else {
 						errMgr.runTimeError(this, scope, ErrorType.EXPECTING_STRING, "strlen", o.getClass().getName());
 						operands[++sp] = 0;
 					}
 					break;
-				case Bytecode.INSTR_REVERSE :
+				case Bytecode.INSTR_REVERSE:
 					operands[sp] = process(reverse(scope, operands[sp]));
 					break;
-				case Bytecode.INSTR_NOT :
+				case Bytecode.INSTR_NOT:
 					operands[sp] = !testAttributeTrue(operands[sp]);
 					break;
-				case Bytecode.INSTR_OR :
+				case Bytecode.INSTR_OR:
 					right = operands[sp--];
 					left = operands[sp--];
 					operands[++sp] = testAttributeTrue(left) || testAttributeTrue(right);
 					break;
-				case Bytecode.INSTR_AND :
+				case Bytecode.INSTR_AND:
 					right = operands[sp--];
 					left = operands[sp--];
 					operands[++sp] = testAttributeTrue(left) && testAttributeTrue(right);
 					break;
-				case Bytecode.INSTR_INDENT :
+				case Bytecode.INSTR_INDENT:
 					int strIndex = getShort(code, ip);
 					ip += Bytecode.OPND_SIZE_IN_BYTES;
 					indent(out, scope, strIndex);
 					break;
-				case Bytecode.INSTR_DEDENT :
+				case Bytecode.INSTR_DEDENT:
 					out.popIndentation();
 					break;
-				case Bytecode.INSTR_NEWLINE :
+				case Bytecode.INSTR_NEWLINE:
 					try {
-						if ( prevOpcode==Bytecode.INSTR_NEWLINE ||
-							prevOpcode==Bytecode.INSTR_INDENT ||
-							nwline>0 )
-						{
+						if (prevOpcode == Bytecode.INSTR_NEWLINE || prevOpcode == Bytecode.INSTR_INDENT || nwline > 0) {
 							out.write(Misc.newline);
 						}
 						nwline = 0;
-					}
-					catch (IOException ioe) {
+					} catch (IOException ioe) {
 						errMgr.IOError(self, ErrorType.WRITE_IO_ERROR, ioe);
 					}
 					break;
-				case Bytecode.INSTR_NOOP :
+				case Bytecode.INSTR_NOOP:
 					break;
-				case Bytecode.INSTR_POP :
+				case Bytecode.INSTR_POP:
 					sp--; // throw away top of stack
 					break;
-				case Bytecode.INSTR_NULL :
+				case Bytecode.INSTR_NULL:
 					operands[++sp] = null;
 					break;
-				case Bytecode.INSTR_TRUE :
+				case Bytecode.INSTR_TRUE:
 					operands[++sp] = true;
 					break;
-				case Bytecode.INSTR_FALSE :
+				case Bytecode.INSTR_FALSE:
 					operands[++sp] = false;
 					break;
-				case Bytecode.INSTR_WRITE_STR :
+				case Bytecode.INSTR_WRITE_STR:
 					strIndex = getShort(code, ip);
 					ip += Bytecode.OPND_SIZE_IN_BYTES;
 					o = self.impl.strings[strIndex];
@@ -334,22 +335,22 @@ public class AdvancedInterpreter extends Interpreter {
 					nwline += n1;
 					break;
 				// TODO: generate this optimization
-//				case Bytecode.INSTR_WRITE_LOCAL:
-//					valueIndex = getShort(code, ip);
-//					ip += Bytecode.OPND_SIZE_IN_BYTES;
-//					o = self.locals[valueIndex];
-//					if ( o==ST.EMPTY_ATTR ) o = null;
-//					n1 = writeObjectNoOptions(out, self, o);
-//					n += n1;
-//					nwline += n1;
-//					break;
-				default :
-					errMgr.internalError(self, "invalid bytecode @ "+(ip-1)+": "+opcode, null);
+				// case Bytecode.INSTR_WRITE_LOCAL:
+				// valueIndex = getShort(code, ip);
+				// ip += Bytecode.OPND_SIZE_IN_BYTES;
+				// o = self.locals[valueIndex];
+				// if ( o==ST.EMPTY_ATTR ) o = null;
+				// n1 = writeObjectNoOptions(out, self, o);
+				// n += n1;
+				// nwline += n1;
+				// break;
+				default:
+					errMgr.internalError(self, "invalid bytecode @ " + (ip - 1) + ": " + opcode, null);
 					self.impl.dump();
 			}
 			prevOpcode = opcode;
 		}
-		if ( debug ) {
+		if (debug) {
 			int stop = out.index() - 1;
 			EvalTemplateEvent e = new EvalTemplateEvent(scope, start, stop);
 			trackDebugEvent(scope, e);
