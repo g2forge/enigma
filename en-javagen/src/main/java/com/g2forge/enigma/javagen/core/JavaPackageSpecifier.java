@@ -5,18 +5,16 @@ import java.util.Collection;
 import com.g2forge.alexandria.java.core.helpers.HCollection;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
 @Data
-@NoArgsConstructor
+@Builder
 @AllArgsConstructor
-@Accessors(chain = true)
 public class JavaPackageSpecifier {
 	protected static final String TEMPLATE = "<name;separator=\".\">";
 
-	protected Collection<String> name;
+	protected final Collection<String> name;
 
 	public JavaPackageSpecifier(String... name) {
 		this(HCollection.asList(name));

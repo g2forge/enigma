@@ -5,9 +5,5 @@ public enum JavaMetaType {
 	Interface,
 	Enum;
 
-	protected static final String TEMPLATE = "<keyword>";
-
-	protected String getKeyword() {
-		return name().toLowerCase();
-	}
+	protected static final String TEMPLATE = "<name;format=\"lower\">";
 }

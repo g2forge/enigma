@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.g2forge.enigma</groupId>
 	<artifactId>en-project</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<parent>
@@ -17,7 +17,7 @@
 		<stringtemplate.version>4.0.8</stringtemplate.version>
 		<antlr.version>4.5.3</antlr.version>
 
-		<enigma.version>0.0.1-SNAPSHOT</enigma.version>
+		<enigma.version>0.0.2-SNAPSHOT</enigma.version>
 		
 		<enigma.organization>g2forge</enigma.organization>
 		<enigma.name>Enigma</enigma.name>

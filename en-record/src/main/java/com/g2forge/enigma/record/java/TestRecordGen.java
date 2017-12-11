@@ -14,6 +14,7 @@ import com.g2forge.enigma.javagen.file.JavaFile;
 import com.g2forge.enigma.javagen.file.JavaImport;
 import com.g2forge.enigma.javagen.type.decl.IJavaMember;
 import com.g2forge.enigma.javagen.type.decl.JavaField;
+import com.g2forge.enigma.javagen.type.decl.JavaField.JavaFieldBuilder;
 import com.g2forge.enigma.javagen.type.decl.JavaProtection;
 import com.g2forge.enigma.javagen.type.decl.JavaTypeDeclaration;
 import com.g2forge.enigma.javagen.type.expression.JavaType;
@@ -68,14 +69,18 @@ public class TestRecordGen {
 	}
 
 	public static void main(String[] args) {
-		final EmbeddedTemplateRenderer renderer = new EmbeddedTemplateRenderer("\n");
+		final EmbeddedTemplateRenderer renderer = EmbeddedTemplateRenderer.STRING;
 
 		final Record<String, JavaType> record = new Record<>(Arrays.asList(new Property<>(new Name("Property"), new Type(new JavaType(String.class)))), new Type(new JavaType("org.Foo")));
 
 		final Context context = new Context(Context.Usage.Field);
 		final Collection<IJavaMember> members = new ArrayList<>();
 		for (IProperty<String, JavaType> property : record.getProperties()) {
-			members.add(new JavaField(property.getType().getLanguageType(context), property.getName().getLanguageName(context)).setProtection(JavaProtection.Protected));
+			final JavaFieldBuilder fieldBuilder = JavaField.builder();
+			fieldBuilder.protection(JavaProtection.Protected);
+			fieldBuilder.type(property.getType().getLanguageType(context));
+			fieldBuilder.name(property.getName().getLanguageName(context));
+			members.add(fieldBuilder.build());
 		}
 
 		// TODO: Move this "break" functionality into JavaType?
@@ -84,7 +89,7 @@ public class TestRecordGen {
 		// TODO: For imported types, render them with their simple names (ideally should handle wildcards too!)
 		final JavaType data = new JavaType(Data.class);
 		// TODO: @AllArgsConstructor, @NoArgsConstructor, @Accessors(chain = true)
-		final JavaTypeDeclaration javaClass = new JavaTypeDeclaration(type.get1()).setMembers(members).setAnnotations(Arrays.asList(new JavaAnnotation(new JavaType("Data"))));
+		final JavaTypeDeclaration javaClass = JavaTypeDeclaration.standardBuilder().name(type.get1()).members(members).annotation(new JavaAnnotation(new JavaType("Data"))).build();
 		System.out.println(renderer.render(new JavaFile(new JavaPackageSpecifier(type.get0()), Arrays.asList(new JavaImport(data)), HCollection.asList(javaClass))));
 	}
 }

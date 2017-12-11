@@ -7,9 +7,5 @@ public enum JavaModifier {
 	Transient,
 	Volative;
 
-	protected static final String TEMPLATE = "<text>";
-
-	protected String getText() {
-		return name().toLowerCase();
-	}
+	protected static final String TEMPLATE = "<name;format=\"lower\">";
 }

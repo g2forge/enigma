@@ -10,36 +10,28 @@ import com.g2forge.enigma.javagen.imperative.expression.IJavaExpression;
 import com.g2forge.enigma.javagen.type.expression.JavaType;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
 @Data
-@NoArgsConstructor
+@Builder
 @AllArgsConstructor
-@Accessors(chain = true)
 public class JavaField implements IJavaMember, IJavaVariable {
 	protected static final String TEMPLATE = TEMPLATE_ANNOTATIONS + "<protection><modifiers:{modifier|<modifier> }><type> <name><if(initializer)> = <initializer><endif>;";
 
-	public static final JavaField STANDARD = new JavaField(null, JavaProtection.Unspecified, null, null, null, null);
-
-	protected Collection<JavaAnnotation> annotations;
-
-	protected JavaProtection protection;
-
-	protected Set<JavaModifier> modifiers;
-
-	protected JavaType type;
-
-	protected String name;
-
-	protected IJavaExpression initializer;
-
-	public JavaField(JavaType type, String name) {
-		this(STANDARD, type, name);
+	public static JavaFieldBuilder standardBuilder() {
+		return builder().protection(JavaProtection.Unspecified);
 	}
 
-	public JavaField(JavaField base, JavaType type, String name) {
-		this(base.getAnnotations(), base.getProtection(), base.getModifiers(), type, name, base.getInitializer());
-	}
+	protected final Collection<JavaAnnotation> annotations;
+
+	protected final JavaProtection protection;
+
+	protected final Set<JavaModifier> modifiers;
+
+	protected final JavaType type;
+
+	protected final String name;
+
+	protected final IJavaExpression initializer;
 }
