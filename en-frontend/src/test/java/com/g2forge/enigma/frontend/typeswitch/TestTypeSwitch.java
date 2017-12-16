@@ -37,7 +37,7 @@ public class TestTypeSwitch {
 	@Builder
 	@AllArgsConstructor
 	protected static class TestNode {
-		public static TestNode from(TypeSwitch.Node<?> node) {
+		public static TestNode from(Node<?> node) {
 			final Set<TestNode> children = node.getChildren().isEmpty() ? null : node.getChildren().stream().map(TestNode::from).collect(Collectors.toSet());
 			return new TestNode(node.getFunction() == null ? null : node.getFunction().getInputType().getSimpleName(), children);
 		}
