@@ -12,6 +12,7 @@ import org.junit.Test;
 import com.g2forge.alexandria.adt.collection.collector.ICollectionBuilder;
 import com.g2forge.alexandria.adt.collection.collector.implementations.CollectionCollectionBuilder;
 import com.g2forge.alexandria.java.core.helpers.HCollection;
+import com.g2forge.alexandria.java.function.IFunction1;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -78,10 +79,10 @@ public class TestTypeSwitch1 {
 	public void basic() {
 		final String context = "a";
 
-		final TypeSwitch1.Builder<Object, Object> builder = new TypeSwitch1.Builder<>();
+		final TypeSwitch1.FunctionBuilder<Object, Object> builder = new TypeSwitch1.FunctionBuilder<>();
 		builder.add(String.class, t -> context + t);
 		builder.add(Integer.class, t -> context + Integer.toString(t + 1));
-		final TypeSwitch1<Object, Object> typeSwitch = builder.build();
+		final IFunction1<Object, Object> typeSwitch = builder.build();
 
 		Assert.assertEquals("ab", typeSwitch.apply("b"));
 		Assert.assertEquals("a2", typeSwitch.apply(1));
@@ -89,20 +90,20 @@ public class TestTypeSwitch1 {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void error() {
-		final TypeSwitch1.Builder<Object, Object> builder = new TypeSwitch1.Builder<>();
+		final TypeSwitch1.FunctionBuilder<Object, Object> builder = new TypeSwitch1.FunctionBuilder<>();
 		builder.add(A.class, t -> null);
 		builder.add(B.class, t -> null);
-		final TypeSwitch1<Object, Object> typeSwitch = builder.build();
+		final IFunction1<Object, Object> typeSwitch = builder.build();
 
 		typeSwitch.apply(new D() {});
 	}
 
 	@Test
 	public void shadow() {
-		final TypeSwitch1.Builder<Object, Object> builder = new TypeSwitch1.Builder<>();
+		final TypeSwitch1.FunctionBuilder<Object, Object> builder = new TypeSwitch1.FunctionBuilder<>();
 		builder.add(String.class, t -> t);
 		builder.add(Object.class, t -> null);
-		final TypeSwitch1<Object, Object> typeSwitch = builder.build();
+		final IFunction1<Object, Object> typeSwitch = builder.build();
 
 		Assert.assertEquals("b", typeSwitch.apply("b"));
 	}
