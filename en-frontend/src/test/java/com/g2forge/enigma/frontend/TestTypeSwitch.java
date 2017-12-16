@@ -3,8 +3,6 @@ package com.g2forge.enigma.frontend;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.g2forge.enigma.frontend.TypeSwitch;
-
 public class TestTypeSwitch {
 	public interface A {}
 
