@@ -11,7 +11,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-public class TypeSwitch<I, O> implements IFunction1<I, O> {
+public class TypeSwitch1<I, O> implements IFunction1<I, O> {
 	public static class Builder<I, O> {
 		protected final Collection<TypedFunction1<?, O>> functions = new ArrayList<>();
 
@@ -20,8 +20,8 @@ public class TypeSwitch<I, O> implements IFunction1<I, O> {
 			return this;
 		}
 
-		public TypeSwitch<I, O> build() {
-			return new TypeSwitch<>(functions);
+		public TypeSwitch1<I, O> build() {
+			return new TypeSwitch1<>(functions);
 		}
 	}
 
@@ -56,12 +56,12 @@ public class TypeSwitch<I, O> implements IFunction1<I, O> {
 	@Getter(AccessLevel.PROTECTED)
 	protected final Node<O> root;
 
-	public TypeSwitch(Collection<? extends ITypedFunction1<?, O>> functions) {
+	public TypeSwitch1(Collection<? extends ITypedFunction1<?, O>> functions) {
 		this.root = Node.computeRoot(functions, Node::new);
 	}
 
 	@SafeVarargs
-	public TypeSwitch(TypedFunction1<I, O>... functions) {
+	public TypeSwitch1(TypedFunction1<I, O>... functions) {
 		this(Arrays.asList(functions));
 	}
 

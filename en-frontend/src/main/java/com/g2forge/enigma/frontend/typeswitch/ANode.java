@@ -19,9 +19,9 @@ import lombok.ToString;
 @ToString
 @Getter
 abstract class ANode<O, N extends ANode<O, N>> {
-	protected static <O, N extends ANode<O, N>> N computeRoot(Collection<? extends ITypedFunction1<?, O>> functions, IFunction1<? super ITypedFunction1<?, O>, ? extends N> createNode) {
+	protected static <F, O, N extends ANode<O, N>> N computeRoot(Collection<? extends F> functions, IFunction1<? super F, ? extends N> createNode) {
 		N root = null;
-		for (ITypedFunction1<?, O> function : functions) {
+		for (F function : functions) {
 			final N node = createNode.apply(function);
 			if (root == null) {
 				root = node;
@@ -121,7 +121,7 @@ abstract class ANode<O, N extends ANode<O, N>> {
 			final N current = explore.remove(explore.size() - 1);
 			final List<N> children = current.getChildren().stream().filter(applies).collect(Collectors.toList());
 			if (children.isEmpty()) {
-				if (!isObjectRoot()) applicable.add(current);
+				if (!current.isObjectRoot()) applicable.add(current);
 			} else explore.addAll(children);
 		}
 
