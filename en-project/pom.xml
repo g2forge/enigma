@@ -46,7 +46,7 @@
 		<developerConnection>scm:git:ssh://github.com:${enigma.organization}/${enigma.repository}.git</developerConnection>
 		<url>http://github.com/${enigma.organization}/${enigma.repository}/tree/${project.version}</url>
 	</scm>
-	
+
 	<build>
 		<plugins>
 			<plugin>
