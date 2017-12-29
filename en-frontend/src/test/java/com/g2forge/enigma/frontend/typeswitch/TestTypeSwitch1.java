@@ -112,7 +112,7 @@ public class TestTypeSwitch1 {
 	public void treeA() {
 		final ICollectionBuilder<List<TypedFunction1<?, Object>>, TypedFunction1<?, Object>> functions = CollectionCollectionBuilder.createList();
 		functions.add(new TypedFunction1<>(A.class, null));
-		final TestNode actual = TestNode.from(new TypeSwitch1<>(functions.create()).getRoot());
+		final TestNode actual = TestNode.from(new TypeSwitch1<>(null, functions.create()).getRoot());
 		Assert.assertEquals(new TestNode("A", null), actual);
 	}
 
@@ -121,7 +121,7 @@ public class TestTypeSwitch1 {
 		final ICollectionBuilder<List<TypedFunction1<?, Object>>, TypedFunction1<?, Object>> functions = CollectionCollectionBuilder.createList();
 		functions.add(new TypedFunction1<>(A.class, null));
 		functions.add(new TypedFunction1<>(B.class, null));
-		final TestNode actual = TestNode.from(new TypeSwitch1<>(functions.create()).getRoot());
+		final TestNode actual = TestNode.from(new TypeSwitch1<>(null, functions.create()).getRoot());
 		Assert.assertEquals(TestNode.builder().child(new TestNode("A")).child(new TestNode("B")).build(), actual);
 	}
 
@@ -131,7 +131,7 @@ public class TestTypeSwitch1 {
 		functions.add(new TypedFunction1<>(A.class, null));
 		functions.add(new TypedFunction1<>(B.class, null));
 		functions.add(new TypedFunction1<>(C.class, null));
-		final TestNode actual = TestNode.from(new TypeSwitch1<>(functions.create()).getRoot());
+		final TestNode actual = TestNode.from(new TypeSwitch1<>(null, functions.create()).getRoot());
 		Assert.assertEquals(TestNode.builder().child(TestNode.builder().name("A").child(new TestNode("C")).build()).child(new TestNode("B")).build(), actual);
 	}
 
@@ -144,7 +144,7 @@ public class TestTypeSwitch1 {
 
 		for (List<Class<? extends Object>> order : permute(types)) {
 			final List<TypedFunction1<?, Object>> functions = order.stream().map(type -> new TypedFunction1<>(type, null)).collect(Collectors.toList());
-			final TestNode actual = TestNode.from(new TypeSwitch1<>(functions).getRoot());
+			final TestNode actual = TestNode.from(new TypeSwitch1<>(null, functions).getRoot());
 			Assert.assertEquals(order.stream().map(Class::getSimpleName).collect(Collectors.joining()), expected, actual);
 		}
 	}
@@ -159,7 +159,7 @@ public class TestTypeSwitch1 {
 
 		for (List<Class<? extends Object>> order : permute(types)) {
 			final List<TypedFunction1<?, Object>> functions = order.stream().map(type -> new TypedFunction1<>(type, null)).collect(Collectors.toList());
-			final TestNode actual = TestNode.from(new TypeSwitch1<>(functions).getRoot());
+			final TestNode actual = TestNode.from(new TypeSwitch1<>(null, functions).getRoot());
 			Assert.assertEquals(order.stream().map(Class::getSimpleName).collect(Collectors.joining()), expected, actual);
 		}
 	}

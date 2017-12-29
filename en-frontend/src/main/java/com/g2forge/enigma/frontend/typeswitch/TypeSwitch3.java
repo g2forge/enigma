@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
+import com.g2forge.alexandria.java.core.helpers.HCollection;
 import com.g2forge.alexandria.java.function.IConsumer1;
 import com.g2forge.alexandria.java.function.IConsumer3;
 import com.g2forge.alexandria.java.function.IFunction3;
@@ -17,6 +18,8 @@ public class TypeSwitch3<I0, I1, I2, O> implements IFunction3<I0, I1, I2, O> {
 	public static class ConsumerBuilder<I0, I1, I2> {
 		protected final Collection<TypedFunction3<?, ?, ?, Void>> functions = new ArrayList<>();
 
+		protected IConsumer3<? super I0, ? super I1, ? super I2> fallback = null;
+
 		public <T0, T1, T2> ConsumerBuilder<I0, I1, I2> add(Class<T0> type0, Class<T1> type1, Class<T2> type2, IConsumer3<? super T0, ? super T1, ? super T2> consumer) {
 			functions.add(new TypedFunction3<T0, T1, T2, Void>(type0, type1, type2, (i0, i1, i2) -> {
 				consumer.accept(i0, i1, i2);
@@ -26,10 +29,19 @@ public class TypeSwitch3<I0, I1, I2, O> implements IFunction3<I0, I1, I2, O> {
 		}
 
 		public IConsumer3<I0, I1, I2> build() {
-			final TypeSwitch3<I0, I1, I2, Void> ts = new TypeSwitch3<>(functions);
+			final TypeSwitch3<I0, I1, I2, Void> ts = new TypeSwitch3<>(fallback == null ? null : (i0, i1, i2) -> {
+				fallback.accept(i0, i1, i2);
+				return null;
+			}, functions);
 			return (i0, i1, i2) -> ts.apply(i0, i1, i2);
 		}
-		
+
+		public ConsumerBuilder<I0, I1, I2> fallback(IConsumer3<? super I0, ? super I1, ? super I2> consumer) {
+			if (this.fallback != null) throw new IllegalStateException("Cannot set more than one fallback consumer!");
+			this.fallback = consumer;
+			return this;
+		}
+
 		public ConsumerBuilder<I0, I1, I2> with(IConsumer1<? super ConsumerBuilder<I0, I1, I2>> consumer) {
 			consumer.accept(this);
 			return this;
@@ -39,15 +51,23 @@ public class TypeSwitch3<I0, I1, I2, O> implements IFunction3<I0, I1, I2, O> {
 	public static class FunctionBuilder<I0, I1, I2, O> {
 		protected final Collection<TypedFunction3<?, ?, ?, O>> functions = new ArrayList<>();
 
+		protected IFunction3<? super I0, ? super I1, ? super I2, ? extends O> fallback = null;
+
 		public <T0, T1, T2> FunctionBuilder<I0, I1, I2, O> add(Class<T0> type0, Class<T1> type1, Class<T2> type2, IFunction3<? super T0, ? super T1, ? super T2, ? extends O> function) {
 			functions.add(new TypedFunction3<T0, T1, T2, O>(type0, type1, type2, function));
 			return this;
 		}
 
 		public IFunction3<I0, I1, I2, O> build() {
-			return new TypeSwitch3<>(functions);
+			return new TypeSwitch3<>(fallback, functions);
 		}
-		
+
+		public FunctionBuilder<I0, I1, I2, O> fallback(IFunction3<? super I0, ? super I1, ? super I2, ? extends O> function) {
+			if (this.fallback != null) throw new IllegalStateException("Cannot set more than one fallback function!");
+			this.fallback = function;
+			return this;
+		}
+
 		public FunctionBuilder<I0, I1, I2, O> with(IConsumer1<? super FunctionBuilder<I0, I1, I2, O>> consumer) {
 			consumer.accept(this);
 			return this;
@@ -60,8 +80,11 @@ public class TypeSwitch3<I0, I1, I2, O> implements IFunction3<I0, I1, I2, O> {
 	protected static class Node<O> extends ANode<O, Node<O>> {
 		protected final ITypedFunction3<?, ?, ?, O> function;
 
-		protected <I0, I1, I2> O apply(I0 input0, I1 input1, I2 input2) {
-			return get(n -> n.getFunction().isApplicable(input0, input1, input2)).getFunction().apply(input0, input1, input2);
+		protected <I0, I1, I2> O apply(IFunction3<? super I0, ? super I1, ? super I2, ? extends O> fallback, I0 input0, I1 input1, I2 input2) {
+			return get(n -> n.getFunction().isApplicable(input0, input1, input2), collection -> {
+				if (collection.isEmpty()) return new Node<O>(new TypedFunction3<>(null, null, null, fallback));
+				return HCollection.getOne(collection);
+			}).getFunction().apply(input0, input1, input2);
 		}
 
 		protected boolean isAncestor(Node<O> node) {
@@ -89,19 +112,23 @@ public class TypeSwitch3<I0, I1, I2, O> implements IFunction3<I0, I1, I2, O> {
 	}
 
 	@Getter(AccessLevel.PROTECTED)
+	protected final IFunction3<? super I0, ? super I1, ? super I2, ? extends O> fallback;
+
+	@Getter(AccessLevel.PROTECTED)
 	protected final Node<O> root;
 
-	public TypeSwitch3(Collection<? extends ITypedFunction3<?, ?, ?, O>> functions) {
+	public TypeSwitch3(IFunction3<? super I0, ? super I1, ? super I2, ? extends O> fallback, Collection<? extends ITypedFunction3<?, ?, ?, O>> functions) {
+		this.fallback = fallback;
 		this.root = Node.computeRoot(functions, Node::new);
 	}
 
 	@SafeVarargs
-	public TypeSwitch3(TypedFunction3<I0, I1, I2, O>... functions) {
-		this(Arrays.asList(functions));
+	public TypeSwitch3(IFunction3<? super I0, ? super I1, ? super I2, ? extends O> fallback, TypedFunction3<I0, I1, I2, O>... functions) {
+		this(fallback, Arrays.asList(functions));
 	}
 
 	@Override
 	public O apply(I0 input0, I1 input1, I2 input2) {
-		return getRoot().apply(input0, input1, input2);
+		return getRoot().apply(getFallback(), input0, input1, input2);
 	}
 }
