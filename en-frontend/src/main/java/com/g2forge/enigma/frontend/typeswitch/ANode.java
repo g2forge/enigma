@@ -109,6 +109,10 @@ abstract class ANode<O, N extends ANode<O, N>> {
 	}
 
 	protected N get(IPredicate1<N> applies) {
+		return get(applies, HCollection::getOne);
+	}
+
+	protected N get(IPredicate1<N> applies, IFunction1<? super Collection<N>, ? extends N> extract) {
 		final Collection<N> applicable = new LinkedHashSet<>();
 
 		final List<N> explore = new ArrayList<>();
@@ -125,7 +129,7 @@ abstract class ANode<O, N extends ANode<O, N>> {
 			} else explore.addAll(children);
 		}
 
-		return HCollection.getOne(applicable);
+		return extract.apply(applicable);
 	}
 
 	protected abstract boolean isAncestor(N node);
