@@ -9,7 +9,7 @@ import lombok.experimental.UtilityClass;
 
 @Helpers
 @UtilityClass
-public class HString {
+public class HStrings {
 	@AllArgsConstructor
 	@Getter
 	protected enum Quotes {
