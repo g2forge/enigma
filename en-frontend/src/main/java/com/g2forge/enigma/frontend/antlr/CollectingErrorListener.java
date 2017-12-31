@@ -1,4 +1,4 @@
-package com.g2forge.enigma.frontend;
+package com.g2forge.enigma.frontend.antlr;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
