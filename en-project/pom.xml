@@ -15,7 +15,7 @@
 
 	<properties>
 		<stringtemplate.version>4.0.8</stringtemplate.version>
-		<antlr.version>4.7</antlr.version>
+		<antlr.version>4.7.1</antlr.version>
 
 		<enigma.version>0.0.2-SNAPSHOT</enigma.version>
 
