@@ -2,24 +2,24 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>enigma</artifactId>
-	<packaging>pom</packaging>
+	<artifactId>en-diagram</artifactId>
 
 	<parent>
 		<groupId>com.g2forge.enigma</groupId>
 		<artifactId>en-project</artifactId>
 		<version>0.0.2-SNAPSHOT</version>
-		<relativePath>en-project/pom.xml</relativePath>
+		<relativePath>../en-project/pom.xml</relativePath>
 	</parent>
 
-	<modules>
-		<module>en-project</module>
-		<module>en-stringtemplate</module>
-		<module>en-javagen</module>
-		<module>en-record</module>
-		<module>en-frontend</module>
-		<module>en-diagram</module>
-		<module>en-document</module>
-		<module>en-presentation</module>
-	</modules>
+	<properties>
+		<plantuml.version>8059</plantuml.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>net.sourceforge.plantuml</groupId>
+			<artifactId>plantuml</artifactId>
+			<version>${plantuml.version}</version>
+		</dependency>
+	</dependencies>
 </project>
