@@ -17,6 +17,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.g2forge.enigma</groupId>
+			<artifactId>en-stringtemplate</artifactId>
+			<version>${enigma.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>net.sourceforge.plantuml</groupId>
 			<artifactId>plantuml</artifactId>
 			<version>${plantuml.version}</version>
