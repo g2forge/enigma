@@ -10,4 +10,12 @@
 		<version>0.0.2-SNAPSHOT</version>
 		<relativePath>../en-project/pom.xml</relativePath>
 	</parent>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.g2forge.alexandria</groupId>
+			<artifactId>ax-reflection</artifactId>
+			<version>${alexandria.version}</version>
+		</dependency>
+	</dependencies>
 </project>
