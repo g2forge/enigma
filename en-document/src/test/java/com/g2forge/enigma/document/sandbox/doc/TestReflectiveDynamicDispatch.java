@@ -3,8 +3,6 @@ package com.g2forge.enigma.document.sandbox.doc;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.g2forge.enigma.document.sandbox.doc.ReflectiveDynamicDispatch;
-
 public class TestReflectiveDynamicDispatch {
 	public interface A {}
 

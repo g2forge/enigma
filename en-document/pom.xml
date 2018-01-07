@@ -17,5 +17,12 @@
 			<artifactId>ax-reflection</artifactId>
 			<version>${alexandria.version}</version>
 		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.eclipse.mylyn.docs/org.eclipse.mylyn.wikitext.markdown -->
+		<dependency>
+			<groupId>org.eclipse.mylyn.docs</groupId>
+			<artifactId>org.eclipse.mylyn.wikitext.markdown</artifactId>
+			<version>3.0.19</version>
+		</dependency>
 	</dependencies>
 </project>
