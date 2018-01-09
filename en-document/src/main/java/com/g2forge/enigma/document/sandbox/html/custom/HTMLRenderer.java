@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import com.g2forge.alexandria.generic.type.java.structure.JavaScope;
 import com.g2forge.alexandria.java.core.error.RuntimeReflectionException;
 import com.g2forge.alexandria.java.function.IFunction1;
-import com.g2forge.alexandria.java.function.IFunction2;
 import com.g2forge.alexandria.java.function.IThrowFunction1;
 import com.g2forge.alexandria.reflection.object.HReflection;
 
@@ -30,7 +29,14 @@ public class HTMLRenderer {
 
 		protected final String newline;
 
-		protected final IFunction2<? super Object, ? super Type, ? extends IExplicitHTMLElement> explicit;
+		@Override
+		public IExplicitHTMLElement toExplicit(final Object element, Type type) {
+			if (element instanceof IExplicitHTMLElement) return (IExplicitHTMLElement) element;
+			if (element instanceof IReflectiveHTMLElement) return new ReflectiveExplicitHTMLElement((IReflectiveHTMLElement) element);
+			if (element instanceof Collection) return context -> ((Collection<?>) element).stream().forEach(child -> context.toExplicit(child, null).render(context));
+			if ((element instanceof String) || (element instanceof Boolean) || (element instanceof Integer) || (element instanceof Long) || (element instanceof Float) || (element instanceof Double)) return context -> context.getBuilder().append(element);
+			throw new IllegalArgumentException("Vale \"" + element + "\" with class " + element.getClass() + " could not be rendered to HTML!");
+		}
 	}
 
 	protected static class ReflectiveExplicitHTMLElement implements IExplicitHTMLElement {
@@ -96,7 +102,6 @@ public class HTMLRenderer {
 
 			{ // Contents
 				ContentState state = ContentState.Empty;
-				final IFunction2<Object, ? super Type, ? extends IExplicitHTMLElement> toExplicit = context.getExplicit();
 				for (Property<IReflectiveHTMLElement, ?> property : content) {
 					final Object value = property.getAccessor().apply(element);
 					if (!property.getField().skipNull() || (value != null)) {
@@ -106,7 +111,7 @@ public class HTMLRenderer {
 						}
 						final int length = builder.length();
 
-						final IExplicitHTMLElement explicit = toExplicit.apply(value, property.getType());
+						final IExplicitHTMLElement explicit = context.toExplicit(value, property.getType());
 						explicit.render(context);
 
 						if (length != builder.length()) state = ContentState.Written;
@@ -132,18 +137,10 @@ public class HTMLRenderer {
 	}
 
 	public String render(Object element) {
-		final IExplicitHTMLElement explicit = toExplicit(element, null);
-
 		final StringBuilder retVal = new StringBuilder();
-		explicit.render(new HTMLRenderContext(retVal, "\n", this::toExplicit));
+		final HTMLRenderContext context = new HTMLRenderContext(retVal, "\n");
+		context.toExplicit(element, null).render(context);
 		return retVal.toString();
 	}
 
-	protected IExplicitHTMLElement toExplicit(final Object element, Type type) {
-		if (element instanceof IExplicitHTMLElement) return (IExplicitHTMLElement) element;
-		if (element instanceof IReflectiveHTMLElement) return new ReflectiveExplicitHTMLElement((IReflectiveHTMLElement) element);
-		if (element instanceof Collection) return context -> ((Collection<?>) element).stream().forEach(child -> context.getExplicit().apply(child, null).render(context));
-		if ((element instanceof String) || (element instanceof Boolean) || (element instanceof Integer) || (element instanceof Long) || (element instanceof Float) || (element instanceof Double)) return context -> context.getBuilder().append(element);
-		throw new IllegalArgumentException("Vale \"" + element + "\" with class " + element.getClass() + " could not be rendered to HTML!");
-	}
 }
