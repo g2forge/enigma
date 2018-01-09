@@ -5,28 +5,21 @@ import java.util.Collection;
 import com.g2forge.alexandria.java.core.helpers.HCollection;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Singular;
 
 @Data
+@Builder
 @AllArgsConstructor
-@NoArgsConstructor
 public class Span implements IReflectiveHTMLElement {
-	protected String id;
+	protected final String id;
 
 	@HTMLField(property = false)
-	protected Collection<?> contents;
+	@Singular
+	protected final Collection<?> contents;
 
-	public Span(Collection<?> contents) {
-		this.contents = contents;
-	}
-
-	public Span(Object... contents) {
-		this(HCollection.asList(contents));
-	}
-
-	public Span setId(String id) {
-		this.id = id;
-		return this;
+	public Span(String id, Object... contents) {
+		this(id, HCollection.asList(contents));
 	}
 }
