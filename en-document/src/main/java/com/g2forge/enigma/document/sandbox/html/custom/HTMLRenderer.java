@@ -10,6 +10,7 @@ import com.g2forge.alexandria.generic.type.java.structure.JavaScope;
 import com.g2forge.alexandria.java.core.error.RuntimeReflectionException;
 import com.g2forge.alexandria.java.function.IFunction1;
 import com.g2forge.alexandria.java.function.IThrowFunction1;
+import com.g2forge.alexandria.java.typeswitch.TypeSwitch1;
 import com.g2forge.alexandria.reflection.object.HReflection;
 
 import lombok.AccessLevel;
@@ -25,35 +26,33 @@ public class HTMLRenderer {
 
 	@Data
 	protected static class HTMLRenderContext implements IHTMLRenderContext {
+		protected static final IFunction1<Object, IExplicitHTMLElement> toExplicit = new TypeSwitch1.FunctionBuilder<Object, IExplicitHTMLElement>().with(builder -> {
+			builder.add(IExplicitHTMLElement.class, IFunction1.identity());
+			builder.add(IReflectiveHTMLElement.class, e -> new ReflectiveExplicitHTMLElement(e));
+			builder.add(Collection.class, e -> {
+				final Collection<?> c = e;
+				return context -> c.stream().forEach(child -> context.toExplicit(child, null).render(context));
+			});
+
+			builder.add(String.class, e -> context -> context.getBuilder().append(e));
+			builder.add(Boolean.class, e -> context -> context.getBuilder().append(e));
+			builder.add(Integer.class, e -> context -> context.getBuilder().append(e));
+			builder.add(Long.class, e -> context -> context.getBuilder().append(e));
+			builder.add(Float.class, e -> context -> context.getBuilder().append(e));
+			builder.add(Double.class, e -> context -> context.getBuilder().append(e));
+		}).build();
+
 		protected final StringBuilder builder;
 
 		protected final String newline;
 
 		@Override
 		public IExplicitHTMLElement toExplicit(final Object element, Type type) {
-			if (element instanceof IExplicitHTMLElement) return (IExplicitHTMLElement) element;
-			if (element instanceof IReflectiveHTMLElement) return new ReflectiveExplicitHTMLElement((IReflectiveHTMLElement) element);
-			if (element instanceof Collection) return context -> ((Collection<?>) element).stream().forEach(child -> context.toExplicit(child, null).render(context));
-			if ((element instanceof String) || (element instanceof Boolean) || (element instanceof Integer) || (element instanceof Long) || (element instanceof Float) || (element instanceof Double)) return context -> context.getBuilder().append(element);
-			throw new IllegalArgumentException("Vale \"" + element + "\" with class " + element.getClass() + " could not be rendered to HTML!");
+			return toExplicit.apply(element);
 		}
 	}
 
 	protected static class ReflectiveExplicitHTMLElement implements IExplicitHTMLElement {
-		@HTMLField
-		protected static final Object DUMMY = null;
-
-		@Getter(value = AccessLevel.PROTECTED, lazy = true)
-		private static final HTMLField defaultHTMLField = computeDefaultHTMLField();
-
-		protected static HTMLField computeDefaultHTMLField() {
-			try {
-				return ReflectiveExplicitHTMLElement.class.getDeclaredField("DUMMY").getAnnotation(HTMLField.class);
-			} catch (NoSuchFieldException | SecurityException e) {
-				throw new RuntimeReflectionException(e);
-			}
-		}
-
 		@Data
 		protected static class Property<T, F> {
 			protected final String name;
@@ -66,6 +65,20 @@ public class HTMLRenderer {
 
 			public boolean isProperty() {
 				return getField().property();
+			}
+		}
+
+		@HTMLField
+		protected static final Object DUMMY = null;
+
+		@Getter(value = AccessLevel.PROTECTED, lazy = true)
+		private static final HTMLField defaultHTMLField = computeDefaultHTMLField();
+
+		protected static HTMLField computeDefaultHTMLField() {
+			try {
+				return ReflectiveExplicitHTMLElement.class.getDeclaredField("DUMMY").getAnnotation(HTMLField.class);
+			} catch (NoSuchFieldException | SecurityException e) {
+				throw new RuntimeReflectionException(e);
 			}
 		}
 
