@@ -1,4 +1,4 @@
-package com.g2forge.enigma.document.sandbox.html.custom;
+package com.g2forge.enigma.document.sandbox.html;
 
 import java.lang.reflect.Type;
 

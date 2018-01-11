@@ -1,8 +1,10 @@
-package com.g2forge.enigma.document.sandbox.html.custom;
+package com.g2forge.enigma.document.sandbox.html.elements;
 
 import java.util.Collection;
 
 import com.g2forge.alexandria.java.core.helpers.HCollection;
+import com.g2forge.enigma.document.sandbox.html.HTMLField;
+import com.g2forge.enigma.document.sandbox.html.IReflectiveHTMLElement;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,7 +14,7 @@ import lombok.Singular;
 @Data
 @Builder
 @AllArgsConstructor
-public class Span implements IReflectiveHTMLElement {
+public class Span implements IBodyElement, IReflectiveHTMLElement {
 	protected final String id;
 
 	@HTMLField(property = false)

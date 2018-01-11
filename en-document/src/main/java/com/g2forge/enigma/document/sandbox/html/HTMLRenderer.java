@@ -1,4 +1,4 @@
-package com.g2forge.enigma.document.sandbox.html.custom;
+package com.g2forge.enigma.document.sandbox.html;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -63,6 +63,14 @@ public class HTMLRenderer {
 
 			protected final Type type;
 
+			public String getNameClose() {
+				return "";
+			}
+
+			public String getNameOpen() {
+				return "";
+			}
+
 			public boolean isProperty() {
 				return getField().property();
 			}
@@ -92,7 +100,11 @@ public class HTMLRenderer {
 
 		public ReflectiveExplicitHTMLElement(IReflectiveHTMLElement element) {
 			this.element = element;
-			this.tag = element.getClass().getSimpleName().toLowerCase();
+
+			{ // Compute the tag
+				final HTMLTag annotation = element.getClass().getAnnotation(HTMLTag.class);
+				this.tag = ((annotation == null) || "".equals(annotation.value())) ? element.getClass().getSimpleName().toLowerCase() : annotation.value();
+			}
 
 			final Map<Boolean, List<Property<IReflectiveHTMLElement, ?>>> map = HReflection.toReflection(element).getFields(JavaScope.Inherited, null).map(field -> {
 				final HTMLField annotation = field.getAnnotations().getAnnotation(HTMLField.class);
@@ -108,14 +120,14 @@ public class HTMLRenderer {
 			final StringBuilder builder = context.getBuilder();
 			builder.append('<').append(tag);
 
-			properties.forEach(property -> {
+			if (properties != null) properties.forEach(property -> {
 				final Object value = property.getAccessor().apply(element);
-				if (!property.getField().skipNull() || (value != null)) builder.append(" \"").append(property.getName()).append("\"=\"").append(value).append("\"");
+				if (!property.getField().skipNull() || (value != null)) builder.append(' ').append(property.getNameOpen()).append(property.getName()).append(property.getNameClose()).append("=\"").append(value).append("\"");
 			});
 
 			{ // Contents
 				ContentState state = ContentState.Empty;
-				for (Property<IReflectiveHTMLElement, ?> property : content) {
+				if (content != null) for (Property<IReflectiveHTMLElement, ?> property : content) {
 					final Object value = property.getAccessor().apply(element);
 					if (!property.getField().skipNull() || (value != null)) {
 						if (state == ContentState.Empty) {

@@ -1,4 +1,4 @@
-package com.g2forge.enigma.document.sandbox.html.custom;
+package com.g2forge.enigma.document.sandbox.html;
 
 @FunctionalInterface
 public interface IExplicitHTMLElement extends IHTMLElement {
