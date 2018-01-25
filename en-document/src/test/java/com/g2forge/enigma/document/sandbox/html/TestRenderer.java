@@ -4,8 +4,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.g2forge.enigma.document.sandbox.html.HTMLRenderer;
-import com.g2forge.enigma.document.sandbox.html.elements.Image;
-import com.g2forge.enigma.document.sandbox.html.elements.Span;
+import com.g2forge.enigma.document.sandbox.html.html.Image;
+import com.g2forge.enigma.document.sandbox.html.html.Span;
 
 public class TestRenderer {
 	protected final HTMLRenderer renderer = new HTMLRenderer();

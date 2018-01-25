@@ -1,5 +1,6 @@
-package com.g2forge.enigma.document.sandbox.html.elements;
+package com.g2forge.enigma.document.sandbox.html.html;
 
+import com.g2forge.enigma.document.sandbox.css.ICSSStyle;
 import com.g2forge.enigma.document.sandbox.html.HTMLTag;
 import com.g2forge.enigma.document.sandbox.html.IReflectiveHTMLElement;
 
@@ -14,5 +15,5 @@ import lombok.Data;
 public class Image implements IBodyElement, IReflectiveHTMLElement {
 	protected final String src;
 
-	protected final String style;
+	protected final ICSSStyle style;
 }

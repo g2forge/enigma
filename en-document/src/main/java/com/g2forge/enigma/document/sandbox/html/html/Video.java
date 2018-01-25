@@ -1,4 +1,4 @@
-package com.g2forge.enigma.document.sandbox.html.elements;
+package com.g2forge.enigma.document.sandbox.html.html;
 
 import java.util.Arrays;
 import java.util.Collection;

@@ -1,4 +1,4 @@
-package com.g2forge.enigma.document.sandbox.html.elements;
+package com.g2forge.enigma.document.sandbox.html.html;
 
 import com.g2forge.alexandria.java.core.iface.ISingleton;
 import com.g2forge.enigma.document.sandbox.html.IReflectiveHTMLElement;
