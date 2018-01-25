@@ -1,25 +1,25 @@
-package com.g2forge.enigma.document.sandbox.html.elements;
+package com.g2forge.enigma.document.sandbox.html.svg;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import com.g2forge.enigma.document.sandbox.html.HTMLField;
+import com.g2forge.enigma.document.sandbox.html.HTMLTag;
 import com.g2forge.enigma.document.sandbox.html.IReflectiveHTMLElement;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Singular;
 
 @Data
 @Builder
 @AllArgsConstructor
-public class Div implements IBodyElement, IReflectiveHTMLElement {
+@HTMLTag("g")
+public class Group implements ISVGElement, IReflectiveHTMLElement {
 	@HTMLField(property = false)
-	@Singular
-	protected final Collection<IBodyElement> elements;
+	protected final Collection<ISVGElement> elements;
 
-	public Div(IBodyElement... elements) {
+	public Group(ISVGElement... elements) {
 		this(Arrays.asList(elements));
 	}
 }

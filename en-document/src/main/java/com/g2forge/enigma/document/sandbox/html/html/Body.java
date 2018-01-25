@@ -1,4 +1,4 @@
-package com.g2forge.enigma.document.sandbox.html.elements;
+package com.g2forge.enigma.document.sandbox.html.html;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,12 +14,12 @@ import lombok.Singular;
 @Data
 @Builder
 @AllArgsConstructor
-public class Head implements IReflectiveHTMLElement {
+public class Body implements IReflectiveHTMLElement {
 	@HTMLField(property = false)
 	@Singular
-	protected final Collection<IHeadElement> elements;
+	protected final Collection<IBodyElement> elements;
 
-	public Head(IHeadElement... elements) {
+	public Body(IBodyElement... elements) {
 		this(Arrays.asList(elements));
 	}
 }

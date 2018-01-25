@@ -1,4 +1,4 @@
-package com.g2forge.enigma.document.sandbox.html.elements;
+package com.g2forge.enigma.document.sandbox.html.html;
 
 import com.g2forge.enigma.document.sandbox.html.HTMLField;
 import com.g2forge.enigma.document.sandbox.html.IReflectiveHTMLElement;

@@ -12,6 +12,8 @@ import com.g2forge.alexandria.java.function.IFunction1;
 import com.g2forge.alexandria.java.function.IThrowFunction1;
 import com.g2forge.alexandria.java.typeswitch.TypeSwitch1;
 import com.g2forge.alexandria.reflection.object.HReflection;
+import com.g2forge.enigma.document.sandbox.css.CSSRenderer;
+import com.g2forge.enigma.document.sandbox.css.ICSSRenderable;
 
 import lombok.AccessLevel;
 import lombok.Data;
@@ -26,8 +28,11 @@ public class HTMLRenderer {
 
 	@Data
 	protected static class HTMLRenderContext implements IHTMLRenderContext {
+		protected static CSSRenderer css = new CSSRenderer();
+
 		protected static final IFunction1<Object, IExplicitHTMLElement> toExplicit = new TypeSwitch1.FunctionBuilder<Object, IExplicitHTMLElement>().with(builder -> {
 			builder.add(IExplicitHTMLElement.class, IFunction1.identity());
+			builder.add(ICSSRenderable.class, e -> context -> context.getBuilder().append(css.render(e)));
 			builder.add(IReflectiveHTMLElement.class, e -> new ReflectiveExplicitHTMLElement(e));
 			builder.add(Collection.class, e -> {
 				final Collection<?> c = e;
@@ -122,7 +127,11 @@ public class HTMLRenderer {
 
 			if (properties != null) properties.forEach(property -> {
 				final Object value = property.getAccessor().apply(element);
-				if (!property.getField().skipNull() || (value != null)) builder.append(' ').append(property.getNameOpen()).append(property.getName()).append(property.getNameClose()).append("=\"").append(value).append("\"");
+				if (!property.getField().skipNull() || (value != null)) {
+					builder.append(' ').append(property.getNameOpen()).append(property.getName()).append(property.getNameClose()).append("=\"");
+					context.toExplicit(value, property.getType()).render(context);
+					builder.append("\"");
+				}
 			});
 
 			{ // Contents
@@ -136,9 +145,7 @@ public class HTMLRenderer {
 						}
 						final int length = builder.length();
 
-						final IExplicitHTMLElement explicit = context.toExplicit(value, property.getType());
-						explicit.render(context);
-
+						context.toExplicit(value, property.getType()).render(context);
 						if (length != builder.length()) state = ContentState.Written;
 					}
 				}
