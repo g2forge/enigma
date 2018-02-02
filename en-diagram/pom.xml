@@ -19,7 +19,7 @@
 		<dependency>
 			<groupId>com.g2forge.enigma</groupId>
 			<artifactId>en-stringtemplate</artifactId>
-			<version>${enigma.version}</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.plantuml</groupId>
