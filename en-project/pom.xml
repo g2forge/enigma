@@ -17,8 +17,7 @@
 		<stringtemplate.version>4.0.8</stringtemplate.version>
 		<antlr.version>4.7.1</antlr.version>
 
-		<alexandria.version>0.0.4-SNAPSHOT</alexandria.version>
-		<enigma.version>0.0.2-SNAPSHOT</enigma.version>
+		<alexandria.version>0.0.5-SNAPSHOT</alexandria.version>
 
 		<enigma.organization>g2forge</enigma.organization>
 		<enigma.name>Enigma</enigma.name>
