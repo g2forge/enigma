@@ -11,6 +11,9 @@
 		<relativePath>../en-project/pom.xml</relativePath>
 	</parent>
 
+	<name>Enigma Document</name>
+	<description>Models, parsers and renderers for common documentation formats. This library is particularly helpful for generating documentation, including general HTML.</description>
+
 	<dependencies>
 		<dependency>
 			<groupId>com.g2forge.alexandria</groupId>

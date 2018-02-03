@@ -24,8 +24,8 @@
 		<enigma.repository>enigma</enigma.repository>
 	</properties>
 
-	<name>${enigma.name} Project</name>
-	<description>Parent project for ${enigma.name}.</description>
+	<name>Enigma Project</name>
+	<description>Parent project for Enigma.</description>
 	<url>https://github.com/${enigma.organization}/${enigma.repository}/tree/${project.version}/${project.artifactId}</url>
 	<developers>
 		<developer>

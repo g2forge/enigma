@@ -10,6 +10,9 @@
 		<version>0.0.2-SNAPSHOT</version>
 		<relativePath>../en-project/pom.xml</relativePath>
 	</parent>
+	
+	<name>Enigma Stringtemplate</name>
+	<description>Small wrapper around StringTemplate to assist in the rendering of models to text. See EmbeddedTemplateRenderer for the true power of this library.</description>
 
 	<dependencies>
 		<dependency>

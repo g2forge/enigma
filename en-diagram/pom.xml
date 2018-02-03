@@ -10,6 +10,9 @@
 		<version>0.0.2-SNAPSHOT</version>
 		<relativePath>../en-project/pom.xml</relativePath>
 	</parent>
+	
+	<name>Enigma Diagram</name>
+	<description>Models and renderers for the programmatic generation of diagrams.</description>
 
 	<properties>
 		<plantuml.version>8059</plantuml.version>

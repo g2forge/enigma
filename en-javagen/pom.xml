@@ -11,6 +11,9 @@
 		<relativePath>../en-project/pom.xml</relativePath>
 	</parent>
 
+	<name>Enigma Javagen</name>
+	<description>Metamodel for manipulating Java ASTs and rendering textual code. Can be combined with ax-compiler.</description>
+
 	<dependencies>
 		<dependency>
 			<groupId>com.g2forge.enigma</groupId>

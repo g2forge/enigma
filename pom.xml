@@ -11,6 +11,9 @@
 		<version>0.0.2-SNAPSHOT</version>
 		<relativePath>en-project/pom.xml</relativePath>
 	</parent>
+	
+	<name>Enigma</name>
+	<description>A library for manipulating codes of various kinds. Useful for constructing programming languages, rendering documents, etc.</description>
 
 	<modules>
 		<module>en-project</module>

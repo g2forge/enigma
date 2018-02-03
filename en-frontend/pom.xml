@@ -11,6 +11,9 @@
 		<relativePath>../en-project/pom.xml</relativePath>
 	</parent>
 
+	<name>Enigma Frontend</name>
+	<description>Small library to ease the creation of a compiler front end using ANTLR4.</description>
+
 	<dependencies>
 		<dependency>
 			<groupId>com.g2forge.alexandria</groupId>
