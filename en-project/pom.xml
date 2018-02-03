@@ -10,7 +10,8 @@
 	<parent>
 		<groupId>com.g2forge.alexandria</groupId>
 		<artifactId>ax-project</artifactId>
-		<version>0.0.4-SNAPSHOT</version>
+		<version>0.0.5-SNAPSHOT</version>
+		<relativePath>../../alexandria/ax-project/pom.xml</relativePath>
 	</parent>
 
 	<properties>
@@ -65,6 +66,24 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>versions-maven-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<properties>
+						<property>
+							<name>alexandria.version</name>
+							<dependencies>
+								<dependency>
+									<groupId>com.g2forge.alexandria</groupId>
+									<artifactId>alexandria</artifactId>
+								</dependency>
+							</dependencies>
+						</property>
+					</properties>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
