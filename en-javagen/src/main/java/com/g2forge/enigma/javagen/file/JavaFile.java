@@ -18,7 +18,7 @@ public class JavaFile {
 
 	protected final JavaPackageSpecifier packageDeclaration;
 
-	@Singular
+	@Singular("import_")
 	protected final Collection<JavaImport> imports;
 
 	@Singular
