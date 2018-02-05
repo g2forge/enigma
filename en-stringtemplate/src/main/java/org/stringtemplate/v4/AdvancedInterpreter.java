@@ -15,10 +15,11 @@ import org.stringtemplate.v4.misc.Misc;
 import org.stringtemplate.v4.misc.STNoSuchAttributeException;
 
 /**
- * Subclass to add support for {@link STAttributeGenerator}
+ * Subclass to add support for {@link STAttributeGenerator}. Note that much of the code in this file is necessarily copied from {@link Interpreter} in order to
+ * cope with encapsulation issues.
  * 
- * @author gdgib
- *
+ * @author Greg Gibeling
+ * @see Interpreter
  */
 public class AdvancedInterpreter extends Interpreter {
 	public AdvancedInterpreter(STGroup group, boolean debug) {

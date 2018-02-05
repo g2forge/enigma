@@ -19,9 +19,6 @@ import org.stringtemplate.v4.misc.ErrorManager;
 
 /**
  * Adds support for the advanced interpreter and custom line separators.
- * 
- * @author gdgib
- *
  */
 public class STAdvanced extends ST {
 	protected final String lineSeparator;

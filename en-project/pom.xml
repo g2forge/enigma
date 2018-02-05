@@ -1,31 +1,31 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.g2forge.enigma</groupId>
 	<artifactId>en-project</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>0.0.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<parent>
 		<groupId>com.g2forge.alexandria</groupId>
 		<artifactId>ax-project</artifactId>
-		<version>0.0.4-SNAPSHOT</version>
+		<version>0.0.6-SNAPSHOT</version>
+		<relativePath>../../alexandria/ax-project/pom.xml</relativePath>
 	</parent>
 
 	<properties>
 		<stringtemplate.version>4.0.8</stringtemplate.version>
 		<antlr.version>4.7.1</antlr.version>
 
-		<alexandria.version>0.0.5-SNAPSHOT</alexandria.version>
+		<alexandria.version>0.0.6-SNAPSHOT</alexandria.version>
 
 		<enigma.organization>g2forge</enigma.organization>
 		<enigma.name>Enigma</enigma.name>
 		<enigma.repository>enigma</enigma.repository>
 	</properties>
 
-	<name>${enigma.name} Project</name>
-	<description>Parent project for ${enigma.name}.</description>
+	<name>Enigma Project</name>
+	<description>Parent project for Enigma.</description>
 	<url>https://github.com/${enigma.organization}/${enigma.repository}/tree/${project.version}/${project.artifactId}</url>
 	<developers>
 		<developer>
@@ -45,7 +45,8 @@
 		<connection>scm:git:git://github.com/${enigma.organization}/${enigma.repository}.git</connection>
 		<developerConnection>scm:git:ssh://github.com:${enigma.organization}/${enigma.repository}.git</developerConnection>
 		<url>http://github.com/${enigma.organization}/${enigma.repository}/tree/${project.version}</url>
-	</scm>
+	  <tag>HEAD</tag>
+  </scm>
 
 	<build>
 		<plugins>
@@ -65,6 +66,24 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>versions-maven-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<properties>
+						<property>
+							<name>alexandria.version</name>
+							<dependencies>
+								<dependency>
+									<groupId>com.g2forge.alexandria</groupId>
+									<artifactId>alexandria</artifactId>
+								</dependency>
+							</dependencies>
+						</property>
+					</properties>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>en-presentation</artifactId>
@@ -7,9 +6,12 @@
 	<parent>
 		<groupId>com.g2forge.enigma</groupId>
 		<artifactId>en-project</artifactId>
-		<version>0.0.2-SNAPSHOT</version>
+		<version>0.0.3-SNAPSHOT</version>
 		<relativePath>../en-project/pom.xml</relativePath>
 	</parent>
+
+	<name>Enigma Presentation</name>
+	<description>Library for the programmatic construction of presentations. Based on Apache POI, this library does not require that you understand office document formats, and provides a simplified abstraction.</description>
 
 	<properties>
 		<poi.version>3.17</poi.version>

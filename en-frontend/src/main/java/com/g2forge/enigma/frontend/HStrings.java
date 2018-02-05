@@ -13,7 +13,7 @@ public class HStrings {
 	@AllArgsConstructor
 	@Getter
 	protected enum Quotes {
-		Smart('“', '”'),
+		Smart('\u201c', '\u201d'),
 		Plain('"', '"');
 
 		protected final char open;
