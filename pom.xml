@@ -22,6 +22,7 @@
 		<module>en-frontend</module>
 		<module>en-diagram</module>
 		<module>en-document</module>
+		<module>en-web</module>
 		<module>en-presentation</module>
 	</modules>
 </project>
