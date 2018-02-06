@@ -11,6 +11,10 @@
 		<relativePath>../en-project/pom.xml</relativePath>
 	</parent>
 
+	<properties>
+		<mylyndocs.version>3.0.22</mylyndocs.version>
+	</properties>
+
 	<name>Enigma Document</name>
 	<description>Models, parsers and renderers for common documentation formats. This library is helpful for generating documentation and translating formats like MD, wikitext and office documents.</description>
 
@@ -25,7 +29,7 @@
 		<dependency>
 			<groupId>org.eclipse.mylyn.docs</groupId>
 			<artifactId>org.eclipse.mylyn.wikitext.markdown</artifactId>
-			<version>3.0.19</version>
+			<version>${mylyndocs.version}</version>
 		</dependency>
 	</dependencies>
 </project>
