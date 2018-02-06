@@ -3,9 +3,9 @@ package com.g2forge.enigma.web.html.svg;
 import java.util.Arrays;
 import java.util.Collection;
 
-import com.g2forge.enigma.web.html.HTMLField;
-import com.g2forge.enigma.web.html.HTMLTag;
-import com.g2forge.enigma.web.html.IReflectiveHTMLElement;
+import com.g2forge.enigma.web.html.convert.HTMLField;
+import com.g2forge.enigma.web.html.convert.HTMLTag;
+import com.g2forge.enigma.web.html.convert.IReflectiveHTMLElement;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
