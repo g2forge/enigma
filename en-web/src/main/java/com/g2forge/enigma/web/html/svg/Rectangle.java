@@ -1,8 +1,8 @@
 package com.g2forge.enigma.web.html.svg;
 
 import com.g2forge.enigma.web.css.ICSSStyle;
-import com.g2forge.enigma.web.html.HTMLTag;
-import com.g2forge.enigma.web.html.IReflectiveHTMLElement;
+import com.g2forge.enigma.web.html.convert.HTMLTag;
+import com.g2forge.enigma.web.html.convert.IReflectiveHTMLElement;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

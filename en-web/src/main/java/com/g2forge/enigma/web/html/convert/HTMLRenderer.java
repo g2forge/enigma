@@ -1,4 +1,4 @@
-package com.g2forge.enigma.web.html;
+package com.g2forge.enigma.web.html.convert;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -12,8 +12,8 @@ import com.g2forge.alexandria.java.function.IFunction1;
 import com.g2forge.alexandria.java.function.IThrowFunction1;
 import com.g2forge.alexandria.java.typeswitch.TypeSwitch1;
 import com.g2forge.alexandria.reflection.object.HReflection;
-import com.g2forge.enigma.web.css.CSSRenderer;
-import com.g2forge.enigma.web.css.ICSSRenderable;
+import com.g2forge.enigma.web.css.convert.CSSRenderer;
+import com.g2forge.enigma.web.css.convert.ICSSRenderable;
 
 import lombok.AccessLevel;
 import lombok.Data;

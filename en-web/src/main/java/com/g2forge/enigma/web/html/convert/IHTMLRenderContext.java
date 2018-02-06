@@ -1,4 +1,4 @@
-package com.g2forge.enigma.web.html;
+package com.g2forge.enigma.web.html.convert;
 
 import java.lang.reflect.Type;
 

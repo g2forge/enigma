@@ -3,11 +3,11 @@ package com.g2forge.enigma.web.html;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.g2forge.enigma.web.html.HTMLRenderer;
+import com.g2forge.enigma.web.html.convert.HTMLRenderer;
 import com.g2forge.enigma.web.html.html.Image;
 import com.g2forge.enigma.web.html.html.Span;
 
-public class TestRenderer {
+public class TestHTML {
 	protected final HTMLRenderer renderer = new HTMLRenderer();
 
 	@Test

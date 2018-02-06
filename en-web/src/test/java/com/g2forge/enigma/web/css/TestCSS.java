@@ -3,6 +3,7 @@ package com.g2forge.enigma.web.css;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.g2forge.enigma.web.css.convert.CSSRenderer;
 import com.g2forge.enigma.web.css.distance.Distance;
 import com.g2forge.enigma.web.css.distance.Distance.Unit;
 import com.g2forge.enigma.web.css.layout.Display;

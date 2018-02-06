@@ -1,4 +1,4 @@
-package com.g2forge.enigma.web.css;
+package com.g2forge.enigma.web.css.convert;
 
 @FunctionalInterface
 public interface IExplicitCSSRenderable extends ICSSRenderable {

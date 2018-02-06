@@ -1,4 +1,4 @@
-package com.g2forge.enigma.web.html.svg;
+package com.g2forge.enigma.web.html;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -10,9 +10,13 @@ import com.g2forge.enigma.web.css.drawing.Stroke;
 import com.g2forge.enigma.web.css.drawing.StrokeWidth;
 import com.g2forge.enigma.web.css.text.DominantBaseline;
 import com.g2forge.enigma.web.css.text.TextAnchor;
-import com.g2forge.enigma.web.html.HTMLRenderer;
+import com.g2forge.enigma.web.html.convert.HTMLRenderer;
 import com.g2forge.enigma.web.html.html.Body;
 import com.g2forge.enigma.web.html.html.HTML;
+import com.g2forge.enigma.web.html.svg.Group;
+import com.g2forge.enigma.web.html.svg.Rectangle;
+import com.g2forge.enigma.web.html.svg.SVG;
+import com.g2forge.enigma.web.html.svg.Text;
 
 public class TestSVG {
 	@Test

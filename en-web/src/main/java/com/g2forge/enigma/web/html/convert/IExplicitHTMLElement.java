@@ -1,4 +1,4 @@
-package com.g2forge.enigma.web.html;
+package com.g2forge.enigma.web.html.convert;
 
 @FunctionalInterface
 public interface IExplicitHTMLElement extends IHTMLElement {
