@@ -55,36 +55,41 @@ public class PresentationBuilder implements ICloseable {
 	@AllArgsConstructor
 	@Getter
 	@ToString
-	public static class ContentContext {
+	protected static class ContentContext implements IContentContext {
 		protected final IFunction1<XSLFSimpleShape, ILayoutContent> layout;
 
-		protected final XMLSlideShow ppt;
+		protected final XMLSlideShow show;
 
 		protected final XSLFSlide slide;
 
 		protected final Rectangle2D anchor;
+
+		@Override
+		public ILayoutContent getLayout(XSLFSimpleShape shape) {
+			return getLayout().apply(shape);
+		}
 	}
 
 	@AllArgsConstructor
 	@Getter
 	@ToString
-	public class SlideContext {
+	protected static class SlideContext implements ISlideContext {
 		protected final ILayoutSlide layout;
 
-		protected final XMLSlideShow ppt;
+		protected final XMLSlideShow show;
 
 		protected final XSLFSlide slide;
 
-		protected void addContent(int placeholder, final IContent content) {
+		public void addContent(int placeholder, final IContent content) {
 			final XSLFTextShape shape = getSlide().getPlaceholder(placeholder);
 			final Rectangle2D anchor = shape.getAnchor();
 			slide.removeShape(shape);
-			contentConsumer.accept(new ContentContext(t -> getLayout().getContent(content, t), getPpt(), slide, anchor), content);
+			contentConsumer.accept(new ContentContext(t -> getLayout().getContent(content, t), getShow(), slide, anchor), content);
 		}
 	}
 
-	protected final IConsumer2<ContentContext, IContent> contentConsumer = new TypeSwitch2.ConsumerBuilder<ContentContext, IContent>().with(builder -> {
-		builder.add(ContentContext.class, ContentText.class, (c, t) -> {
+	protected static final IConsumer2<IContentContext, IContent> contentConsumer = new TypeSwitch2.ConsumerBuilder<IContentContext, IContent>().with(builder -> {
+		builder.add(IContentContext.class, ContentText.class, (c, t) -> {
 			final XSLFTextBox body = c.getSlide().createTextBox();
 			body.setAnchor(c.getAnchor());
 
@@ -103,25 +108,25 @@ public class PresentationBuilder implements ICloseable {
 
 			run.setText(t.getText());
 		});
-		builder.add(ContentContext.class, ContentPicture.class, (c, t) -> {
+		builder.add(IContentContext.class, ContentPicture.class, (c, t) -> {
 			final byte[] data;
 			try (final InputStream stream = Files.newInputStream(t.getPath())) {
 				data = IOUtils.toByteArray(stream);
 			} catch (IOException e) {
 				throw new RuntimeIOException(e);
 			}
-			final XSLFPictureData picture = c.getPpt().addPicture(data, PictureType.PNG);
+			final XSLFPictureData picture = c.getShow().addPicture(data, PictureType.PNG);
 			final XSLFPictureShape shape = c.getSlide().createPicture(picture);
-			c.getLayout().apply(shape).anchor(c.getAnchor(), picture.getImageDimension(), true);
+			c.getLayout(shape).anchor(c.getAnchor(), picture.getImageDimension(), true);
 		});
-		builder.add(ContentContext.class, IContentManual.class, (c, t) -> t.apply(c));
+		builder.add(IContentContext.class, IContentManual.class, (c, t) -> t.apply(c));
 	}).build();
 
 	@Getter(AccessLevel.PROTECTED)
 	protected final ILayoutPresentation layout;
 
 	@Getter(AccessLevel.PROTECTED)
-	protected final XMLSlideShow ppt;
+	protected final XMLSlideShow show;
 
 	@Getter(AccessLevel.PROTECTED)
 	protected final XSLFSlideMaster master;
@@ -129,20 +134,20 @@ public class PresentationBuilder implements ICloseable {
 	protected final IConsumer1<ISlide> slides = new TypeSwitch1.ConsumerBuilder<ISlide>().with(builder -> {
 		builder.add(SlideTitle.class, s -> {
 			final XSLFSlideLayout layout = getMaster().getLayout(SlideLayout.TITLE);
-			final XSLFSlide actual = getPpt().createSlide(layout);
+			final XSLFSlide actual = getShow().createSlide(layout);
 			actual.getPlaceholder(0).setText(s.getTitle());
 			actual.getPlaceholder(1).setText(s.getSubtitle());
 		});
 		builder.add(SlideContent.class, s -> {
 			final XSLFSlide actual = createSlideWithTitle(s, SlideLayout.TITLE_AND_CONTENT);
 			try (final ILayoutSlide layout = getLayout().getSlide(s)) {
-				new SlideContext(layout, getPpt(), actual).addContent(1, s.getContent());
+				new SlideContext(layout, getShow(), actual).addContent(1, s.getContent());
 			}
 		});
 		builder.add(SlideContent2.class, s -> {
 			final XSLFSlide actual = createSlideWithTitle(s, SlideLayout.TWO_OBJ);
 			try (final ILayoutSlide layout = getLayout().getSlide(s)) {
-				final SlideContext context = new SlideContext(layout, getPpt(), actual);
+				final ISlideContext context = new SlideContext(layout, getShow(), actual);
 				context.addContent(1, s.getLeft());
 				context.addContent(2, s.getRight());
 			}
@@ -150,7 +155,7 @@ public class PresentationBuilder implements ICloseable {
 		builder.add(SlideSection.class, s -> {
 			{ // Create section header slide
 				final XSLFSlideLayout layout = getMaster().getLayout(SlideLayout.SECTION_HEADER);
-				final XSLFSlide actual = getPpt().createSlide(layout);
+				final XSLFSlide actual = getShow().createSlide(layout);
 				actual.getPlaceholder(0).setText(s.getTitle());
 				actual.getPlaceholder(1).setText(s.getSubtitle());
 			}
@@ -163,11 +168,11 @@ public class PresentationBuilder implements ICloseable {
 	public PresentationBuilder(Path template, ILayoutPresentation layout) {
 		this.layout = layout == null ? StandardLayoutPresentation.create() : layout;
 		try {
-			this.ppt = template == null ? new XMLSlideShow() : new XMLSlideShow(new FileInputStream(template.toFile()));
+			this.show = template == null ? new XMLSlideShow() : new XMLSlideShow(new FileInputStream(template.toFile()));
 		} catch (IOException e) {
 			throw new RuntimeIOException(e);
 		}
-		this.master = ppt.getSlideMasters().get(0);
+		this.master = getShow().getSlideMasters().get(0);
 	}
 
 	public PresentationBuilder add(ISlide slide) {
@@ -178,14 +183,14 @@ public class PresentationBuilder implements ICloseable {
 	@Override
 	public void close() {
 		try {
-			ppt.close();
+			getShow().close();
 		} catch (IOException e) {
 			throw new RuntimeIOException(e);
 		}
 	}
 
 	protected XSLFSlide createSlideWithTitle(ISlide slide, final SlideLayout layout) {
-		final XSLFSlide actual = ppt.createSlide(master.getLayout(layout));
+		final XSLFSlide actual = getShow().createSlide(master.getLayout(layout));
 		actual.getPlaceholder(0).setText(slide.getTitle());
 		if (slide.getSubtitle() != null) {
 			final XSLFTextRun subtitle = actual.getPlaceholder(0).addNewTextParagraph().addNewTextRun();
@@ -198,7 +203,7 @@ public class PresentationBuilder implements ICloseable {
 	public PresentationBuilder write(Path path) {
 		layout.layout();
 		try (OutputStream out = Files.newOutputStream(path)) {
-			ppt.write(out);
+			getShow().write(out);
 		} catch (IOException e) {
 			throw new RuntimeIOException(e);
 		}
