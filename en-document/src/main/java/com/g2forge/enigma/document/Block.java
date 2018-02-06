@@ -1,4 +1,4 @@
-package com.g2forge.enigma.document.sandbox.wikitext;
+package com.g2forge.enigma.document;
 
 import java.util.List;
 
@@ -11,8 +11,6 @@ import lombok.Singular;
 @Builder
 @AllArgsConstructor
 public class Block implements IBlock {
-	protected static final String TEMPLATE = "<contents:{c|<c><\\n>}>";
-
 	@Singular
 	protected final List<IBlock> contents;
 }

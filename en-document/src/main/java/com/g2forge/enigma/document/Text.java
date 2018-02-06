@@ -1,4 +1,4 @@
-package com.g2forge.enigma.document.sandbox.wikitext;
+package com.g2forge.enigma.document;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,7 +8,5 @@ import lombok.Data;
 @Builder
 @AllArgsConstructor
 public class Text implements ISpan {
-	protected static final String TEMPLATE = "<text>";
-
 	protected final String text;
 }
