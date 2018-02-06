@@ -11,6 +11,7 @@ import com.g2forge.alexandria.java.core.error.NotYetImplementedError;
 import com.g2forge.alexandria.java.function.IConsumer1;
 import com.g2forge.alexandria.java.function.IPredicate1;
 import com.g2forge.enigma.document.Block;
+import com.g2forge.enigma.document.Emphasis;
 import com.g2forge.enigma.document.IBlock;
 import com.g2forge.enigma.document.ISpan;
 import com.g2forge.enigma.document.List;
@@ -53,6 +54,28 @@ public class WikitextDocumentBuilder extends DocumentBuilder {
 		@Override
 		public void accept(IDocElement element) {
 			builder.item((IBlock) element);
+		}
+
+		@Override
+		public IDocElement build() {
+			return builder.build();
+		}
+	}
+
+	protected static class EmphasisDOMBuilder implements IDOMBuilder {
+		@Getter
+		protected final Emphasis.Type type;
+
+		protected final Emphasis.EmphasisBuilder builder = Emphasis.builder();
+
+		public EmphasisDOMBuilder(Emphasis.Type type) {
+			this.type = type;
+			builder.type(type);
+		}
+
+		@Override
+		public void accept(IDocElement element) {
+			builder.span((ISpan) element);
 		}
 
 		@Override
@@ -127,7 +150,6 @@ public class WikitextDocumentBuilder extends DocumentBuilder {
 			default:
 				throw new NotYetImplementedError(String.format("Block type \"%1$s\" is not supported yet!", type));
 		}
-
 	}
 
 	@Override
@@ -149,7 +171,19 @@ public class WikitextDocumentBuilder extends DocumentBuilder {
 
 	@Override
 	public void beginSpan(SpanType type, Attributes attributes) {
-		throw new NotYetImplementedError();
+		switch (type) {
+			case EMPHASIS:
+				stack.push(new EmphasisDOMBuilder(Emphasis.Type.Emphasis));
+				break;
+			case STRONG:
+				stack.push(new EmphasisDOMBuilder(Emphasis.Type.Strong));
+				break;
+			case CODE:
+				stack.push(new EmphasisDOMBuilder(Emphasis.Type.Code));
+				break;
+			default:
+				throw new NotYetImplementedError(String.format("Span type \"%1$s\" is not supported yet!", type));
+		}
 	}
 
 	@Override
@@ -180,7 +214,7 @@ public class WikitextDocumentBuilder extends DocumentBuilder {
 
 	@Override
 	public void endSpan() {
-		throw new NotYetImplementedError();
+		pop();
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.g2forge.enigma.document.Block;
+import com.g2forge.enigma.document.Emphasis;
 import com.g2forge.enigma.document.Section;
 import com.g2forge.enigma.document.Text;
 import com.g2forge.enigma.document.convert.md.MDRenderer;
@@ -36,6 +37,15 @@ public class TestWikitext {
 	public void text() {
 		final String text = "Text";
 		final IDocElement dom = Block.builder().type(Block.Type.Document).content(Block.builder().type(Block.Type.Paragraph).content(new Text(text)).build()).build();
+
+		Assert.assertEquals(dom, WikitextDocumentBuilder.parse(markdown, text));
+		Assert.assertEquals(text, renderer.render(dom));
+	}
+
+	@Test
+	public void emphasis() {
+		final String text = "*Text*";
+		final IDocElement dom = Block.builder().type(Block.Type.Document).content(Block.builder().type(Block.Type.Paragraph).content(new Emphasis(Emphasis.Type.Emphasis, new Text("Text"))).build()).build();
 
 		Assert.assertEquals(dom, WikitextDocumentBuilder.parse(markdown, text));
 		Assert.assertEquals(text, renderer.render(dom));
