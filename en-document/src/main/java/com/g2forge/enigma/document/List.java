@@ -20,5 +20,5 @@ public class List implements IBlock {
 	protected final Marker marker;
 
 	@Singular
-	protected final java.util.List<IBlock> items;
+	protected final java.util.List<IListItem> items;
 }

@@ -6,7 +6,10 @@ import org.junit.Test;
 import com.g2forge.alexandria.java.core.helpers.HResource;
 import com.g2forge.enigma.document.Block;
 import com.g2forge.enigma.document.Block.BlockBuilder;
+import com.g2forge.enigma.document.Definition;
+import com.g2forge.enigma.document.Emphasis;
 import com.g2forge.enigma.document.List;
+import com.g2forge.enigma.document.List.ListBuilder;
 import com.g2forge.enigma.document.Text;
 
 public class TestMD {
@@ -21,6 +24,17 @@ public class TestMD {
 		final Block actual = builder.build();
 
 		final String expected = HResource.read(getClass(), "simple.md").replace(System.lineSeparator(), "\n");
+		Assert.assertEquals(expected, renderer.render(actual));
+	}
+
+	@Test
+	public void help() {
+		final ListBuilder builder = List.builder().marker(List.Marker.Ordered);
+		builder.item(Definition.builder().term(new Emphasis(Emphasis.Type.Code, new Text("-x"))).body(new Text("This is a sentence about the 'x' option!")).build());
+		builder.item(Definition.builder().term(new Emphasis(Emphasis.Type.Code, new Text("-y"))).body(new Text("Some description of another option")).build());
+		final List actual = builder.build();
+
+		final String expected = HResource.read(getClass(), "help.md").replace(System.lineSeparator(), "\n");
 		Assert.assertEquals(expected, renderer.render(actual));
 	}
 }

@@ -1,24 +1,21 @@
 package com.g2forge.enigma.document;
 
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Singular;
 
 @Data
 @Builder
 @AllArgsConstructor
-public class Block implements IBlock {
+public class Emphasis implements ISpan {
 	public enum Type {
-		Document,
-		Paragraph,
-		ListItem;
+		Code,
+		Emphasis,
+		Strong,
+		Strikethrough;
 	}
 
 	protected final Type type;
 
-	@Singular
-	protected final List<IBlock> contents;
+	protected final ISpan span;
 }

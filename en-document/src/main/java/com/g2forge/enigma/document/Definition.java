@@ -7,8 +7,8 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-public class Section implements IBlock {
-	protected final ISpan title;
-
+public class Definition implements IListItem {
+	protected final ISpan term;
+	
 	protected final IBlock body;
 }

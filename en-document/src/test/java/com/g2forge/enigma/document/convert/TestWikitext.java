@@ -17,7 +17,7 @@ public class TestWikitext {
 	@Test
 	public void section() {
 		final String text = "# Section\n\nContent";
-		final IDocElement dom = Block.builder().type(Block.Type.Document).content(Section.builder().title("Section").body(Block.builder().type(Block.Type.Paragraph).content(new Text("Content")).build()).build()).build();
+		final IDocElement dom = Block.builder().type(Block.Type.Document).content(Section.builder().title(new Text("Section")).body(Block.builder().type(Block.Type.Paragraph).content(new Text("Content")).build()).build()).build();
 
 		Assert.assertEquals(dom, WikitextDocumentBuilder.parse(markdown, text));
 		Assert.assertEquals(text, renderer.render(dom));
@@ -26,7 +26,7 @@ public class TestWikitext {
 	@Test
 	public void section2() {
 		final String text = "# Section\n\n## Subsection\n\nContent";
-		final IDocElement dom = Block.builder().type(Block.Type.Document).content(Section.builder().title("Section").body(Section.builder().title("Subsection").body(Block.builder().type(Block.Type.Paragraph).content(new Text("Content")).build()).build()).build()).build();
+		final IDocElement dom = Block.builder().type(Block.Type.Document).content(Section.builder().title(new Text("Section")).body(Section.builder().title(new Text("Subsection")).body(Block.builder().type(Block.Type.Paragraph).content(new Text("Content")).build()).build()).build()).build();
 
 		Assert.assertEquals(dom, WikitextDocumentBuilder.parse(markdown, text));
 		Assert.assertEquals(text, renderer.render(dom));
