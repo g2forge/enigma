@@ -14,32 +14,33 @@ import org.apache.poi.xslf.usermodel.SlideLayout;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFPictureData;
 import org.apache.poi.xslf.usermodel.XSLFPictureShape;
-import org.apache.poi.xslf.usermodel.XSLFSimpleShape;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
 import org.apache.poi.xslf.usermodel.XSLFSlideLayout;
 import org.apache.poi.xslf.usermodel.XSLFSlideMaster;
-import org.apache.poi.xslf.usermodel.XSLFTextBox;
 import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
 import org.apache.poi.xslf.usermodel.XSLFTextRun;
 import org.apache.poi.xslf.usermodel.XSLFTextShape;
 
 import com.g2forge.alexandria.java.close.ICloseable;
-import com.g2forge.alexandria.java.function.IConsumer1;
 import com.g2forge.alexandria.java.function.IConsumer2;
-import com.g2forge.alexandria.java.function.IFunction1;
 import com.g2forge.alexandria.java.io.RuntimeIOException;
-import com.g2forge.alexandria.java.typeswitch.TypeSwitch1;
 import com.g2forge.alexandria.java.typeswitch.TypeSwitch2;
+import com.g2forge.enigma.presentation.content.ContentDoc;
 import com.g2forge.enigma.presentation.content.ContentPicture;
 import com.g2forge.enigma.presentation.content.ContentText;
 import com.g2forge.enigma.presentation.content.IContent;
-import com.g2forge.enigma.presentation.content.IContentManual;
-import com.g2forge.enigma.presentation.layout.ILayoutContent;
+import com.g2forge.enigma.presentation.content.IContentContext;
+import com.g2forge.enigma.presentation.content.IContentExplicit;
+import com.g2forge.enigma.presentation.content.document.XSLFRenderer;
 import com.g2forge.enigma.presentation.layout.ILayoutPresentation;
 import com.g2forge.enigma.presentation.layout.ILayoutSlide;
 import com.g2forge.enigma.presentation.layout.StandardLayoutPresentation;
 import com.g2forge.enigma.presentation.slide.ISlide;
-import com.g2forge.enigma.presentation.slide.SlideContent;
+import com.g2forge.enigma.presentation.slide.ISlideContext;
+import com.g2forge.enigma.presentation.slide.ISlideContextGenerator;
+import com.g2forge.enigma.presentation.slide.ISlideExplicit;
+import com.g2forge.enigma.presentation.slide.ISlideStandard;
+import com.g2forge.enigma.presentation.slide.SlideContent1;
 import com.g2forge.enigma.presentation.slide.SlideContent2;
 import com.g2forge.enigma.presentation.slide.SlideSection;
 import com.g2forge.enigma.presentation.slide.SlideTitle;
@@ -49,52 +50,129 @@ import com.g2forge.enigma.presentation.text.Paragraph;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-public class PresentationBuilder implements ICloseable {
+public class PresentationBuilder implements IPresentationBuilder {
 	@AllArgsConstructor
 	@Getter
 	@ToString
-	public static class ContentContext {
-		protected final IFunction1<XSLFSimpleShape, ILayoutContent> layout;
+	protected static class ContentContext implements IContentContext {
+		protected final ISlideContext slide;
 
-		protected final XMLSlideShow ppt;
+		protected final XSLFTextShape text;
 
-		protected final XSLFSlide slide;
+		@Getter(lazy = true)
+		private final Rectangle2D anchor = computeAnchor();
 
-		protected final Rectangle2D anchor;
-	}
-
-	@AllArgsConstructor
-	@Getter
-	@ToString
-	public class SlideContext {
-		protected final ILayoutSlide layout;
-
-		protected final XMLSlideShow ppt;
-
-		protected final XSLFSlide slide;
-
-		protected void addContent(int placeholder, final IContent content) {
-			final XSLFTextShape shape = getSlide().getPlaceholder(placeholder);
-			final Rectangle2D anchor = shape.getAnchor();
-			slide.removeShape(shape);
-			contentConsumer.accept(new ContentContext(t -> getLayout().getContent(content, t), getPpt(), slide, anchor), content);
+		protected Rectangle2D computeAnchor() {
+			final Rectangle2D anchor = getText().getAnchor();
+			getSlide().getSlide().removeShape(getText());
+			return anchor;
 		}
 	}
 
-	protected final IConsumer2<ContentContext, IContent> contentConsumer = new TypeSwitch2.ConsumerBuilder<ContentContext, IContent>().with(builder -> {
-		builder.add(ContentContext.class, ContentText.class, (c, t) -> {
-			final XSLFTextBox body = c.getSlide().createTextBox();
-			body.setAnchor(c.getAnchor());
+	@AllArgsConstructor
+	@Getter
+	@ToString
+	public static class PresentationContext {
+		protected final ILayoutPresentation layout;
 
-			final XSLFTextParagraph paragraph = body.getTextParagraphs().get(0);
+		protected final XMLSlideShow show;
+
+		@Getter(lazy = true)
+		private final XSLFSlideMaster master = getShow().getSlideMasters().get(0);
+
+		public void add(ISlide slide) {
+			slideConsumer.accept(this, slide);
+		}
+
+		public SlideContext createContentSlide(ISlideStandard slide, final SlideLayout layout) {
+			final XSLFSlide actual = getShow().createSlide(getMaster().getLayout(layout));
+			actual.getPlaceholder(0).setText(slide.getTitle());
+			if (slide.getSubtitle() != null) {
+				final XSLFTextRun subtitle = actual.getPlaceholder(0).addNewTextParagraph().addNewTextRun();
+				subtitle.setFontSize(subtitle.getFontSize() * 0.5);
+				subtitle.setText(slide.getSubtitle());
+			}
+
+			return new SlideContext(getLayout().getSlide(slide), getShow(), actual);
+		}
+
+		public XSLFSlide createTitleSlide(ISlideStandard slide, final SlideLayout layout) {
+			final XSLFSlide actual = getShow().createSlide(getMaster().getLayout(layout));
+			actual.getPlaceholder(0).setText(slide.getTitle());
+			actual.getPlaceholder(1).setText(slide.getSubtitle() == null ? " " : slide.getSubtitle());
+			return actual;
+		}
+	}
+
+	@AllArgsConstructor
+	@Getter
+	@ToString
+	protected static class SlideContext implements ISlideContext, ICloseable {
+		protected final ILayoutSlide layout;
+
+		protected final XMLSlideShow show;
+
+		protected final XSLFSlide slide;
+
+		@Override
+		public void addContent(int placeholder, final IContent content) {
+			final XSLFTextShape shape = getSlide().getPlaceholder(placeholder);
+			contentConsumer.accept(new ContentContext(this, shape), content);
+		}
+
+		@Override
+		public void close() {
+			getLayout().close();
+		}
+	}
+
+	@RequiredArgsConstructor
+	protected static class SlideContextGenerator implements ISlideContextGenerator, ICloseable {
+		protected final PresentationContext presentation;
+
+		protected final ISlide slide;
+
+		protected SlideContext context = null;
+
+		@Override
+		public void close() {
+			if (context != null) context.close();
+		}
+
+		@Override
+		public ISlideContext create(SlideLayout layout) {
+			if (context == null) create(presentation.getMaster().getLayout(layout));
+			return context;
+		}
+
+		@Override
+		public ISlideContext create(String layout) {
+			if (context == null) create(presentation.getMaster().getLayout(layout));
+			return context;
+		}
+
+		private void create(XSLFSlideLayout layout) {
+			final XMLSlideShow show = presentation.getShow();
+			context = new SlideContext(presentation.getLayout().getSlide(slide), show, show.createSlide(layout));
+		}
+	}
+
+	protected static final IConsumer2<IContentContext, IContent> contentConsumer = new TypeSwitch2.ConsumerBuilder<IContentContext, IContent>().with(builder -> {
+		builder.add(IContentContext.class, ContentText.class, (c, t) -> {
+			final XSLFTextShape body = c.getText();
+			body.clearText();
+
+			final XSLFTextParagraph paragraph = body.addNewTextParagraph();
+			paragraph.setBullet(false);
 			final Paragraph paragraphControl = t.getParagraph();
 			if (paragraphControl != null) {
 				if (paragraphControl.getSpaceBefore() > 0.0) paragraph.setSpaceBefore(paragraphControl.getSpaceBefore());
 			}
 
-			final XSLFTextRun run = paragraph.getTextRuns().get(0);
+			final XSLFTextRun run = paragraph.addNewTextRun();
 			final Font fontControl = t.getFont();
 			if (fontControl != null) {
 				if (fontControl.getFamily() != null) run.setFontFamily(fontControl.getFamily());
@@ -103,102 +181,85 @@ public class PresentationBuilder implements ICloseable {
 
 			run.setText(t.getText());
 		});
-		builder.add(ContentContext.class, ContentPicture.class, (c, t) -> {
+		builder.add(IContentContext.class, ContentPicture.class, (c, t) -> {
 			final byte[] data;
 			try (final InputStream stream = Files.newInputStream(t.getPath())) {
 				data = IOUtils.toByteArray(stream);
 			} catch (IOException e) {
 				throw new RuntimeIOException(e);
 			}
-			final XSLFPictureData picture = c.getPpt().addPicture(data, PictureType.PNG);
-			final XSLFPictureShape shape = c.getSlide().createPicture(picture);
-			c.getLayout().apply(shape).anchor(c.getAnchor(), picture.getImageDimension(), true);
+			final XSLFPictureData picture = c.getSlide().getShow().addPicture(data, PictureType.PNG);
+			final XSLFPictureShape shape = c.getSlide().getSlide().createPicture(picture);
+			c.getSlide().getLayout().getContent(t, shape).anchor(c.getAnchor(), picture.getImageDimension(), true);
 		});
-		builder.add(ContentContext.class, IContentManual.class, (c, t) -> t.apply(c));
+		builder.add(IContentContext.class, ContentDoc.class, (c, t) -> {
+			final XSLFTextShape body = c.getText();
+			XSLFRenderer.create().render(body, t.getDoc());
+		});
+		builder.add(IContentContext.class, IContentExplicit.class, (c, t) -> t.apply(c));
+	}).build();
+
+	protected static final IConsumer2<PresentationContext, ISlide> slideConsumer = new TypeSwitch2.ConsumerBuilder<PresentationContext, ISlide>().with(builder -> {
+		builder.add(PresentationContext.class, SlideTitle.class, (p, s) -> p.createTitleSlide(s, SlideLayout.TITLE));
+		builder.add(PresentationContext.class, SlideContent1.class, (p, s) -> {
+			try (final SlideContext context = p.createContentSlide(s, SlideLayout.TITLE_AND_CONTENT)) {
+				context.addContent(1, s.getContent());
+			}
+		});
+		builder.add(PresentationContext.class, SlideContent2.class, (p, s) -> {
+			try (final SlideContext context = p.createContentSlide(s, SlideLayout.TWO_OBJ)) {
+				context.addContent(1, s.getLeft());
+				context.addContent(2, s.getRight());
+			}
+		});
+		builder.add(PresentationContext.class, SlideSection.class, (p, s) -> {
+			// Create section header slide
+			p.createTitleSlide(s, SlideLayout.SECTION_HEADER);
+			// Add the individual slides
+			s.getSlides().forEach(p::add);
+		});
+		builder.add(PresentationContext.class, ISlideExplicit.class, (p, s) -> {
+			try (final SlideContextGenerator generator = new SlideContextGenerator(p, s)) {
+				s.apply(generator);
+			}
+		});
 	}).build();
 
 	@Getter(AccessLevel.PROTECTED)
 	protected final ILayoutPresentation layout;
 
 	@Getter(AccessLevel.PROTECTED)
-	protected final XMLSlideShow ppt;
-
-	@Getter(AccessLevel.PROTECTED)
-	protected final XSLFSlideMaster master;
-
-	protected final IConsumer1<ISlide> slides = new TypeSwitch1.ConsumerBuilder<ISlide>().with(builder -> {
-		builder.add(SlideTitle.class, s -> {
-			final XSLFSlideLayout layout = getMaster().getLayout(SlideLayout.TITLE);
-			final XSLFSlide actual = getPpt().createSlide(layout);
-			actual.getPlaceholder(0).setText(s.getTitle());
-			actual.getPlaceholder(1).setText(s.getSubtitle());
-		});
-		builder.add(SlideContent.class, s -> {
-			final XSLFSlide actual = createSlideWithTitle(s, SlideLayout.TITLE_AND_CONTENT);
-			try (final ILayoutSlide layout = getLayout().getSlide(s)) {
-				new SlideContext(layout, getPpt(), actual).addContent(1, s.getContent());
-			}
-		});
-		builder.add(SlideContent2.class, s -> {
-			final XSLFSlide actual = createSlideWithTitle(s, SlideLayout.TWO_OBJ);
-			try (final ILayoutSlide layout = getLayout().getSlide(s)) {
-				final SlideContext context = new SlideContext(layout, getPpt(), actual);
-				context.addContent(1, s.getLeft());
-				context.addContent(2, s.getRight());
-			}
-		});
-		builder.add(SlideSection.class, s -> {
-			{ // Create section header slide
-				final XSLFSlideLayout layout = getMaster().getLayout(SlideLayout.SECTION_HEADER);
-				final XSLFSlide actual = getPpt().createSlide(layout);
-				actual.getPlaceholder(0).setText(s.getTitle());
-				actual.getPlaceholder(1).setText(s.getSubtitle());
-			}
-
-			// Add the individual slides
-			s.getSlides().forEach(PresentationBuilder.this::add);
-		});
-	}).build();
+	protected final XMLSlideShow show;
 
 	public PresentationBuilder(Path template, ILayoutPresentation layout) {
 		this.layout = layout == null ? StandardLayoutPresentation.create() : layout;
 		try {
-			this.ppt = template == null ? new XMLSlideShow() : new XMLSlideShow(new FileInputStream(template.toFile()));
+			this.show = template == null ? new XMLSlideShow() : new XMLSlideShow(new FileInputStream(template.toFile()));
 		} catch (IOException e) {
 			throw new RuntimeIOException(e);
 		}
-		this.master = ppt.getSlideMasters().get(0);
 	}
 
-	public PresentationBuilder add(ISlide slide) {
-		slides.accept(slide);
+	@Override
+	public IPresentationBuilder add(ISlide slide) {
+		slideConsumer.accept(new PresentationContext(getLayout(), getShow()), slide);
 		return this;
 	}
 
 	@Override
 	public void close() {
 		try {
-			ppt.close();
+			getShow().close();
 		} catch (IOException e) {
 			throw new RuntimeIOException(e);
 		}
 	}
 
-	protected XSLFSlide createSlideWithTitle(ISlide slide, final SlideLayout layout) {
-		final XSLFSlide actual = ppt.createSlide(master.getLayout(layout));
-		actual.getPlaceholder(0).setText(slide.getTitle());
-		if (slide.getSubtitle() != null) {
-			final XSLFTextRun subtitle = actual.getPlaceholder(0).addNewTextParagraph().addNewTextRun();
-			subtitle.setFontSize(subtitle.getFontSize() * 0.5);
-			subtitle.setText(slide.getSubtitle());
-		}
-		return actual;
-	}
-
-	public PresentationBuilder write(Path path) {
+	@Override
+	public IPresentationBuilder write(Path path) {
 		layout.layout();
 		try (OutputStream out = Files.newOutputStream(path)) {
-			ppt.write(out);
+			getShow().write(out);
 		} catch (IOException e) {
 			throw new RuntimeIOException(e);
 		}

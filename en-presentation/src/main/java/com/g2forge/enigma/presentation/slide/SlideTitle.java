@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-public class SlideTitle implements ISlide {
+public class SlideTitle implements ISlideStandard {
 	protected final String title;
 
 	protected final String subtitle;

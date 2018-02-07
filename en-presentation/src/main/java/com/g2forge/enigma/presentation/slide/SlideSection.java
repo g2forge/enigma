@@ -10,7 +10,7 @@ import lombok.Singular;
 @Data
 @Builder
 @AllArgsConstructor
-public class SlideSection implements ISlide {
+public class SlideSection implements ISlideStandard {
 	protected final String title;
 
 	protected final String subtitle;
