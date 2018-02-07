@@ -1,4 +1,4 @@
-package com.g2forge.enigma.presentation;
+package com.g2forge.enigma.presentation.slide;
 
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
