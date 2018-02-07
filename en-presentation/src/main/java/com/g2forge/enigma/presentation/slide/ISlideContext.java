@@ -12,6 +12,6 @@ public interface ISlideContext {
 	public ILayoutSlide getLayout();
 
 	public XMLSlideShow getShow();
-	
+
 	public XSLFSlide getSlide();
 }
