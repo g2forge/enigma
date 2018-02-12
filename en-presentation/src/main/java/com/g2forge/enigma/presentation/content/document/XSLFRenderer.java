@@ -6,17 +6,21 @@ import java.util.Stack;
 
 import org.apache.poi.sl.usermodel.AutoNumberingScheme;
 import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
+import org.apache.poi.xslf.usermodel.XSLFTextRun;
 import org.apache.poi.xslf.usermodel.XSLFTextShape;
 
 import com.g2forge.alexandria.java.close.ICloseable;
 import com.g2forge.alexandria.java.core.error.NotYetImplementedError;
 import com.g2forge.alexandria.java.core.iface.ISingleton;
+import com.g2forge.alexandria.java.enums.EnumException;
 import com.g2forge.alexandria.java.function.IConsumer1;
 import com.g2forge.alexandria.java.function.IFunction1;
 import com.g2forge.alexandria.java.typeswitch.TypeSwitch1;
 import com.g2forge.enigma.document.Block;
+import com.g2forge.enigma.document.Emphasis;
 import com.g2forge.enigma.document.IBlock;
 import com.g2forge.enigma.document.IListItem;
+import com.g2forge.enigma.document.ISpan;
 import com.g2forge.enigma.document.List;
 import com.g2forge.enigma.document.Text;
 
@@ -45,7 +49,20 @@ public class XSLFRenderer implements ISingleton {
 			builder.add(IExplicitXSLFElement.class, IFunction1.identity());
 			builder.add(Text.class, xslf -> c -> {
 				try (final ICloseable closeable = c.openParagraph(false)) {
-					c.getParagraph().addNewTextRun().setText(xslf.getText());
+					c.createRun().setText(xslf.getText());
+				}
+			});
+			builder.add(Emphasis.class, xslf -> c -> {
+				try (final ICloseable closeable = c.openRunFormatter(formatters -> run -> {
+					switch (xslf.getType()) {
+						case Strong:
+							run.setBold(true);
+							break;
+						default:
+							throw new EnumException(Emphasis.Type.class, xslf.getType());
+					}
+				})) {
+					c.toExplicit(xslf.getSpan(), ISpan.class).render(c);
 				}
 			});
 			builder.add(Block.class, xslf -> c -> {
@@ -70,7 +87,16 @@ public class XSLFRenderer implements ISingleton {
 
 		protected XSLFTextParagraph paragraph;
 
-		protected final Stack<IConsumer1<XSLFTextParagraph>> formatters = new Stack<>();
+		protected final Stack<IConsumer1<XSLFTextParagraph>> paragraphFormatters = new Stack<>();
+
+		protected final Stack<IConsumer1<XSLFTextRun>> runFormatters = new Stack<>();
+
+		@Override
+		public XSLFTextRun createRun() {
+			final XSLFTextRun retVal = getParagraph().addNewTextRun();
+			if (!runFormatters.isEmpty()) runFormatters.peek().accept(retVal);
+			return retVal;
+		}
 
 		@Override
 		public ICloseable openParagraph(boolean forceNew) {
@@ -78,7 +104,7 @@ public class XSLFRenderer implements ISingleton {
 
 			if (paragraph != null) throw new IllegalStateException();
 			final XSLFTextParagraph mine = shape.addNewTextParagraph();
-			if (!formatters.isEmpty()) formatters.peek().accept(mine);
+			if (!paragraphFormatters.isEmpty()) paragraphFormatters.peek().accept(mine);
 			paragraph = mine;
 			return () -> {
 				if (getParagraph() != mine) throw new IllegalStateException();
@@ -88,11 +114,21 @@ public class XSLFRenderer implements ISingleton {
 
 		@Override
 		public ICloseable openParagraphFormatter(IFunction1<? super java.util.List<? extends IConsumer1<XSLFTextParagraph>>, ? extends IConsumer1<XSLFTextParagraph>> function) {
-			final IConsumer1<XSLFTextParagraph> formatter = function.apply(Collections.unmodifiableList(formatters));
-			formatters.push(formatter);
+			final IConsumer1<XSLFTextParagraph> formatter = function.apply(Collections.unmodifiableList(paragraphFormatters));
+			paragraphFormatters.push(formatter);
 			return () -> {
-				if (formatters.peek() != formatter) throw new IllegalStateException();
-				formatters.pop();
+				if (paragraphFormatters.peek() != formatter) throw new IllegalStateException();
+				paragraphFormatters.pop();
+			};
+		}
+
+		@Override
+		public ICloseable openRunFormatter(IFunction1<? super java.util.List<? extends IConsumer1<XSLFTextRun>>, ? extends IConsumer1<XSLFTextRun>> function) {
+			final IConsumer1<XSLFTextRun> formatter = function.apply(Collections.unmodifiableList(runFormatters));
+			runFormatters.push(formatter);
+			return () -> {
+				if (runFormatters.peek() != formatter) throw new IllegalStateException();
+				runFormatters.pop();
 			};
 		}
 

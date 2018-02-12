@@ -231,6 +231,10 @@ public class PresentationBuilder implements IPresentationBuilder {
 	@Getter(AccessLevel.PROTECTED)
 	protected final XMLSlideShow show;
 
+	public PresentationBuilder() {
+		this(null, null);
+	}
+
 	public PresentationBuilder(Path template, ILayoutPresentation layout) {
 		this.layout = layout == null ? StandardLayoutPresentation.create() : layout;
 		try {
