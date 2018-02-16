@@ -11,10 +11,10 @@ import com.g2forge.alexandria.java.core.error.NotYetImplementedError;
 import com.g2forge.alexandria.java.function.IConsumer1;
 import com.g2forge.alexandria.java.function.IPredicate1;
 import com.g2forge.enigma.document.Block;
+import com.g2forge.enigma.document.DocList;
 import com.g2forge.enigma.document.Emphasis;
 import com.g2forge.enigma.document.IBlock;
 import com.g2forge.enigma.document.ISpan;
-import com.g2forge.enigma.document.List;
 import com.g2forge.enigma.document.Section;
 import com.g2forge.enigma.document.Text;
 
@@ -45,9 +45,9 @@ public class WikitextDocumentBuilder extends DocumentBuilder {
 	}
 
 	protected static class BulletedListDOMBuilder implements IBlockDOMBuilder {
-		protected final List.ListBuilder builder = List.builder();
+		protected final DocList.DocListBuilder builder = DocList.builder();
 
-		public BulletedListDOMBuilder(List.Marker marker) {
+		public BulletedListDOMBuilder(DocList.Marker marker) {
 			builder.marker(marker);
 		}
 
@@ -136,10 +136,10 @@ public class WikitextDocumentBuilder extends DocumentBuilder {
 	public void beginBlock(BlockType type, Attributes attributes) {
 		switch (type) {
 			case BULLETED_LIST:
-				stack.push(new BulletedListDOMBuilder(List.Marker.Ordered));
+				stack.push(new BulletedListDOMBuilder(DocList.Marker.Ordered));
 				break;
 			case NUMERIC_LIST:
-				stack.push(new BulletedListDOMBuilder(List.Marker.Numbered));
+				stack.push(new BulletedListDOMBuilder(DocList.Marker.Numbered));
 				break;
 			case LIST_ITEM:
 				stack.push(new BlockDOMBuilder(Block.Type.ListItem));

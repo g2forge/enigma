@@ -19,9 +19,9 @@ import com.g2forge.alexandria.java.typeswitch.TypeSwitch1;
 import com.g2forge.enigma.document.Block;
 import com.g2forge.enigma.document.Emphasis;
 import com.g2forge.enigma.document.IBlock;
-import com.g2forge.enigma.document.IListItem;
+import com.g2forge.enigma.document.IDocListItem;
 import com.g2forge.enigma.document.ISpan;
-import com.g2forge.enigma.document.List;
+import com.g2forge.enigma.document.DocList;
 import com.g2forge.enigma.document.Text;
 
 import lombok.Data;
@@ -70,12 +70,12 @@ public class XSLFRenderer implements ISingleton {
 					c.toExplicit(content, IBlock.class).render(c);
 				}
 			});
-			builder.add(List.class, xslf -> c -> {
+			builder.add(DocList.class, xslf -> c -> {
 				for (int i = 0; i < xslf.getItems().size(); i++) {
-					final IListItem item = xslf.getItems().get(i);
-					final int index = (List.Marker.Numbered.equals(xslf.getMarker())) ? i + 1 : 0;
+					final IDocListItem item = xslf.getItems().get(i);
+					final int index = (DocList.Marker.Numbered.equals(xslf.getMarker())) ? i + 1 : 0;
 					try (final ICloseable formatter = c.openParagraphFormatter(list -> new ListItemParagraphFormatter((int) list.stream().filter(f -> f instanceof ListItemParagraphFormatter).count(), index))) {
-						c.toExplicit(item, IListItem.class).render(c);
+						c.toExplicit(item, IDocListItem.class).render(c);
 					}
 				}
 			});
