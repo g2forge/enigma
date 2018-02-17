@@ -18,7 +18,7 @@ public class PUMLClass {
 		protected static final String TEMPLATE = "<name;format=\"lower\">";
 	}
 
-	protected static final String TEMPLATE = "<metaType> <if(quoteName)>\"<endif><name><if(quoteName)>\"<endif><if(stereotypes)> \\<\\< <stereotypes;separator=\" \"> >\\><endif><if(members)> {<\\n><members:{m|<\\t><m><\\n>}>}<endif>";
+	protected static final String TEMPLATE = "<metaType> <name><if(stereotypes)> \\<\\< <stereotypes;separator=\" \"> >\\><endif><if(members)> {<\\n><members:{m|<\\t><m><\\n>}>}<endif>";
 
 	public static final String SPOT_C_COLOR = "#ADD1B2";
 
@@ -29,15 +29,11 @@ public class PUMLClass {
 	@Builder.Default
 	protected final MetaType metaType = MetaType.Class;
 
-	protected final String name;
+	protected final PUMLClassName name;
 
 	@Singular
 	protected final List<String> stereotypes;
 
 	@Singular
 	protected final List<String> members;
-
-	protected boolean isQuoteName() {
-		return !name.matches("[a-zA-Z_][0-9a-zA-Z_]*");
-	}
 }

@@ -1,20 +1,28 @@
 package com.g2forge.enigma.document.convert;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 import org.eclipse.mylyn.wikitext.parser.Attributes;
 import org.eclipse.mylyn.wikitext.parser.DocumentBuilder;
+import org.eclipse.mylyn.wikitext.parser.ImageAttributes;
 import org.eclipse.mylyn.wikitext.parser.MarkupParser;
 import org.eclipse.mylyn.wikitext.parser.markup.MarkupLanguage;
 
 import com.g2forge.alexandria.java.core.error.NotYetImplementedError;
+import com.g2forge.alexandria.java.core.helpers.HCollection;
 import com.g2forge.alexandria.java.function.IConsumer1;
 import com.g2forge.alexandria.java.function.IPredicate1;
 import com.g2forge.enigma.document.Block;
+import com.g2forge.enigma.document.DocList;
 import com.g2forge.enigma.document.Emphasis;
 import com.g2forge.enigma.document.IBlock;
 import com.g2forge.enigma.document.ISpan;
-import com.g2forge.enigma.document.List;
+import com.g2forge.enigma.document.Image;
+import com.g2forge.enigma.document.Link;
 import com.g2forge.enigma.document.Section;
 import com.g2forge.enigma.document.Text;
 
@@ -45,9 +53,9 @@ public class WikitextDocumentBuilder extends DocumentBuilder {
 	}
 
 	protected static class BulletedListDOMBuilder implements IBlockDOMBuilder {
-		protected final List.ListBuilder builder = List.builder();
+		protected final DocList.DocListBuilder builder = DocList.builder();
 
-		public BulletedListDOMBuilder(List.Marker marker) {
+		public BulletedListDOMBuilder(DocList.Marker marker) {
 			builder.marker(marker);
 		}
 
@@ -93,26 +101,32 @@ public class WikitextDocumentBuilder extends DocumentBuilder {
 	}
 
 	@RequiredArgsConstructor
+	@Getter
 	protected static class SectionDOMBuilder implements IDOMBuilder {
-		@Getter
 		protected final int level;
 
-		protected final Section.SectionBuilder builder = Section.builder();
+		protected ISpan title = null;
 
-		protected boolean title = true;
+		protected final List<IBlock> body = new ArrayList<>();
 
 		@Override
 		public void accept(IDocElement element) {
-			if (title) {
-				builder.title(((ISpan) element));
-				title = false;
-			} else builder.body((IBlock) element);
+			if (getTitle() == null) title = ((ISpan) element);
+			else body.add((IBlock) element);
 		}
 
 		@Override
 		public IDocElement build() {
-			return builder.build();
+			final IBlock body = getBody().size() == 1 ? HCollection.getOne(getBody()) : new Block(Block.Type.Block, getBody());
+			return new Section(title, body);
 		}
+	}
+
+	public static Block parse(MarkupLanguage language, Reader content) throws IOException {
+		final WikitextDocumentBuilder builder = new WikitextDocumentBuilder();
+		final MarkupParser parser = new MarkupParser(language, builder);
+		parser.parse(content);
+		return builder.getDocument();
 	}
 
 	public static Block parse(MarkupLanguage language, String content) {
@@ -136,10 +150,10 @@ public class WikitextDocumentBuilder extends DocumentBuilder {
 	public void beginBlock(BlockType type, Attributes attributes) {
 		switch (type) {
 			case BULLETED_LIST:
-				stack.push(new BulletedListDOMBuilder(List.Marker.Ordered));
+				stack.push(new BulletedListDOMBuilder(DocList.Marker.Ordered));
 				break;
 			case NUMERIC_LIST:
-				stack.push(new BulletedListDOMBuilder(List.Marker.Numbered));
+				stack.push(new BulletedListDOMBuilder(DocList.Marker.Numbered));
 				break;
 			case LIST_ITEM:
 				stack.push(new BlockDOMBuilder(Block.Type.ListItem));
@@ -224,7 +238,7 @@ public class WikitextDocumentBuilder extends DocumentBuilder {
 
 	@Override
 	public void image(Attributes attributes, String url) {
-		throw new NotYetImplementedError();
+		stack.peek().accept(new Image(((ImageAttributes) attributes).getAlt(), url));
 	}
 
 	@Override
@@ -239,7 +253,7 @@ public class WikitextDocumentBuilder extends DocumentBuilder {
 
 	@Override
 	public void link(Attributes attributes, String hrefOrHashName, String text) {
-		throw new NotYetImplementedError();
+		stack.peek().accept(new Link(hrefOrHashName, new Text(text)));
 	}
 
 	protected void pop() {

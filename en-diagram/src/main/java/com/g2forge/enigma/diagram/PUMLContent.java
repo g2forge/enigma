@@ -23,6 +23,12 @@ import net.sourceforge.plantuml.SourceStringReader;
 public class PUMLContent {
 	protected static final String TEMPLATE = "@startuml<\\n><if(control)><control><endif><diagram>@enduml";
 
+	public static Path toPNG(final IPUMLDiagram diagram, final Path file) throws IOException, FileNotFoundException {
+		final PUMLContent.PUMLContentBuilder builder = PUMLContent.builder().diagram(diagram);
+		builder.control(PUMLControl.builder().shadowing(false).dpi(600).background(PUMLControl.Color.Transparent).build());
+		return builder.build().toFile(file, FileFormat.PNG);
+	}
+
 	protected final PUMLControl control;
 
 	protected final IPUMLDiagram diagram;

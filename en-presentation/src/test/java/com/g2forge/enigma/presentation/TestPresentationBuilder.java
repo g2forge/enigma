@@ -14,8 +14,8 @@ import com.g2forge.alexandria.java.function.IConsumer1;
 import com.g2forge.alexandria.java.io.HBinaryIO;
 import com.g2forge.alexandria.java.io.HZip;
 import com.g2forge.alexandria.java.io.TempDirectory;
+import com.g2forge.enigma.document.DocList;
 import com.g2forge.enigma.document.Emphasis;
-import com.g2forge.enigma.document.List.ListBuilder;
 import com.g2forge.enigma.document.Text;
 import com.g2forge.enigma.presentation.content.ContentDoc;
 import com.g2forge.enigma.presentation.slide.SlideContent1;
@@ -42,7 +42,7 @@ public class TestPresentationBuilder {
 	@Test
 	public void doc() throws IOException {
 		assertPresentationEquals("doc.pptx", presentation -> {
-			final ListBuilder list = com.g2forge.enigma.document.List.builder().marker(com.g2forge.enigma.document.List.Marker.Numbered);
+			final DocList.DocListBuilder list = DocList.builder().marker(DocList.Marker.Numbered);
 			list.item(new Text("First"));
 			list.item(new Emphasis(Emphasis.Type.Strong, new Text("Second")));
 			presentation.add(new SlideContent1("Title", "Subtitle", new ContentDoc(list.build())));

@@ -1,5 +1,7 @@
 package com.g2forge.enigma.document;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +11,7 @@ import lombok.Singular;
 @Data
 @Builder
 @AllArgsConstructor
-public class List implements IBlock {
+public class DocList implements IBlock {
 	@Getter
 	@AllArgsConstructor
 	public enum Marker {
@@ -20,5 +22,5 @@ public class List implements IBlock {
 	protected final Marker marker;
 
 	@Singular
-	protected final java.util.List<IListItem> items;
+	protected final List<IDocListItem> items;
 }

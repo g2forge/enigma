@@ -7,8 +7,8 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-public class Definition implements IDocListItem {
-	protected final ISpan term;
-	
-	protected final IBlock body;
+public class Image implements IBlock {
+	protected final String alt;
+
+	protected final String url;
 }

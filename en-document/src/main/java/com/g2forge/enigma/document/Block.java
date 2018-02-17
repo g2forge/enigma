@@ -13,6 +13,7 @@ import lombok.Singular;
 public class Block implements IBlock {
 	public enum Type {
 		Document,
+		Block,
 		Paragraph,
 		ListItem;
 	}
