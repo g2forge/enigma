@@ -21,6 +21,7 @@ public class PUMLRelation {
 	@AllArgsConstructor
 	@Getter
 	public enum Type {
+		Arrow("<--"),
 		Extension("<|--"),
 		Composition("*--"),
 		Aggregation("o--");
@@ -30,7 +31,7 @@ public class PUMLRelation {
 
 	protected static final String TEMPLATE = "<left><if(leftLabel)> \"<leftLabel>\"<endif> <type.plantUML> <if(rightLabel)>\"<rightLabel>\" <endif><right><if(label)> : <label><if(arrow)> <arrow.plantUML><endif><endif>";
 
-	protected final String left;
+	protected final PUMLClassName left;
 
 	protected final String leftLabel;
 
@@ -38,7 +39,7 @@ public class PUMLRelation {
 
 	protected final String rightLabel;
 
-	protected final String right;
+	protected final PUMLClassName right;
 
 	protected final String label;
 
