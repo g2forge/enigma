@@ -27,7 +27,7 @@ public class TestMD {
 
 	@Test
 	public void simple() {
-		final BlockBuilder builder = Block.builder();
+		final BlockBuilder builder = Block.builder().type(Block.Type.Block);
 		builder.content(DocList.builder().marker(DocList.Marker.Ordered).item(new Text("Item 1")).build());
 		builder.content(new Text("A paragraph goes here."));
 		builder.content(DocList.builder().marker(DocList.Marker.Numbered).item(new Text("Item 2")).item(new Text("Item 3")).build());
