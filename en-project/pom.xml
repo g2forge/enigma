@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>com.g2forge.alexandria</groupId>
 		<artifactId>ax-project</artifactId>
-		<version>0.0.7</version>
+		<version>0.0.8-SNAPSHOT</version>
 		<relativePath>../../alexandria/ax-project/pom.xml</relativePath>
 	</parent>
 
@@ -17,7 +17,7 @@
 		<stringtemplate.version>4.0.8</stringtemplate.version>
 		<antlr.version>4.7.1</antlr.version>
 
-		<alexandria.version>0.0.7</alexandria.version>
+		<alexandria.version>0.0.8-SNAPSHOT</alexandria.version>
 
 		<enigma.organization>g2forge</enigma.organization>
 		<enigma.name>Enigma</enigma.name>
