@@ -9,6 +9,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class Emphasis implements ISpan {
 	public enum Type {
+		Monospace,
 		Code,
 		Emphasis,
 		Strong,

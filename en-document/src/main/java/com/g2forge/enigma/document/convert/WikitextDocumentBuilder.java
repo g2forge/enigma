@@ -136,6 +136,21 @@ public class WikitextDocumentBuilder extends DocumentBuilder {
 		return builder.getDocument();
 	}
 
+	protected static Emphasis.Type toEmphasisType(SpanType type) {
+		switch (type) {
+			case EMPHASIS:
+				return Emphasis.Type.Emphasis;
+			case STRONG:
+				return Emphasis.Type.Strong;
+			case CODE:
+				return Emphasis.Type.Code;
+			case MONOSPACE:
+				return Emphasis.Type.Monospace;
+			default:
+				throw new NotYetImplementedError(String.format("Span type \"%1$s\" is not supported yet!", type));
+		}
+	}
+
 	protected final Stack<IDOMBuilder> stack = new Stack<>();
 
 	@Getter
@@ -185,19 +200,7 @@ public class WikitextDocumentBuilder extends DocumentBuilder {
 
 	@Override
 	public void beginSpan(SpanType type, Attributes attributes) {
-		switch (type) {
-			case EMPHASIS:
-				stack.push(new EmphasisDOMBuilder(Emphasis.Type.Emphasis));
-				break;
-			case STRONG:
-				stack.push(new EmphasisDOMBuilder(Emphasis.Type.Strong));
-				break;
-			case CODE:
-				stack.push(new EmphasisDOMBuilder(Emphasis.Type.Code));
-				break;
-			default:
-				throw new NotYetImplementedError(String.format("Span type \"%1$s\" is not supported yet!", type));
-		}
+		stack.push(new EmphasisDOMBuilder(toEmphasisType(type)));
 	}
 
 	@Override

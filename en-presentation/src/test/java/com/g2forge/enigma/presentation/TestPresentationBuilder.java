@@ -14,8 +14,11 @@ import com.g2forge.alexandria.java.function.IConsumer1;
 import com.g2forge.alexandria.java.io.HBinaryIO;
 import com.g2forge.alexandria.java.io.HZip;
 import com.g2forge.alexandria.java.io.TempDirectory;
+import com.g2forge.enigma.document.Block;
 import com.g2forge.enigma.document.DocList;
 import com.g2forge.enigma.document.Emphasis;
+import com.g2forge.enigma.document.IBlock;
+import com.g2forge.enigma.document.Link;
 import com.g2forge.enigma.document.Text;
 import com.g2forge.enigma.presentation.content.ContentDoc;
 import com.g2forge.enigma.presentation.slide.SlideContent1;
@@ -40,6 +43,14 @@ public class TestPresentationBuilder {
 	}
 
 	@Test
+	public void code() throws IOException {
+		assertPresentationEquals("code.pptx", presentation -> {
+			final IBlock content = Block.builder().type(Block.Type.Paragraph).content(new Text("Hello ")).content(new Emphasis(Emphasis.Type.Code, new Text("world"))).content(new Text("!")).build();
+			presentation.add(new SlideContent1("Title", "Subtitle", new ContentDoc(content)));
+		});
+	}
+
+	@Test
 	public void doc() throws IOException {
 		assertPresentationEquals("doc.pptx", presentation -> {
 			final DocList.DocListBuilder list = DocList.builder().marker(DocList.Marker.Numbered);
@@ -52,6 +63,13 @@ public class TestPresentationBuilder {
 	@Test
 	public void empty() throws IOException {
 		assertPresentationEquals("empty.pptx", presentation -> {});
+	}
+
+	@Test
+	public void link() throws IOException {
+		assertPresentationEquals("link.pptx", presentation -> {
+			presentation.add(new SlideContent1("Title", "Subtitle", new ContentDoc(new Link("http://g2forge.com", new Text("G2Forge")))));
+		});
 	}
 
 	@Test
