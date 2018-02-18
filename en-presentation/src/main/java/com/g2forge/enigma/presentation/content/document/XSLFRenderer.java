@@ -17,11 +17,11 @@ import com.g2forge.alexandria.java.function.IConsumer1;
 import com.g2forge.alexandria.java.function.IFunction1;
 import com.g2forge.alexandria.java.typeswitch.TypeSwitch1;
 import com.g2forge.enigma.document.Block;
+import com.g2forge.enigma.document.DocList;
 import com.g2forge.enigma.document.Emphasis;
 import com.g2forge.enigma.document.IBlock;
 import com.g2forge.enigma.document.IDocListItem;
 import com.g2forge.enigma.document.ISpan;
-import com.g2forge.enigma.document.DocList;
 import com.g2forge.enigma.document.Text;
 
 import lombok.Data;
@@ -48,15 +48,18 @@ public class XSLFRenderer implements ISingleton {
 		protected static final IFunction1<Object, IExplicitXSLFElement> toExplicit = new TypeSwitch1.FunctionBuilder<Object, IExplicitXSLFElement>().with(builder -> {
 			builder.add(IExplicitXSLFElement.class, IFunction1.identity());
 			builder.add(Text.class, xslf -> c -> {
-				try (final ICloseable closeable = c.openParagraph(false)) {
-					c.createRun().setText(xslf.getText());
-				}
+				c.openParagraph(false);
+				c.createRun().setText(xslf.getText());
 			});
 			builder.add(Emphasis.class, xslf -> c -> {
 				try (final ICloseable closeable = c.openRunFormatter(formatters -> run -> {
 					switch (xslf.getType()) {
 						case Strong:
 							run.setBold(true);
+							break;
+						case Monospace:
+						case Code:
+							run.setFontFamily("Courier New");
 							break;
 						default:
 							throw new EnumException(Emphasis.Type.class, xslf.getType());
@@ -75,12 +78,14 @@ public class XSLFRenderer implements ISingleton {
 					final IDocListItem item = xslf.getItems().get(i);
 					final int index = (DocList.Marker.Numbered.equals(xslf.getMarker())) ? i + 1 : 0;
 					try (final ICloseable formatter = c.openParagraphFormatter(list -> new ListItemParagraphFormatter((int) list.stream().filter(f -> f instanceof ListItemParagraphFormatter).count(), index))) {
-						c.toExplicit(item, IDocListItem.class).render(c);
+						try (final ICloseable closeable = c.openParagraph(true)) {
+							c.toExplicit(item, IDocListItem.class).render(c);
+						}
 					}
 				}
 			});
 		}).fallback(xslf -> {
-			throw new NotYetImplementedError();
+			throw new NotYetImplementedError(String.format("Cannot translate \"%1$s\" with type %2$s into office text (yet)!", xslf, xslf != null ? xslf.getClass() : null));
 		}).build();
 
 		protected final XSLFTextShape shape;
@@ -102,14 +107,10 @@ public class XSLFRenderer implements ISingleton {
 		public ICloseable openParagraph(boolean forceNew) {
 			if (!forceNew && (paragraph != null)) return () -> {};
 
-			if (paragraph != null) throw new IllegalStateException();
 			final XSLFTextParagraph mine = shape.addNewTextParagraph();
 			if (!paragraphFormatters.isEmpty()) paragraphFormatters.peek().accept(mine);
 			paragraph = mine;
-			return () -> {
-				if (getParagraph() != mine) throw new IllegalStateException();
-				paragraph = null;
-			};
+			return () -> paragraph = null;
 		}
 
 		@Override
