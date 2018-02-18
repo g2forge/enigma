@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Stack;
 
 import org.apache.poi.sl.usermodel.AutoNumberingScheme;
+import org.apache.poi.xslf.usermodel.XSLFHyperlink;
 import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
 import org.apache.poi.xslf.usermodel.XSLFTextRun;
 import org.apache.poi.xslf.usermodel.XSLFTextShape;
@@ -22,6 +23,7 @@ import com.g2forge.enigma.document.Emphasis;
 import com.g2forge.enigma.document.IBlock;
 import com.g2forge.enigma.document.IDocListItem;
 import com.g2forge.enigma.document.ISpan;
+import com.g2forge.enigma.document.Link;
 import com.g2forge.enigma.document.Text;
 
 import lombok.Data;
@@ -51,6 +53,14 @@ public class XSLFRenderer implements ISingleton {
 				c.openParagraph(false);
 				c.createRun().setText(xslf.getText());
 			});
+			builder.add(Link.class, xslf -> c -> {
+				try (final ICloseable closeable = c.openRunFormatter(formatters -> run -> {
+					final XSLFHyperlink link = run.createHyperlink();
+					link.setAddress(xslf.getTarget());
+				})) {
+					c.toExplicit(xslf.getBody(), ISpan.class).render(c);
+				}
+			});
 			builder.add(Emphasis.class, xslf -> c -> {
 				try (final ICloseable closeable = c.openRunFormatter(formatters -> run -> {
 					switch (xslf.getType()) {
@@ -68,6 +78,7 @@ public class XSLFRenderer implements ISingleton {
 					c.toExplicit(xslf.getSpan(), ISpan.class).render(c);
 				}
 			});
+
 			builder.add(Block.class, xslf -> c -> {
 				for (IBlock content : xslf.getContents()) {
 					c.toExplicit(content, IBlock.class).render(c);

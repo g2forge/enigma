@@ -18,6 +18,7 @@ import com.g2forge.enigma.document.Block;
 import com.g2forge.enigma.document.DocList;
 import com.g2forge.enigma.document.Emphasis;
 import com.g2forge.enigma.document.IBlock;
+import com.g2forge.enigma.document.Link;
 import com.g2forge.enigma.document.Text;
 import com.g2forge.enigma.presentation.content.ContentDoc;
 import com.g2forge.enigma.presentation.slide.SlideContent1;
@@ -62,6 +63,13 @@ public class TestPresentationBuilder {
 	@Test
 	public void empty() throws IOException {
 		assertPresentationEquals("empty.pptx", presentation -> {});
+	}
+
+	@Test
+	public void link() throws IOException {
+		assertPresentationEquals("link.pptx", presentation -> {
+			presentation.add(new SlideContent1("Title", "Subtitle", new ContentDoc(new Link("http://g2forge.com", new Text("G2Forge")))));
+		});
 	}
 
 	@Test
