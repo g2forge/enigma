@@ -20,6 +20,7 @@ import com.g2forge.enigma.document.Block;
 import com.g2forge.enigma.document.DocList;
 import com.g2forge.enigma.document.Emphasis;
 import com.g2forge.enigma.document.IBlock;
+import com.g2forge.enigma.document.IDocElement;
 import com.g2forge.enigma.document.ISpan;
 import com.g2forge.enigma.document.Image;
 import com.g2forge.enigma.document.Link;
