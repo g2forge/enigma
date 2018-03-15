@@ -1,6 +1,6 @@
 package com.g2forge.enigma.presentation.content;
 
-import com.g2forge.enigma.document.convert.IDocElement;
+import com.g2forge.enigma.document.IDocElement;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
