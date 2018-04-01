@@ -1,9 +1,10 @@
 package com.g2forge.enigma.web.html.html;
 
-import java.util.Arrays;
 import java.util.Collection;
 
+import com.g2forge.alexandria.java.core.helpers.HCollection;
 import com.g2forge.enigma.web.html.convert.HTMLField;
+import com.g2forge.enigma.web.html.convert.HTMLTag;
 import com.g2forge.enigma.web.html.convert.IReflectiveHTMLElement;
 
 import lombok.AllArgsConstructor;
@@ -14,12 +15,13 @@ import lombok.Singular;
 @Data
 @Builder
 @AllArgsConstructor
-public class Div implements IBodyElement, IReflectiveHTMLElement {
+@HTMLTag("p")
+public class Paragraph implements IBodyElement, IReflectiveHTMLElement {
 	@HTMLField(property = false)
 	@Singular
-	protected final Collection<?> elements;
+	protected final Collection<?> contents;
 
-	public Div(Object... elements) {
-		this(Arrays.asList(elements));
+	public Paragraph(Object... contents) {
+		this(HCollection.asList(contents));
 	}
 }
