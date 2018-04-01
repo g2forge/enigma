@@ -7,7 +7,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.g2forge.alexandria.generic.type.java.structure.JavaScope;
+import com.g2forge.alexandria.generic.type.java.type.implementations.ReflectionException;
 import com.g2forge.alexandria.java.core.error.RuntimeReflectionException;
+import com.g2forge.alexandria.java.core.error.UnreachableCodeError;
 import com.g2forge.alexandria.java.function.IFunction1;
 import com.g2forge.alexandria.java.function.IThrowFunction1;
 import com.g2forge.alexandria.java.typeswitch.TypeSwitch1;
@@ -108,10 +110,22 @@ public class HTMLRenderer {
 
 			{ // Compute the tag
 				final HTMLTag annotation = element.getClass().getAnnotation(HTMLTag.class);
-				this.tag = ((annotation == null) || "".equals(annotation.value())) ? element.getClass().getSimpleName().toLowerCase() : annotation.value();
+				if (annotation == null) this.tag = element.getClass().getSimpleName().toLowerCase();
+				else {
+					final boolean explicit = !"".equals(annotation.value());
+					final boolean generator = annotation.generator() != IHTMLTagGenerator.class;
+					if (explicit == generator) throw new IllegalArgumentException();
+					else if (explicit) this.tag = annotation.value();
+					else if (generator) try {
+						this.tag = annotation.generator().newInstance().apply(element);
+					} catch (InstantiationException | IllegalAccessException exception) {
+						throw new ReflectionException(exception);
+					}
+					else throw new UnreachableCodeError();
+				}
 			}
 
-			final Map<Boolean, List<Property<IReflectiveHTMLElement, ?>>> map = HReflection.toReflection(element).getFields(JavaScope.Inherited, null).map(field -> {
+			final Map<Boolean, List<Property<IReflectiveHTMLElement, ?>>> map = HReflection.toReflection(element).getFields(JavaScope.Inherited, null).filter(field -> field.getAnnotations().getAnnotation(HTMLIgnore.class) == null).map(field -> {
 				final HTMLField annotation = field.getAnnotations().getAnnotation(HTMLField.class);
 				final IFunction1<IReflectiveHTMLElement, Object> accessor = IThrowFunction1.<IReflectiveHTMLElement, Object, Throwable>create(object -> field.getAccessor(object).get0()).wrap(RuntimeReflectionException::new);
 				return new Property<>(field.getType().getName(), annotation == null ? getDefaultHTMLField() : annotation, accessor, field.getType().getJavaMember().getGenericType());
