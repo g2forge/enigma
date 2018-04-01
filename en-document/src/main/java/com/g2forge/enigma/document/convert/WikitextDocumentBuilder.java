@@ -1,7 +1,5 @@
 package com.g2forge.enigma.document.convert;
 
-import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -9,8 +7,6 @@ import java.util.Stack;
 import org.eclipse.mylyn.wikitext.parser.Attributes;
 import org.eclipse.mylyn.wikitext.parser.DocumentBuilder;
 import org.eclipse.mylyn.wikitext.parser.ImageAttributes;
-import org.eclipse.mylyn.wikitext.parser.MarkupParser;
-import org.eclipse.mylyn.wikitext.parser.markup.MarkupLanguage;
 
 import com.g2forge.alexandria.java.core.error.NotYetImplementedError;
 import com.g2forge.alexandria.java.core.helpers.HCollection;
@@ -121,20 +117,6 @@ public class WikitextDocumentBuilder extends DocumentBuilder {
 			final IBlock body = getBody().size() == 1 ? HCollection.getOne(getBody()) : new Block(Block.Type.Block, getBody());
 			return new Section(title, body);
 		}
-	}
-
-	public static Block parse(MarkupLanguage language, Reader content) throws IOException {
-		final WikitextDocumentBuilder builder = new WikitextDocumentBuilder();
-		final MarkupParser parser = new MarkupParser(language, builder);
-		parser.parse(content);
-		return builder.getDocument();
-	}
-
-	public static Block parse(MarkupLanguage language, String content) {
-		final WikitextDocumentBuilder builder = new WikitextDocumentBuilder();
-		final MarkupParser parser = new MarkupParser(language, builder);
-		parser.parse(content);
-		return builder.getDocument();
 	}
 
 	protected static Emphasis.Type toEmphasisType(SpanType type) {
