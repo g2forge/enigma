@@ -59,7 +59,7 @@ public class TestJavagen extends ATestJavagen {
 		final JavaMethod method = JavaMethod.standardBuilder().type(string).name("toString").body(JavaBlock.builder().statement(JavaVariable.standardBuilder().type(string).name("retVal").annotation(new JavaAnnotation(string)).build()).build()).build();
 		final String actual = renderFile.render(new JavaFile(new JavaPackageSpecifier("foo"), HCollection.asList(new JavaImport(new JavaType("foo.Other"))), HCollection.asList(new JavaTypeDeclaration(null, JavaProtection.Unspecified, null, JavaMetaType.Class, "Test", null, null, null, HCollection.asList(method)))));
 
-		final String expected = HResource.read(getClass(), "Test.java.txt");
+		final String expected = HResource.read(getClass(), "Test.java.txt", false);
 		Assert.assertEquals(expected, actual);
 	}
 

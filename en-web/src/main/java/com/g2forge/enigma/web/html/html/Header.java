@@ -17,7 +17,7 @@ import lombok.Singular;
 @Data
 @Builder
 @AllArgsConstructor
-@HTMLTag(generator = Header.TagGenerator.class)
+@HTMLTag(generator = Header.TagGenerator.class, pretty = HTMLTag.Pretty.Inline)
 public class Header implements IBodyElement, IReflectiveHTMLElement {
 	public static class TagGenerator implements IHTMLTagGenerator {
 		@Override

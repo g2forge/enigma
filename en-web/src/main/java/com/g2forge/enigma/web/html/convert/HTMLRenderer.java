@@ -8,8 +8,9 @@ import java.util.stream.Collectors;
 
 import com.g2forge.alexandria.generic.type.java.structure.JavaScope;
 import com.g2forge.alexandria.generic.type.java.type.implementations.ReflectionException;
+import com.g2forge.alexandria.java.close.ICloseable;
 import com.g2forge.alexandria.java.core.error.RuntimeReflectionException;
-import com.g2forge.alexandria.java.core.error.UnreachableCodeError;
+import com.g2forge.alexandria.java.function.IConsumer2;
 import com.g2forge.alexandria.java.function.IFunction1;
 import com.g2forge.alexandria.java.function.IThrowFunction1;
 import com.g2forge.alexandria.java.typeswitch.TypeSwitch1;
@@ -36,10 +37,6 @@ public class HTMLRenderer {
 			builder.add(IExplicitHTMLElement.class, IFunction1.identity());
 			builder.add(ICSSRenderable.class, e -> context -> context.getBuilder().append(css.render(e)));
 			builder.add(IReflectiveHTMLElement.class, e -> new ReflectiveExplicitHTMLElement(e));
-			builder.add(Collection.class, e -> {
-				final Collection<?> c = e;
-				return context -> c.stream().forEach(child -> context.toExplicit(child, null).render(context));
-			});
 
 			builder.add(String.class, e -> context -> context.getBuilder().append(e));
 			builder.add(Boolean.class, e -> context -> context.getBuilder().append(e));
@@ -51,7 +48,24 @@ public class HTMLRenderer {
 
 		protected final StringBuilder builder;
 
-		protected final String newline;
+		protected int indent = 0;
+
+		@Override
+		public ICloseable indent() {
+			final int post = ++indent;
+			return () -> {
+				if (indent != post) throw new IllegalStateException();
+				indent--;
+			};
+		}
+
+		@Override
+		public void newline() {
+			builder.append('\n');
+			for (int i = 0; i < indent; i++) {
+				builder.append('\t');
+			}
+		}
 
 		@Override
 		public IExplicitHTMLElement toExplicit(final Object element, Type type) {
@@ -101,6 +115,8 @@ public class HTMLRenderer {
 
 		protected final String tag;
 
+		protected final HTMLTag.Pretty pretty;
+
 		protected final List<Property<IReflectiveHTMLElement, ?>> properties;
 
 		protected final List<Property<IReflectiveHTMLElement, ?>> content;
@@ -110,18 +126,23 @@ public class HTMLRenderer {
 
 			{ // Compute the tag
 				final HTMLTag annotation = element.getClass().getAnnotation(HTMLTag.class);
-				if (annotation == null) this.tag = element.getClass().getSimpleName().toLowerCase();
-				else {
+				if (annotation == null) {
+					this.tag = element.getClass().getSimpleName().toLowerCase();
+					this.pretty = HTMLTag.Pretty.Block;
+				} else {
 					final boolean explicit = !"".equals(annotation.value());
 					final boolean generator = annotation.generator() != IHTMLTagGenerator.class;
-					if (explicit == generator) throw new IllegalArgumentException();
+					if (explicit && generator) throw new IllegalArgumentException();
 					else if (explicit) this.tag = annotation.value();
-					else if (generator) try {
-						this.tag = annotation.generator().newInstance().apply(element);
-					} catch (InstantiationException | IllegalAccessException exception) {
-						throw new ReflectionException(exception);
-					}
-					else throw new UnreachableCodeError();
+					else if (generator) {
+						try {
+							this.tag = annotation.generator().newInstance().apply(element);
+						} catch (InstantiationException | IllegalAccessException exception) {
+							throw new ReflectionException(exception);
+						}
+					} else this.tag = element.getClass().getSimpleName().toLowerCase();
+
+					this.pretty = annotation.pretty();
 				}
 			}
 
@@ -149,32 +170,50 @@ public class HTMLRenderer {
 			});
 
 			{ // Contents
-				ContentState state = ContentState.Empty;
-				if (content != null) for (Property<IReflectiveHTMLElement, ?> property : content) {
-					final Object value = property.getAccessor().apply(element);
-					if (!property.getField().skipNull() || (value != null)) {
-						if (state == ContentState.Empty) {
+				final ContentState[] state = new ContentState[] { ContentState.Empty };
+				final int prepLength = builder.length();
+				if (content != null) {
+					final IConsumer2<Object, Type> accepter = (value, type) -> {
+						if (state[0] == ContentState.Empty) {
 							builder.append('>');
-							state = ContentState.Prepped;
+							state[0] = ContentState.Prepped;
 						}
-						final int length = builder.length();
 
-						context.toExplicit(value, property.getType()).render(context);
-						if (length != builder.length()) state = ContentState.Written;
+						if (pretty != HTMLTag.Pretty.Inline) context.newline();
+
+						final int length = builder.length();
+						context.toExplicit(value, type).render(context);
+						if (length != builder.length()) state[0] = ContentState.Written;
+						else builder.setLength(length - 1);
+					};
+
+					try (final ICloseable close = (pretty == HTMLTag.Pretty.NoIndent) ? () -> {} : context.indent()) {
+						for (Property<IReflectiveHTMLElement, ?> property : content) {
+							final Object value = property.getAccessor().apply(element);
+							if (!property.getField().skipNull() || (value != null)) {
+								if (value instanceof Collection) {
+									final Collection<?> collection = ((Collection<?>) value);
+									collection.forEach(child -> accepter.accept(child, null));
+								} else accepter.accept(value, property.getType());
+							}
+						}
 					}
 				}
 
-				switch (state) {
+				switch (state[0]) {
 					case Empty:
 						// No content was even found, so just wrap up
 						builder.append("/>");
 						break;
 					case Prepped:
 						// We found content, but it didn't actually write anything to change the ">" at the end of the buffer to a "/>"
-						builder.replace(builder.length() - 1, builder.length(), "/").append(">");
+						if (prepLength == -1) throw new IllegalStateException();
+						builder.setLength(prepLength);
+						builder.append("/>");
 						break;
 					case Written:
 						// Content was written so actually write the closing tag
+						if (pretty != HTMLTag.Pretty.Inline) context.newline();
 						builder.append("</").append(tag).append('>');
 						break;
 				}
@@ -184,7 +223,7 @@ public class HTMLRenderer {
 
 	public String render(Object element) {
 		final StringBuilder retVal = new StringBuilder();
-		final HTMLRenderContext context = new HTMLRenderContext(retVal, "\n");
+		final HTMLRenderContext context = new HTMLRenderContext(retVal);
 		context.toExplicit(element, null).render(context);
 		return retVal.toString();
 	}

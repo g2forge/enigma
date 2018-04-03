@@ -21,7 +21,7 @@ public class TestMD {
 		builder.item(Definition.builder().term(new Emphasis(Emphasis.Type.Code, new Text("-y"))).body(new Text("Some description of another option")).build());
 		final DocList actual = builder.build();
 
-		final String expected = HResource.read(getClass(), "help.md").replace(System.lineSeparator(), "\n");
+		final String expected = HResource.read(getClass(), "help.md", true);
 		Assert.assertEquals(expected, renderer.render(actual));
 	}
 
@@ -33,7 +33,7 @@ public class TestMD {
 		builder.content(DocList.builder().marker(DocList.Marker.Numbered).item(new Text("Item 2")).item(new Text("Item 3")).build());
 		final Block actual = builder.build();
 
-		final String expected = HResource.read(getClass(), "simple.md").replace(System.lineSeparator(), "\n");
+		final String expected = HResource.read(getClass(), "simple.md", true);
 		Assert.assertEquals(expected, renderer.render(actual));
 	}
 }
