@@ -2,6 +2,7 @@ package com.g2forge.enigma.web.html.svg;
 
 import com.g2forge.enigma.web.css.ICSSStyle;
 import com.g2forge.enigma.web.html.convert.HTMLField;
+import com.g2forge.enigma.web.html.convert.HTMLTag;
 import com.g2forge.enigma.web.html.convert.IReflectiveHTMLElement;
 
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
+@HTMLTag(pretty = HTMLTag.Pretty.Inline)
 public class Text implements ISVGElement, IReflectiveHTMLElement {
 	protected final int x;
 

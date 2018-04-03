@@ -15,7 +15,7 @@ import lombok.Singular;
 @Data
 @Builder
 @AllArgsConstructor
-@HTMLTag("p")
+@HTMLTag(value = "p", pretty = HTMLTag.Pretty.Inline)
 public class Paragraph implements IBodyElement, IReflectiveHTMLElement {
 	@HTMLField(property = false)
 	@Singular

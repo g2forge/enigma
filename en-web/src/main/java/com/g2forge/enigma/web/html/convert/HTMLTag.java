@@ -8,7 +8,15 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface HTMLTag {
+	public enum Pretty {
+		Inline,
+		Block,
+		NoIndent;
+	}
+
 	public String value() default "";
 
 	public Class<? extends IHTMLTagGenerator> generator() default IHTMLTagGenerator.class;
+
+	public Pretty pretty() default Pretty.Block;
 }
