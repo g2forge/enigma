@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
+import com.g2forge.alexandria.command.ICommand;
 import com.g2forge.alexandria.java.core.helpers.HCollection;
 import com.g2forge.alexandria.java.core.helpers.HString;
 import com.g2forge.alexandria.java.tuple.ITuple2G_;
@@ -31,7 +32,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 
-public class TestRecordGen {
+public class TestRecordGen implements ICommand {
 	@AllArgsConstructor
 	public static class Name implements IName<String> {
 		@Getter(AccessLevel.PROTECTED)
