@@ -3,7 +3,7 @@ package com.g2forge.enigma.document.convert.md;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.g2forge.alexandria.java.core.helpers.HResource;
+import com.g2forge.alexandria.java.core.resource.HResource;
 import com.g2forge.enigma.document.Block;
 import com.g2forge.enigma.document.Block.BlockBuilder;
 import com.g2forge.enigma.document.Definition;

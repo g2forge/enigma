@@ -3,7 +3,7 @@ package com.g2forge.enigma.web.html;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.g2forge.alexandria.java.core.helpers.HResource;
+import com.g2forge.alexandria.java.core.resource.HResource;
 import com.g2forge.enigma.web.css.Block;
 import com.g2forge.enigma.web.css.color.Color;
 import com.g2forge.enigma.web.css.drawing.Fill;
