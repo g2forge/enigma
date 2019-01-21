@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.g2forge.alexandria.java.core.helpers.HResource;
+import com.g2forge.alexandria.java.core.resource.HResource;
 import com.g2forge.alexandria.java.function.IConsumer1;
 import com.g2forge.alexandria.java.io.HBinaryIO;
 import com.g2forge.alexandria.java.io.HZip;
