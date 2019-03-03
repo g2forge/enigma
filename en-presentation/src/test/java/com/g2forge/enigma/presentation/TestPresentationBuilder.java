@@ -1,17 +1,12 @@
 package com.g2forge.enigma.presentation;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.g2forge.alexandria.java.core.resource.HResource;
 import com.g2forge.alexandria.java.function.IConsumer1;
-import com.g2forge.alexandria.java.io.HBinaryIO;
 import com.g2forge.alexandria.java.io.HZip;
 import com.g2forge.alexandria.java.io.TempDirectory;
 import com.g2forge.enigma.document.Block;
@@ -29,14 +24,10 @@ public class TestPresentationBuilder {
 		try (final TempDirectory temp = new TempDirectory()) {
 			try (final PresentationBuilder actual = new PresentationBuilder()) {
 				final Path actualActual = temp.getPath().resolve("actual.pptx");
-				final Path expectedPath = temp.getPath().resolve("expected.pptx");
+				final Path expectedPath = temp.getResource().resource(getClass(), expected, "expected.pptx");
 
 				test.accept(actual);
 				actual.write(actualActual);
-
-				try (final InputStream input = HResource.getResourceAsStream(getClass(), expected); final OutputStream output = Files.newOutputStream(expectedPath)) {
-					HBinaryIO.copy(input, output);
-				}
 				Assert.assertTrue(HZip.isEqual(actualActual, expectedPath));
 			}
 		}
