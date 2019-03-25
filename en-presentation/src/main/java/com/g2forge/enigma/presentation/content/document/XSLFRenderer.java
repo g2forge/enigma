@@ -16,7 +16,7 @@ import com.g2forge.alexandria.java.core.iface.ISingleton;
 import com.g2forge.alexandria.java.enums.EnumException;
 import com.g2forge.alexandria.java.function.IConsumer1;
 import com.g2forge.alexandria.java.function.IFunction1;
-import com.g2forge.alexandria.java.typeswitch.TypeSwitch1;
+import com.g2forge.alexandria.java.type.function.TypeSwitch1;
 import com.g2forge.enigma.document.Block;
 import com.g2forge.enigma.document.DocList;
 import com.g2forge.enigma.document.Emphasis;

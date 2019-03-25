@@ -24,7 +24,7 @@ import org.apache.poi.xslf.usermodel.XSLFTextShape;
 import com.g2forge.alexandria.java.close.ICloseable;
 import com.g2forge.alexandria.java.function.IConsumer2;
 import com.g2forge.alexandria.java.io.RuntimeIOException;
-import com.g2forge.alexandria.java.typeswitch.TypeSwitch2;
+import com.g2forge.alexandria.java.type.function.TypeSwitch2;
 import com.g2forge.enigma.presentation.content.ContentDoc;
 import com.g2forge.enigma.presentation.content.ContentPicture;
 import com.g2forge.enigma.presentation.content.ContentText;

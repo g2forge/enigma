@@ -7,7 +7,7 @@ import com.g2forge.alexandria.java.close.ICloseable;
 import com.g2forge.alexandria.java.core.error.NotYetImplementedError;
 import com.g2forge.alexandria.java.enums.EnumException;
 import com.g2forge.alexandria.java.function.IFunction1;
-import com.g2forge.alexandria.java.typeswitch.TypeSwitch1;
+import com.g2forge.alexandria.java.type.function.TypeSwitch1;
 import com.g2forge.enigma.document.Block;
 import com.g2forge.enigma.document.Definition;
 import com.g2forge.enigma.document.DocList;

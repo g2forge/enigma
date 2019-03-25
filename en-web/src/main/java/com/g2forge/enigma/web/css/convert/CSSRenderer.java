@@ -7,7 +7,7 @@ import com.g2forge.alexandria.java.core.helpers.HCollector;
 import com.g2forge.alexandria.java.function.IFunction1;
 import com.g2forge.alexandria.java.text.casing.CamelCase;
 import com.g2forge.alexandria.java.text.casing.SnakeCase;
-import com.g2forge.alexandria.java.typeswitch.TypeSwitch1;
+import com.g2forge.alexandria.java.type.function.TypeSwitch1;
 import com.g2forge.alexandria.reflection.object.HReflection;
 import com.g2forge.alexandria.reflection.object.IJavaFieldReflection;
 import com.g2forge.enigma.web.css.Block;
