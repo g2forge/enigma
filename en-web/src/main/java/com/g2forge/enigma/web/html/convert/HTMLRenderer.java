@@ -13,7 +13,7 @@ import com.g2forge.alexandria.java.core.error.RuntimeReflectionException;
 import com.g2forge.alexandria.java.function.IConsumer2;
 import com.g2forge.alexandria.java.function.IFunction1;
 import com.g2forge.alexandria.java.function.IThrowFunction1;
-import com.g2forge.alexandria.java.typeswitch.TypeSwitch1;
+import com.g2forge.alexandria.java.type.function.TypeSwitch1;
 import com.g2forge.alexandria.reflection.object.HReflection;
 import com.g2forge.enigma.web.css.convert.CSSRenderer;
 import com.g2forge.enigma.web.css.convert.ICSSRenderable;
