@@ -7,8 +7,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.g2forge.alexandria.java.function.IConsumer1;
-import com.g2forge.alexandria.java.io.HZip;
-import com.g2forge.alexandria.java.io.TempDirectory;
+import com.g2forge.alexandria.java.io.file.HZip;
+import com.g2forge.alexandria.java.io.file.TempDirectory;
 import com.g2forge.enigma.document.Block;
 import com.g2forge.enigma.document.DocList;
 import com.g2forge.enigma.document.Emphasis;
