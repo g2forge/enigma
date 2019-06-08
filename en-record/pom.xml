@@ -12,7 +12,7 @@
 	</parent>
 
 	<name>Enigma Record</name>
-	<description>A general abstraction of record types. Currently duplicates ax-record from Alexandria.</description>
+	<description>A general abstraction of record types. Currently duplicates ax-adt records from Alexandria.</description>
 
 	<dependencies>
 		<dependency>
