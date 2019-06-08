@@ -1,6 +1,6 @@
 package com.g2forge.enigma.presentation.layout;
 
-import com.g2forge.alexandria.java.core.iface.ISingleton;
+import com.g2forge.alexandria.java.core.marker.ISingleton;
 import com.g2forge.enigma.presentation.slide.ISlide;
 
 public class StandardLayoutPresentation implements ILayoutPresentation, ISingleton {

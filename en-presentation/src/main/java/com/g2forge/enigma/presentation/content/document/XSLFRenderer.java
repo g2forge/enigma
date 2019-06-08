@@ -12,7 +12,7 @@ import org.apache.poi.xslf.usermodel.XSLFTextShape;
 
 import com.g2forge.alexandria.java.close.ICloseable;
 import com.g2forge.alexandria.java.core.error.NotYetImplementedError;
-import com.g2forge.alexandria.java.core.iface.ISingleton;
+import com.g2forge.alexandria.java.core.marker.ISingleton;
 import com.g2forge.alexandria.java.enums.EnumException;
 import com.g2forge.alexandria.java.function.IConsumer1;
 import com.g2forge.alexandria.java.function.IFunction1;
