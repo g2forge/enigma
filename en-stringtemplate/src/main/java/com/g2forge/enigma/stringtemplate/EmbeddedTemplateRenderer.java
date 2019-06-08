@@ -2,8 +2,8 @@ package com.g2forge.enigma.stringtemplate;
 
 import java.util.function.Function;
 
-import com.g2forge.alexandria.java.associative.cache.Cache;
-import com.g2forge.alexandria.java.associative.cache.LRUCacheEvictionPolicy;
+import com.g2forge.alexandria.adt.associative.cache.Cache;
+import com.g2forge.alexandria.adt.associative.cache.LRUCacheEvictionPolicy;
 import com.g2forge.alexandria.reflection.record.v2.reflection.ReflectedRecordType;
 
 public class EmbeddedTemplateRenderer {
