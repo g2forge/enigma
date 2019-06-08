@@ -1,6 +1,6 @@
 package com.g2forge.enigma.diagram.component;
 
-import com.g2forge.alexandria.java.name.IStringNamed;
+import com.g2forge.alexandria.java.adt.name.IStringNamed;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
