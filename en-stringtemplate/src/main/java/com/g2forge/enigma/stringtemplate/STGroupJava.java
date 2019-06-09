@@ -23,10 +23,10 @@ import org.stringtemplate.v4.misc.ErrorBuffer;
 import org.stringtemplate.v4.misc.ErrorManager;
 import org.stringtemplate.v4.misc.STMessage;
 
-import com.g2forge.alexandria.generic.type.java.structure.JavaScope;
 import com.g2forge.alexandria.java.core.helpers.HCollector;
-import com.g2forge.alexandria.reflection.object.IJavaFieldReflection;
+import com.g2forge.alexandria.java.reflect.JavaScope;
 import com.g2forge.alexandria.reflection.object.HReflection;
+import com.g2forge.alexandria.reflection.object.IJavaFieldReflection;
 import com.g2forge.alexandria.reflection.record.v2.IPropertyType;
 import com.g2forge.alexandria.reflection.record.v2.IRecordType;
 
