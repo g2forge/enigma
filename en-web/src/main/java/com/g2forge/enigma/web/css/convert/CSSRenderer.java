@@ -2,9 +2,9 @@ package com.g2forge.enigma.web.css.convert;
 
 import java.lang.reflect.Type;
 
-import com.g2forge.alexandria.generic.type.java.structure.JavaScope;
 import com.g2forge.alexandria.java.core.helpers.HCollector;
 import com.g2forge.alexandria.java.function.IFunction1;
+import com.g2forge.alexandria.java.reflect.JavaScope;
 import com.g2forge.alexandria.java.text.casing.CamelCase;
 import com.g2forge.alexandria.java.text.casing.SnakeCase;
 import com.g2forge.alexandria.java.type.function.TypeSwitch1;
