@@ -23,7 +23,7 @@ public class TestPresentationBuilder {
 	protected void assertPresentationEquals(final String expected, final IConsumer1<PresentationBuilder> test) throws IOException {
 		try (final TempDirectory temp = new TempDirectory()) {
 			try (final PresentationBuilder actual = new PresentationBuilder()) {
-				final Path actualActual = temp.getPath().resolve("actual.pptx");
+				final Path actualActual = temp.get().resolve("actual.pptx");
 				final Path expectedPath = temp.getResource().resource(getClass(), expected, "expected.pptx");
 
 				test.accept(actual);
