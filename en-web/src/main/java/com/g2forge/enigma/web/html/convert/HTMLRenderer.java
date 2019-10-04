@@ -227,5 +227,4 @@ public class HTMLRenderer {
 		context.toExplicit(element, null).render(context);
 		return retVal.toString();
 	}
-
 }

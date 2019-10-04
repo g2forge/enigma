@@ -9,6 +9,7 @@ import com.g2forge.enigma.web.html.convert.IReflectiveHTMLElement;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Singular;
 
 @lombok.Data
 @Builder
@@ -19,10 +20,13 @@ public class Table implements IBodyElement, IReflectiveHTMLElement {
 	@AllArgsConstructor
 	@HTMLTag("td")
 	public static class Data implements ICell, IReflectiveHTMLElement {
-		@HTMLField(property = false)
-		protected final Collection<IBodyElement> elements;
+		public static final Data EMPTY = new Data();
 
-		public Data(IBodyElement... elements) {
+		@HTMLField(property = false)
+		@Singular
+		protected final Collection<?> elements;
+
+		public Data(Object... elements) {
 			this(Arrays.asList(elements));
 		}
 	}
@@ -32,15 +36,20 @@ public class Table implements IBodyElement, IReflectiveHTMLElement {
 	@AllArgsConstructor
 	@HTMLTag("th")
 	public static class Header implements ICell, IReflectiveHTMLElement {
-		@HTMLField(property = false)
-		protected final Collection<IBodyElement> elements;
+		public static final Header EMPTY = new Header();
 
-		public Header(IBodyElement... elements) {
+		@HTMLField(property = false)
+		@Singular
+		protected final Collection<?> elements;
+
+		public Header(Object... elements) {
 			this(Arrays.asList(elements));
 		}
 	}
 
-	public static interface ICell {}
+	public static interface ICell {
+		public Collection<?> getElements();
+	}
 
 	@lombok.Data
 	@Builder
@@ -48,6 +57,7 @@ public class Table implements IBodyElement, IReflectiveHTMLElement {
 	@HTMLTag("tr")
 	public static class Row implements IReflectiveHTMLElement {
 		@HTMLField(property = false)
+		@Singular
 		protected Collection<ICell> cells;
 
 		public Row(ICell... cells) {
@@ -58,6 +68,7 @@ public class Table implements IBodyElement, IReflectiveHTMLElement {
 	protected String style;
 
 	@HTMLField(property = false)
+	@Singular
 	protected Collection<Row> rows;
 
 	public Table(String style, Row... rows) {
