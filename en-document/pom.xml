@@ -11,7 +11,7 @@
 	</parent>
 
 	<properties>
-		<mylyndocs.version>3.0.22</mylyndocs.version>
+		<mylyndocs.version>3.0.33</mylyndocs.version>
 	</properties>
 
 	<name>Enigma Document</name>
