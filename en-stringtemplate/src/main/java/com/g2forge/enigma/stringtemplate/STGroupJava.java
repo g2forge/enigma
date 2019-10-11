@@ -108,7 +108,7 @@ public class STGroupJava extends STGroup {
 	@Override
 	protected CompiledST load(String name) {
 		final Class<?> type = getTemplateType(name);
-		if (type == null) throw new NullPointerException("Failed to load template \"" + name + "\", there was an internal error!");
+		if (type == null) throw new NullPointerException("Failed to load template \"" + name + "\", there was an internal error! Valid templates: " + types);
 		final String templateName = getTemplateName(type);
 		final String fileName = templateName + ".st";
 
