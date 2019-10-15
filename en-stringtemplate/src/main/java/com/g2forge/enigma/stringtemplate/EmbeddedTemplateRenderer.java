@@ -11,10 +11,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 
 public class EmbeddedTemplateRenderer {
-	public final static EmbeddedTemplateRenderer DEFAULT = new EmbeddedTemplateRenderer();
-
-	public final static EmbeddedTemplateRenderer STRING = new EmbeddedTemplateRenderer("\n");
-
+	/** A function which is used to abstract a record from a java type. This must be initialized before {@link #DEFAULT} or {@link #STRING}. */
 	@Getter(value = AccessLevel.PROTECTED, lazy = true)
 	private static final IFunction1<? super Class<?>, ? extends ReflectedRecordType> recordFunction = new IFunction1<Class<?>, ReflectedRecordType>() {
 		protected final IFunction1<? super Class<?>, ? extends ReflectedRecordType> cache = new Cache<>(ReflectedRecordType::new, new LRUCacheEvictionPolicy<>(30));
@@ -24,6 +21,10 @@ public class EmbeddedTemplateRenderer {
 			return cache.apply(argument);
 		}
 	};
+
+	public final static EmbeddedTemplateRenderer DEFAULT = new EmbeddedTemplateRenderer();
+
+	public final static EmbeddedTemplateRenderer STRING = new EmbeddedTemplateRenderer("\n");
 
 	public static String toString(Object object) {
 		return DEFAULT.render(object);
