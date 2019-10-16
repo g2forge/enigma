@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.g2forge.enigma</groupId>
 		<artifactId>en-project</artifactId>
-		<version>0.0.5-SNAPSHOT</version>
+		<version>0.0.6-SNAPSHOT</version>
 		<relativePath>../en-project/pom.xml</relativePath>
 	</parent>
 	
