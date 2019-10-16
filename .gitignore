@@ -13,3 +13,4 @@ hs_err_pid*
 /.settings/
 /target/
 /bulldozer-temp.json
+/bulldozer-state.json
