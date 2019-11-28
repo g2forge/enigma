@@ -1,4 +1,4 @@
-package com.g2forge.enigma.backend.bash.model;
+package com.g2forge.enigma.backend.bash.model.expression;
 
 import java.util.List;
 
@@ -12,11 +12,11 @@ import lombok.Singular;
 @Data
 @Builder(toBuilder = true)
 @RequiredArgsConstructor
-public class BashCommand implements IBashStatement {
+public class BashString {
 	@Singular
-	protected final List<Object> tokens;
+	protected final List<Object> elements;
 
-	public BashCommand(Object... tokens) {
-		this(HCollection.asList(tokens));
+	public BashString(Object... elements) {
+		this(HCollection.asList(elements));
 	}
 }

@@ -7,14 +7,18 @@ import com.g2forge.alexandria.annotations.note.Note;
 import com.g2forge.alexandria.annotations.note.NoteType;
 import com.g2forge.alexandria.java.close.ICloseable;
 import com.g2forge.alexandria.java.core.error.NotYetImplementedError;
+import com.g2forge.alexandria.java.function.IConsumer2;
 import com.g2forge.alexandria.java.function.IFunction1;
 import com.g2forge.alexandria.java.function.builder.IBuilder;
 import com.g2forge.alexandria.java.type.function.TypeSwitch1;
+import com.g2forge.enigma.backend.ITextAppender;
 import com.g2forge.enigma.backend.bash.convert.textmodifiers.BashTokenModifier;
 import com.g2forge.enigma.backend.bash.model.BashBlock;
 import com.g2forge.enigma.backend.bash.model.BashCommand;
 import com.g2forge.enigma.backend.bash.model.BashScript;
 import com.g2forge.enigma.backend.bash.model.IBashBlock;
+import com.g2forge.enigma.backend.bash.model.expression.BashCommandSubstitution;
+import com.g2forge.enigma.backend.bash.model.expression.BashString;
 import com.g2forge.enigma.backend.convert.common.ARenderer;
 import com.g2forge.enigma.backend.model.expression.ITextExpression;
 import com.g2forge.enigma.backend.model.expression.TextCharSequence;
@@ -31,7 +35,7 @@ import lombok.RequiredArgsConstructor;
 
 @Note(type = NoteType.TODO, value = "Add a method which renders a list of strings for a one-liner")
 public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRenderContext> {
-	protected static class BashRenderContext implements IBashRenderContext, IBuilder<ITextExpression> {
+	public static class BashRenderContext implements IBashRenderContext, IBuilder<ITextExpression> {
 		@Getter
 		@RequiredArgsConstructor
 		protected static class Frame {
@@ -41,16 +45,29 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 		}
 
 		protected static final IFunction1<Object, IExplicitBashRenderable> toExplicit = new TypeSwitch1.FunctionBuilder<Object, IExplicitBashRenderable>().with(builder -> {
+			ITextAppender.addToBuilder(builder, new ITextAppender.IExplicitFactory<IBashRenderContext, IExplicitBashRenderable>() {
+				@Override
+				public <T> IFunction1<? super T, ? extends IExplicitBashRenderable> create(IConsumer2<? super IBashRenderContext, ? super T> consumer) {
+					return e -> c -> consumer.accept(c, e);
+				}
+			});
+
 			builder.add(BashScript.class, e -> c -> c.append("#!/bin/bash").newline().render(e.getBody(), IBashBlock.class));
 			builder.add(BashBlock.class, e -> c -> e.getContents().forEach(x -> c.render(x, IBashBlock.class)));
 			builder.add(BashCommand.class, e -> c -> {
 				boolean first = true;
-				for (String string : e.getTokens()) {
+				for (Object object : e.getTokens()) {
 					if (first) first = false;
 					else c.append(" ");
 					try (final ICloseable token = c.token()) {
-						c.append(string);
+						c.render(object, null);
 					}
+				}
+			});
+			builder.add(BashCommandSubstitution.class, e -> c -> c.append("$(").render(e.getCommand(), BashCommand.class).append(")"));
+			builder.add(BashString.class, e -> c -> {
+				try (final ICloseable token = c.token()) {
+					e.getElements().forEach(x -> c.render(x, null));
 				}
 			});
 		}).build();
