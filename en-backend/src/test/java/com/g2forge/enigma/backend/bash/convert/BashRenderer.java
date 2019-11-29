@@ -1,7 +1,6 @@
 package com.g2forge.enigma.backend.bash.convert;
 
 import java.lang.reflect.Type;
-import java.util.Stack;
 
 import com.g2forge.alexandria.annotations.note.Note;
 import com.g2forge.alexandria.annotations.note.NoteType;
@@ -27,7 +26,7 @@ import com.g2forge.enigma.backend.model.expression.TextNewline;
 import com.g2forge.enigma.backend.model.expression.TextObject;
 import com.g2forge.enigma.backend.model.modifier.ITextModifier;
 import com.g2forge.enigma.backend.model.modifier.IndentTextModifier;
-import com.g2forge.enigma.backend.model.modifier.TextModified;
+import com.g2forge.enigma.backend.model.modifier.TextNestedModified;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -66,18 +65,16 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 			});
 			builder.add(BashCommandSubstitution.class, e -> c -> c.append("$(").render(e.getCommand(), BashCommand.class).append(")"));
 			builder.add(BashString.class, e -> c -> {
-				try (final ICloseable token = c.token()) {
-					e.getElements().forEach(x -> c.render(x, null));
+				try (final ICloseable raw = c.raw()) {
+					try (final ICloseable token = c.token()) {
+						e.getElements().forEach(x -> c.render(x, null));
+					}
 				}
 			});
 		}).build();
 
 		@Getter(AccessLevel.PROTECTED)
-		protected final Stack<Frame> stack = new Stack<>();
-
-		public BashRenderContext() {
-			getStack().push(new Frame(null));
-		}
+		protected final TextNestedModified.TextNestedModifiedBuilder builder = TextNestedModified.builder();
 
 		@Override
 		public IBashRenderContext append(boolean bool) {
@@ -96,7 +93,7 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 
 		@Override
 		public IBashRenderContext append(CharSequence characters) {
-			getBuilder().element(new TextCharSequence(characters));
+			getBuilder().expression(new TextCharSequence(characters));
 			return this;
 		}
 
@@ -122,7 +119,7 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 
 		@Override
 		public IBashRenderContext append(Object object) {
-			getBuilder().element(new TextObject(object));
+			getBuilder().expression(new TextObject(object));
 			return this;
 		}
 
@@ -133,41 +130,23 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 
 		@Override
 		public ITextExpression build() {
-			while (getStack().size() > 1) {
-				pop();
-			}
 			return getBuilder().build();
 		}
 
-		protected TextConcatenation.TextConcatenationBuilder getBuilder() {
-			return getStack().peek().getBuilder();
-		}
-
 		@Override
-		public ICloseable indent() {
-			return open(new Frame(new IndentTextModifier(new TextCharSequence("\t"))));
+		public TextNestedModified.IModifierHandle indent() {
+			return getBuilder().open(new IndentTextModifier(new TextCharSequence("\t")));
 		}
 
 		@Override
 		public IBashRenderContext newline() {
-			getBuilder().element(TextNewline.create());
+			getBuilder().expression(TextNewline.create());
 			return this;
 		}
 
-		protected ICloseable open(final Frame frame) {
-			getStack().push(frame);
-			return () -> {
-				if (getStack().peek() != frame) throw new IllegalStateException();
-				pop();
-			};
-		}
-
-		protected void pop() {
-			final Stack<Frame> stack = getStack();
-			final Frame frame = stack.pop();
-			final ITextExpression expression = frame.getBuilder().build();
-			final ITextExpression modified = (frame.getModifier() == null) ? expression : new TextModified(expression, frame.getModifier());
-			stack.peek().getBuilder().element(modified);
+		@Override
+		public TextNestedModified.IModifierHandle raw() {
+			return getBuilder().getRoot().reactivate();
 		}
 
 		@Override
@@ -177,8 +156,8 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 		}
 
 		@Override
-		public ICloseable token() {
-			return open(new Frame(BashTokenModifier.create()));
+		public TextNestedModified.IModifierHandle token() {
+			return getBuilder().open(BashTokenModifier.create());
 		}
 	}
 

@@ -25,6 +25,9 @@ public class BashTokenModifier implements ITextModifier, ISingleton {
 	}
 
 	protected boolean isRequiresQuote(List<CharSequence> list) {
+		// If there's a gap in the middle, always quote since we never know what someone will put in there...
+		if (list.size() > 1) return true;
+		
 		boolean containsOpCharacters = false, containsNonOpCharacters = false;
 		for (CharSequence sequence : list) {
 			for (int i = 0; i < sequence.length(); i++) {
