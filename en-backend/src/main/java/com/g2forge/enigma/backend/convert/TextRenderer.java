@@ -2,9 +2,14 @@ package com.g2forge.enigma.backend.convert;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import com.g2forge.alexandria.adt.range.IRange;
+import com.g2forge.alexandria.adt.range.IntegerRange;
 import com.g2forge.alexandria.java.core.helpers.HCollection;
 import com.g2forge.alexandria.java.function.IFunction1;
 import com.g2forge.alexandria.java.function.builder.IBuilder;
@@ -22,7 +27,6 @@ import com.g2forge.enigma.backend.model.modifier.ITextModifier;
 import com.g2forge.enigma.backend.model.modifier.TextModified;
 import com.g2forge.enigma.backend.model.modifier.TextNestedModified;
 import com.g2forge.enigma.backend.model.modifier.TextNestedModified.Element;
-import com.g2forge.enigma.backend.model.modifier.TextNestedModified.Modifier;
 import com.g2forge.enigma.backend.model.modifier.TextUpdate;
 
 import lombok.Getter;
@@ -59,6 +63,7 @@ public class TextRenderer implements IRenderer<ITextRenderable> {
 			builder.add(TextNestedModified.class, e -> c -> {
 				final StringBuilder b = c.getBuilder();
 
+				final Map<ITextModifier, Set<Element>> applicableMap = e.getApplicableMap();
 				final Map<Element, List<ITextModifier>> closureMap = e.getClosureMap();
 				// Render each expression, storing the starting offset where it went in the builder
 				final List<Integer> elementOffsets = new ArrayList<>();
@@ -70,11 +75,38 @@ public class TextRenderer implements IRenderer<ITextRenderable> {
 					// Whenever we close a modifier, perform the modifications
 					if (closures != null) for (ITextModifier modifier : closures) {
 						// Look back over the elements for those to which the modifier applies, and coalesce runs
+						final List<IRange<Integer>> ranges = IRange.coalesce(applicableMap.get(modifier).stream().map(x -> {
+							final int index = e.getElements().indexOf(x);
+							return new IntegerRange(elementOffsets.get(index), x == element ? b.length() : elementOffsets.get(index + 1));
+						}).collect(Collectors.toList()), IntegerRange::new);
 
-						// A modify() can span multiple elements, so update the element offsets (resultlength - length = expansion)
+						final List<List<TextUpdate>> allUpdates = modifier.computeUpdates(ranges.stream().map(r -> new CharSubSequence(b, r.getMin(), r.getMax() - r.getMin())).collect(Collectors.toList()));
+						if (allUpdates != null) {
+							final int nRanges = ranges.size();
+							if (allUpdates.size() != nRanges) throw new RuntimeException();
+							for (int i = 0; i < nRanges; i++) {
+								final List<TextUpdate> rangeUpdates = allUpdates.get(i);
+								if (rangeUpdates.isEmpty()) continue;
+								final IRange<Integer> range = ranges.get(i);
 
-						// If the modify is at the end, we can copy/delete the text
-						// If the modify is in the middle, we need a child renderer to properly render the updates
+								final int unchanged = rangeUpdates.get(0).getOffset();
+								final String string = b.substring(range.getMin() + unchanged, range.getMax());
+								final TextRenderContext child = new TextRenderContext();
+								final List<Integer> updateLengths = child.modify(string, rangeUpdates, unchanged);
+								b.replace(range.getMin(), range.getMax(), child.build());
+
+								// Update the element offsets (resultlength - length = expansion)
+								for (int j = 0; j < rangeUpdates.size(); j++) {
+									final TextUpdate textUpdate = rangeUpdates.get(j);
+									final int offset = textUpdate.getOffset() + range.getMin();
+									final int index = Collections.binarySearch(elementOffsets, offset);
+									final int updateFrom = index > 0 ? index + 1 : -(index + 1);
+									for (int k = updateFrom; k < elementOffsets.size(); k++) {
+										elementOffsets.set(k, elementOffsets.get(k) + updateLengths.get(j));
+									}
+								}
+							}
+						}
 					}
 				}
 			});

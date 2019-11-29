@@ -15,5 +15,10 @@
 	<description>Model &amp; renderer for text, including complex template-ized, type-safe language models.</description>
 
 	<dependencies>
+		<dependency>
+			<groupId>com.g2forge.alexandria</groupId>
+			<artifactId>ax-adt</artifactId>
+			<version>${alexandria.version}</version>
+		</dependency>
 	</dependencies>
 </project>
