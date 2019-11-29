@@ -27,6 +27,7 @@ import com.g2forge.enigma.backend.model.modifier.ITextModifier;
 import com.g2forge.enigma.backend.model.modifier.TextModified;
 import com.g2forge.enigma.backend.model.modifier.TextNestedModified;
 import com.g2forge.enigma.backend.model.modifier.TextNestedModified.Element;
+import com.g2forge.enigma.backend.model.modifier.TextNestedModified.Modifier;
 import com.g2forge.enigma.backend.model.modifier.TextUpdate;
 
 import lombok.Getter;
@@ -63,32 +64,37 @@ public class TextRenderer implements IRenderer<ITextRenderable> {
 			builder.add(TextNestedModified.class, e -> c -> {
 				final StringBuilder b = c.getBuilder();
 
-				final Map<ITextModifier, Set<Element>> applicableMap = e.getApplicableMap();
-				final Map<Element, List<ITextModifier>> closureMap = e.getClosureMap();
+				final Map<Modifier, Set<Element>> applicableMap = e.getApplicableMap();
+				final Map<Element, List<Modifier>> closureMap = e.getClosureMap();
 				// Render each expression, storing the starting offset where it went in the builder
 				final List<Integer> elementOffsets = new ArrayList<>();
 				for (TextNestedModified.Element element : e.getElements()) {
 					elementOffsets.add(b.length());
 					c.render(element.getExpression(), ITextExpression.class);
 
-					final List<ITextModifier> closures = closureMap.get(element);
+					final List<Modifier> closures = closureMap.get(element);
 					// Whenever we close a modifier, perform the modifications
-					if (closures != null) for (ITextModifier modifier : closures) {
+					if (closures != null) for (Modifier modifier : closures) {
 						// Look back over the elements for those to which the modifier applies, and coalesce runs
 						final List<IRange<Integer>> ranges = IRange.coalesce(applicableMap.get(modifier).stream().map(x -> {
 							final int index = e.getElements().indexOf(x);
 							return new IntegerRange(elementOffsets.get(index), x == element ? b.length() : elementOffsets.get(index + 1));
 						}).collect(Collectors.toList()), IntegerRange::new);
 
-						final List<List<TextUpdate>> allUpdates = modifier.computeUpdates(ranges.stream().map(r -> new CharSubSequence(b, r.getMin(), r.getMax() - r.getMin())).collect(Collectors.toList()));
+						// Compute the updates
+						final List<List<TextUpdate>> allUpdates = modifier.getModifier().computeUpdates(ranges.stream().map(r -> new CharSubSequence(b, r.getMin(), r.getMax() - r.getMin())).collect(Collectors.toList()));
 						if (allUpdates != null) {
+							// Apply the updates
 							final int nRanges = ranges.size();
+							// Make sure we got as many update lists as we sent in ranges
 							if (allUpdates.size() != nRanges) throw new RuntimeException();
 							for (int i = 0; i < nRanges; i++) {
+								// Apply updates for each range (if any)
 								final List<TextUpdate> rangeUpdates = allUpdates.get(i);
 								if (rangeUpdates.isEmpty()) continue;
 								final IRange<Integer> range = ranges.get(i);
 
+								// Perform the update using a child renderer
 								final int unchanged = rangeUpdates.get(0).getOffset();
 								final String string = b.substring(range.getMin() + unchanged, range.getMax());
 								final TextRenderContext child = new TextRenderContext();
@@ -112,6 +118,14 @@ public class TextRenderer implements IRenderer<ITextRenderable> {
 			});
 		}).build();
 
+		@Getter
+		protected final StringBuilder builder = new StringBuilder();
+
+		@Override
+		public String build() {
+			return getBuilder().toString();
+		}
+
 		/**
 		 * @param string
 		 * @param updates
@@ -133,14 +147,6 @@ public class TextRenderer implements IRenderer<ITextRenderable> {
 			}
 			if (stringOffset < string.length()) builder.append(string.substring(stringOffset, string.length()));
 			return retVal;
-		}
-
-		@Getter
-		protected final StringBuilder builder = new StringBuilder();
-
-		@Override
-		public String build() {
-			return getBuilder().toString();
 		}
 
 		@Override

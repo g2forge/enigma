@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.g2forge.alexandria.java.close.ICloseable;
+import com.g2forge.alexandria.java.core.helpers.HCollector;
 import com.g2forge.alexandria.java.function.builder.IBuilder;
 import com.g2forge.enigma.backend.model.expression.ITextExpression;
 
@@ -149,25 +149,25 @@ public class TextNestedModified implements ITextExpression {
 	@Singular
 	protected final List<Element> elements;
 
-	public Map<ITextModifier, Set<Element>> getApplicableMap() {
-		final Map<ITextModifier, Map<Element, Object>> retVal = new IdentityHashMap<>();
+	public Map<Modifier, Set<Element>> getApplicableMap() {
+		final Map<Modifier, Map<Element, Object>> retVal = new IdentityHashMap<>();
 
 		for (Element element : getElements()) {
 			Modifier current = element.getModifier();
 			while (current != null) {
 				if (current.getModifier() != null) {
-					retVal.computeIfAbsent(current.getModifier(), m -> new IdentityHashMap<>()).put(element, null);
+					retVal.computeIfAbsent(current, m -> new IdentityHashMap<>()).put(element, null);
 				}
 				current = current.getParent();
 			}
 		}
 
-		return retVal.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().keySet()));
+		return retVal.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().keySet(), HCollector.mergeFail(), IdentityHashMap::new));
 	}
 
-	public Map<Element, List<ITextModifier>> getClosureMap() {
+	public Map<Element, List<Modifier>> getClosureMap() {
 		final Map<Modifier, Object> closed = new IdentityHashMap<>();
-		final Map<Element, List<ITextModifier>> retVal = new IdentityHashMap<>();
+		final Map<Element, List<Modifier>> retVal = new IdentityHashMap<>();
 
 		// Scan the elements backward
 		for (int i = getElements().size() - 1; i >= 0; i--) {
@@ -178,12 +178,12 @@ public class TextNestedModified implements ITextExpression {
 			// This works because Modifiers are unique to each ITextModifier activation
 			Modifier current = element.getModifier();
 			while ((current != null) && !closed.containsKey(current)) {
-				found.add(current);
+				if (current.getModifier() != null) found.add(current);
 				current = current.getParent();
 			}
 
 			if (!found.isEmpty()) {
-				retVal.put(element, found.stream().map(Modifier::getModifier).filter(Objects::nonNull).collect(Collectors.toList()));
+				retVal.put(element, found);
 				found.forEach(m -> closed.put(m, null));
 			}
 		}

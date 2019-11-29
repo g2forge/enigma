@@ -11,7 +11,7 @@ public class BashTokenModifier implements ITextModifier, ISingleton {
 	protected static final String WHITESPACE = " \t\n\r";
 	protected static final String OPCHARACTERS = "|&;()<>";
 	protected static final String METACHARACTERS = WHITESPACE + OPCHARACTERS;
-	
+
 	protected static final BashTokenModifier INSTANCE = new BashTokenModifier();
 
 	public static BashTokenModifier create() {
@@ -27,7 +27,7 @@ public class BashTokenModifier implements ITextModifier, ISingleton {
 	protected boolean isRequiresQuote(List<CharSequence> list) {
 		// If there's a gap in the middle, always quote since we never know what someone will put in there...
 		if (list.size() > 1) return true;
-		
+
 		boolean containsOpCharacters = false, containsNonOpCharacters = false;
 		for (CharSequence sequence : list) {
 			for (int i = 0; i < sequence.length(); i++) {

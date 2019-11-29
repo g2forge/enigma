@@ -19,7 +19,7 @@ public class TestBash {
 	@Test
 	public void substitution() {
 		final String actual = new BashRenderer().render(new BashScript(new BashCommand("echo", new BashCommandSubstitution(new BashCommand("echo", "Hello")))));
-		HAssert.assertEquals("#!/bin/bash\necho $(echo Hello)", actual);
+		HAssert.assertEquals("#!/bin/bash\necho \"$(echo Hello)\"", actual);
 	}
 
 	@Test
