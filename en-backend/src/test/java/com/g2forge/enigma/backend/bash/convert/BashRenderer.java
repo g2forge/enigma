@@ -35,14 +35,6 @@ import lombok.RequiredArgsConstructor;
 @Note(type = NoteType.TODO, value = "Add a method which renders a list of strings for a one-liner")
 public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRenderContext> {
 	public static class BashRenderContext implements IBashRenderContext, IBuilder<ITextExpression> {
-		@Getter
-		@RequiredArgsConstructor
-		protected static class Frame {
-			protected final ITextModifier modifier;
-
-			protected final TextConcatenation.TextConcatenationBuilder builder = TextConcatenation.builder();
-		}
-
 		protected static final IFunction1<Object, IExplicitBashRenderable> toExplicit = new TypeSwitch1.FunctionBuilder<Object, IExplicitBashRenderable>().with(builder -> {
 			ITextAppender.addToBuilder(builder, new ITextAppender.IExplicitFactory<IBashRenderContext, IExplicitBashRenderable>() {
 				@Override
