@@ -18,11 +18,19 @@ import com.g2forge.alexandria.java.type.function.TypeSwitch1;
 import com.g2forge.enigma.backend.convert.common.IRenderer;
 import com.g2forge.enigma.backend.model.ITextRenderable;
 import com.g2forge.enigma.backend.model.expression.ITextExpression;
+import com.g2forge.enigma.backend.model.expression.TextBoolean;
+import com.g2forge.enigma.backend.model.expression.TextByte;
 import com.g2forge.enigma.backend.model.expression.TextCharSequence;
+import com.g2forge.enigma.backend.model.expression.TextCharacter;
 import com.g2forge.enigma.backend.model.expression.TextConcatenation;
+import com.g2forge.enigma.backend.model.expression.TextDouble;
+import com.g2forge.enigma.backend.model.expression.TextFloat;
+import com.g2forge.enigma.backend.model.expression.TextInteger;
+import com.g2forge.enigma.backend.model.expression.TextLong;
 import com.g2forge.enigma.backend.model.expression.TextNewline;
 import com.g2forge.enigma.backend.model.expression.TextObject;
 import com.g2forge.enigma.backend.model.expression.TextRepeat;
+import com.g2forge.enigma.backend.model.expression.TextShort;
 import com.g2forge.enigma.backend.model.modifier.ITextModifier;
 import com.g2forge.enigma.backend.model.modifier.TextModified;
 import com.g2forge.enigma.backend.model.modifier.TextNestedModified;
@@ -36,6 +44,14 @@ public class TextRenderer implements IRenderer<ITextRenderable> {
 	protected static class TextRenderContext implements ITextRenderContext, IBuilder<String> {
 		protected static final IFunction1<Object, IExplicitTextRenderable> toExplicit = new TypeSwitch1.FunctionBuilder<Object, IExplicitTextRenderable>().with(builder -> {
 			builder.add(TextCharSequence.class, e -> c -> c.getBuilder().append(e.getValue()));
+			builder.add(TextBoolean.class, e -> c -> c.getBuilder().append(e.isValue()));
+			builder.add(TextCharacter.class, e -> c -> c.getBuilder().append(e.getValue()));
+			builder.add(TextByte.class, e -> c -> c.getBuilder().append(e.getValue()));
+			builder.add(TextShort.class, e -> c -> c.getBuilder().append(e.getValue()));
+			builder.add(TextInteger.class, e -> c -> c.getBuilder().append(e.getValue()));
+			builder.add(TextLong.class, e -> c -> c.getBuilder().append(e.getValue()));
+			builder.add(TextFloat.class, e -> c -> c.getBuilder().append(e.getValue()));
+			builder.add(TextDouble.class, e -> c -> c.getBuilder().append(e.getValue()));
 			builder.add(TextObject.class, e -> c -> c.getBuilder().append(e.getValue()));
 			builder.add(TextNewline.class, e -> c -> c.getBuilder().append("\n"));
 			builder.add(TextConcatenation.class, e -> c -> e.getElements().forEach(x -> c.render(x, ITextExpression.class)));

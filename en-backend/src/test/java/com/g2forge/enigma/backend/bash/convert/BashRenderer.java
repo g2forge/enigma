@@ -5,7 +5,6 @@ import java.lang.reflect.Type;
 import com.g2forge.alexandria.annotations.note.Note;
 import com.g2forge.alexandria.annotations.note.NoteType;
 import com.g2forge.alexandria.java.close.ICloseable;
-import com.g2forge.alexandria.java.core.error.NotYetImplementedError;
 import com.g2forge.alexandria.java.function.IConsumer2;
 import com.g2forge.alexandria.java.function.IFunction1;
 import com.g2forge.alexandria.java.function.builder.IBuilder;
@@ -20,17 +19,22 @@ import com.g2forge.enigma.backend.bash.model.expression.BashCommandSubstitution;
 import com.g2forge.enigma.backend.bash.model.expression.BashString;
 import com.g2forge.enigma.backend.convert.common.ARenderer;
 import com.g2forge.enigma.backend.model.expression.ITextExpression;
+import com.g2forge.enigma.backend.model.expression.TextBoolean;
+import com.g2forge.enigma.backend.model.expression.TextByte;
 import com.g2forge.enigma.backend.model.expression.TextCharSequence;
-import com.g2forge.enigma.backend.model.expression.TextConcatenation;
+import com.g2forge.enigma.backend.model.expression.TextCharacter;
+import com.g2forge.enigma.backend.model.expression.TextDouble;
+import com.g2forge.enigma.backend.model.expression.TextFloat;
+import com.g2forge.enigma.backend.model.expression.TextInteger;
+import com.g2forge.enigma.backend.model.expression.TextLong;
 import com.g2forge.enigma.backend.model.expression.TextNewline;
 import com.g2forge.enigma.backend.model.expression.TextObject;
-import com.g2forge.enigma.backend.model.modifier.ITextModifier;
+import com.g2forge.enigma.backend.model.expression.TextShort;
 import com.g2forge.enigma.backend.model.modifier.IndentTextModifier;
 import com.g2forge.enigma.backend.model.modifier.TextNestedModified;
 
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Note(type = NoteType.TODO, value = "Add a method which renders a list of strings for a one-liner")
 public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRenderContext> {
@@ -70,17 +74,20 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 
 		@Override
 		public IBashRenderContext append(boolean bool) {
-			throw new NotYetImplementedError();
+			getBuilder().expression(new TextBoolean(bool));
+			return this;
 		}
 
 		@Override
 		public IBashRenderContext append(byte number) {
-			throw new NotYetImplementedError();
+			getBuilder().expression(new TextByte(number));
+			return this;
 		}
 
 		@Override
 		public IBashRenderContext append(char character) {
-			throw new NotYetImplementedError();
+			getBuilder().expression(new TextCharacter(character));
+			return this;
 		}
 
 		@Override
@@ -91,22 +98,26 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 
 		@Override
 		public IBashRenderContext append(double number) {
-			throw new NotYetImplementedError();
+			getBuilder().expression(new TextDouble(number));
+			return this;
 		}
 
 		@Override
 		public IBashRenderContext append(float number) {
-			throw new NotYetImplementedError();
+			getBuilder().expression(new TextFloat(number));
+			return this;
 		}
 
 		@Override
 		public IBashRenderContext append(int number) {
-			throw new NotYetImplementedError();
+			getBuilder().expression(new TextInteger(number));
+			return this;
 		}
 
 		@Override
 		public IBashRenderContext append(long number) {
-			throw new NotYetImplementedError();
+			getBuilder().expression(new TextLong(number));
+			return this;
 		}
 
 		@Override
@@ -117,7 +128,8 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 
 		@Override
 		public IBashRenderContext append(short number) {
-			throw new NotYetImplementedError();
+			getBuilder().expression(new TextShort(number));
+			return this;
 		}
 
 		@Override
