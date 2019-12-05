@@ -24,5 +24,6 @@
 		<module>en-document</module>
 		<module>en-web</module>
 		<module>en-presentation</module>
+		<module>en-backend</module>
 	</modules>
 </project>
