@@ -30,7 +30,7 @@ public class TextNestedModified implements ITextExpression {
 	public static class Element {
 		protected final Modifier modifier;
 
-		protected final ITextExpression expression;
+		protected final Object expression;
 	}
 
 	public static interface IModifierHandle extends ICloseable {
@@ -136,7 +136,7 @@ public class TextNestedModified implements ITextExpression {
 		@Getter
 		protected final IModifierHandle root = new OpenModifierHandle(null);
 
-		public TextNestedModifiedBuilder expression(ITextExpression expression) {
+		public TextNestedModifiedBuilder expression(Object expression) {
 			this.element(new Element(getCurrentModifier(), expression));
 			return this;
 		}

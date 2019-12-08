@@ -17,20 +17,9 @@ import com.g2forge.alexandria.java.text.CharSubSequence;
 import com.g2forge.alexandria.java.type.function.TypeSwitch1;
 import com.g2forge.enigma.backend.convert.common.IRenderer;
 import com.g2forge.enigma.backend.model.ITextRenderable;
-import com.g2forge.enigma.backend.model.expression.ITextExpression;
-import com.g2forge.enigma.backend.model.expression.TextBoolean;
-import com.g2forge.enigma.backend.model.expression.TextByte;
-import com.g2forge.enigma.backend.model.expression.TextCharSequence;
-import com.g2forge.enigma.backend.model.expression.TextCharacter;
 import com.g2forge.enigma.backend.model.expression.TextConcatenation;
-import com.g2forge.enigma.backend.model.expression.TextDouble;
-import com.g2forge.enigma.backend.model.expression.TextFloat;
-import com.g2forge.enigma.backend.model.expression.TextInteger;
-import com.g2forge.enigma.backend.model.expression.TextLong;
 import com.g2forge.enigma.backend.model.expression.TextNewline;
-import com.g2forge.enigma.backend.model.expression.TextObject;
 import com.g2forge.enigma.backend.model.expression.TextRepeat;
-import com.g2forge.enigma.backend.model.expression.TextShort;
 import com.g2forge.enigma.backend.model.modifier.ITextModifier;
 import com.g2forge.enigma.backend.model.modifier.TextModified;
 import com.g2forge.enigma.backend.model.modifier.TextNestedModified;
@@ -43,27 +32,29 @@ import lombok.Getter;
 public class TextRenderer implements IRenderer<ITextRenderable> {
 	protected static class TextRenderContext implements ITextRenderContext, IBuilder<String> {
 		protected static final IFunction1<Object, IExplicitTextRenderable> toExplicit = new TypeSwitch1.FunctionBuilder<Object, IExplicitTextRenderable>().with(builder -> {
-			builder.add(TextCharSequence.class, e -> c -> c.getBuilder().append(e.getValue()));
-			builder.add(TextBoolean.class, e -> c -> c.getBuilder().append(e.isValue()));
-			builder.add(TextCharacter.class, e -> c -> c.getBuilder().append(e.getValue()));
-			builder.add(TextByte.class, e -> c -> c.getBuilder().append(e.getValue()));
-			builder.add(TextShort.class, e -> c -> c.getBuilder().append(e.getValue()));
-			builder.add(TextInteger.class, e -> c -> c.getBuilder().append(e.getValue()));
-			builder.add(TextLong.class, e -> c -> c.getBuilder().append(e.getValue()));
-			builder.add(TextFloat.class, e -> c -> c.getBuilder().append(e.getValue()));
-			builder.add(TextDouble.class, e -> c -> c.getBuilder().append(e.getValue()));
-			builder.add(TextObject.class, e -> c -> c.getBuilder().append(e.getValue()));
+			builder.add(Object.class, e -> c -> c.getBuilder().append(e));
+			builder.add(CharSequence.class, e -> c -> c.getBuilder().append(e));
+			builder.add(String.class, e -> c -> c.getBuilder().append(e));
+			builder.add(Boolean.class, e -> c -> c.getBuilder().append(e.booleanValue()));
+			builder.add(Character.class, e -> c -> c.getBuilder().append(e.charValue()));
+			builder.add(Byte.class, e -> c -> c.getBuilder().append(e.byteValue()));
+			builder.add(Short.class, e -> c -> c.getBuilder().append(e.shortValue()));
+			builder.add(Integer.class, e -> c -> c.getBuilder().append(e.intValue()));
+			builder.add(Long.class, e -> c -> c.getBuilder().append(e.longValue()));
+			builder.add(Float.class, e -> c -> c.getBuilder().append(e.floatValue()));
+			builder.add(Double.class, e -> c -> c.getBuilder().append(e.doubleValue()));
+			
 			builder.add(TextNewline.class, e -> c -> c.getBuilder().append("\n"));
-			builder.add(TextConcatenation.class, e -> c -> e.getElements().forEach(x -> c.render(x, ITextExpression.class)));
+			builder.add(TextConcatenation.class, e -> c -> e.getElements().forEach(x -> c.render(x, Object.class)));
 			builder.add(TextRepeat.class, e -> c -> {
 				for (int i = 0; i < e.getRepeat(); i++) {
-					c.render(e.getExpression(), ITextExpression.class);
+					c.render(e.getExpression(), Object.class);
 				}
 			});
 			builder.add(TextModified.class, e -> c -> {
 				final StringBuilder b = c.getBuilder();
 				final int priorOffset = b.length();
-				c.render(e.getExpression(), ITextExpression.class);
+				c.render(e.getExpression(), Object.class);
 
 				final ITextModifier modifier = e.getModifier();
 				final List<List<TextUpdate>> updates = modifier.computeUpdates(HCollection.asList(new CharSubSequence(b, priorOffset)));
@@ -86,7 +77,7 @@ public class TextRenderer implements IRenderer<ITextRenderable> {
 				final List<Integer> elementOffsets = new ArrayList<>();
 				for (TextNestedModified.Element element : e.getElements()) {
 					elementOffsets.add(b.length());
-					c.render(element.getExpression(), ITextExpression.class);
+					c.render(element.getExpression(), Object.class);
 
 					final List<Modifier> closures = closureMap.get(element);
 					// Whenever we close a modifier, perform the modifications
@@ -157,7 +148,7 @@ public class TextRenderer implements IRenderer<ITextRenderable> {
 				final int updateOffset = update.getOffset() - unchanged;
 				if (updateOffset > stringOffset) builder.append(string.substring(stringOffset, updateOffset));
 				final int prelength = builder.length();
-				render(update.getFunction().apply(string.substring(updateOffset, updateOffset + update.getLength())), ITextExpression.class);
+				render(update.getFunction().apply(string.substring(updateOffset, updateOffset + update.getLength())), Object.class);
 				retVal.add(builder.length() - prelength);
 				stringOffset = updateOffset + update.getLength();
 			}

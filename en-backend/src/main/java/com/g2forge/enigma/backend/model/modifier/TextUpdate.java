@@ -1,7 +1,6 @@
 package com.g2forge.enigma.backend.model.modifier;
 
 import com.g2forge.alexandria.java.function.IFunction1;
-import com.g2forge.enigma.backend.model.expression.ITextExpression;
 
 import lombok.Builder;
 import lombok.Data;
@@ -15,5 +14,5 @@ public class TextUpdate {
 
 	protected final int length;
 
-	protected final IFunction1<? super CharSequence, ? extends ITextExpression> function;
+	protected final IFunction1<? super CharSequence, ? extends Object> function;
 }

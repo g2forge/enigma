@@ -12,5 +12,5 @@ import lombok.Singular;
 @RequiredArgsConstructor
 public class TextConcatenation implements ITextExpression {
 	@Singular
-	protected final List<ITextExpression> elements;
+	protected final List<Object> elements;
 }
