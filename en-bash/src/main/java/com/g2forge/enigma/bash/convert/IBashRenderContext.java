@@ -1,4 +1,4 @@
-package com.g2forge.enigma.backend.bash.convert;
+package com.g2forge.enigma.bash.convert;
 
 import com.g2forge.enigma.backend.ITextBuilder;
 import com.g2forge.enigma.backend.convert.common.IRenderContext;

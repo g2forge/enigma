@@ -16,7 +16,6 @@ import com.g2forge.alexandria.java.function.builder.IBuilder;
 import com.g2forge.alexandria.java.text.CharSubSequence;
 import com.g2forge.alexandria.java.type.function.TypeSwitch1;
 import com.g2forge.enigma.backend.convert.common.IRenderer;
-import com.g2forge.enigma.backend.model.ITextRenderable;
 import com.g2forge.enigma.backend.model.expression.TextConcatenation;
 import com.g2forge.enigma.backend.model.expression.TextNewline;
 import com.g2forge.enigma.backend.model.expression.TextRepeat;
@@ -29,7 +28,7 @@ import com.g2forge.enigma.backend.model.modifier.TextUpdate;
 
 import lombok.Getter;
 
-public class TextRenderer implements IRenderer<ITextRenderable> {
+public class TextRenderer implements IRenderer<Object> {
 	protected static class TextRenderContext implements ITextRenderContext, IBuilder<String> {
 		protected static final IFunction1<Object, IExplicitTextRenderable> toExplicit = new TypeSwitch1.FunctionBuilder<Object, IExplicitTextRenderable>().with(builder -> {
 			builder.add(Object.class, e -> c -> c.getBuilder().append(e));
@@ -164,7 +163,7 @@ public class TextRenderer implements IRenderer<ITextRenderable> {
 	}
 
 	@Override
-	public String render(ITextRenderable renderable) {
+	public String render(Object renderable) {
 		final TextRenderContext context = new TextRenderContext();
 		context.render(renderable, null);
 		return context.build();

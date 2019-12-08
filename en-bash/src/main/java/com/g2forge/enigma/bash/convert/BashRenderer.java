@@ -1,4 +1,4 @@
-package com.g2forge.enigma.backend.bash.convert;
+package com.g2forge.enigma.bash.convert;
 
 import java.lang.reflect.Type;
 
@@ -10,18 +10,18 @@ import com.g2forge.alexandria.java.function.IFunction1;
 import com.g2forge.alexandria.java.function.builder.IBuilder;
 import com.g2forge.alexandria.java.type.function.TypeSwitch1;
 import com.g2forge.enigma.backend.ITextAppender;
-import com.g2forge.enigma.backend.bash.convert.textmodifiers.BashTokenModifier;
-import com.g2forge.enigma.backend.bash.model.BashBlock;
-import com.g2forge.enigma.backend.bash.model.BashCommand;
-import com.g2forge.enigma.backend.bash.model.BashScript;
-import com.g2forge.enigma.backend.bash.model.IBashBlock;
-import com.g2forge.enigma.backend.bash.model.expression.BashCommandSubstitution;
-import com.g2forge.enigma.backend.bash.model.expression.BashString;
 import com.g2forge.enigma.backend.convert.common.ARenderer;
 import com.g2forge.enigma.backend.model.expression.ITextExpression;
 import com.g2forge.enigma.backend.model.expression.TextNewline;
 import com.g2forge.enigma.backend.model.modifier.IndentTextModifier;
 import com.g2forge.enigma.backend.model.modifier.TextNestedModified;
+import com.g2forge.enigma.bash.convert.textmodifiers.BashTokenModifier;
+import com.g2forge.enigma.bash.model.BashBlock;
+import com.g2forge.enigma.bash.model.BashCommand;
+import com.g2forge.enigma.bash.model.BashScript;
+import com.g2forge.enigma.bash.model.IBashBlock;
+import com.g2forge.enigma.bash.model.expression.BashCommandSubstitution;
+import com.g2forge.enigma.bash.model.expression.BashString;
 
 import lombok.AccessLevel;
 import lombok.Getter;

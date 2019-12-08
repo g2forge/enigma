@@ -1,13 +1,13 @@
-package com.g2forge.enigma.backend;
+package com.g2forge.enigma.bash;
 
 import org.junit.Test;
 
 import com.g2forge.alexandria.test.HAssert;
-import com.g2forge.enigma.backend.bash.convert.BashRenderer;
-import com.g2forge.enigma.backend.bash.model.BashCommand;
-import com.g2forge.enigma.backend.bash.model.BashScript;
-import com.g2forge.enigma.backend.bash.model.expression.BashCommandSubstitution;
-import com.g2forge.enigma.backend.bash.model.expression.BashString;
+import com.g2forge.enigma.bash.convert.BashRenderer;
+import com.g2forge.enigma.bash.model.BashCommand;
+import com.g2forge.enigma.bash.model.BashScript;
+import com.g2forge.enigma.bash.model.expression.BashCommandSubstitution;
+import com.g2forge.enigma.bash.model.expression.BashString;
 
 public class TestBash {
 	@Test

@@ -1,6 +1,6 @@
-package com.g2forge.enigma.backend.bash.model;
+package com.g2forge.enigma.bash.model;
 
-import com.g2forge.enigma.backend.bash.convert.IBashRenderable;
+import com.g2forge.enigma.bash.convert.IBashRenderable;
 
 import lombok.Builder;
 import lombok.Data;
