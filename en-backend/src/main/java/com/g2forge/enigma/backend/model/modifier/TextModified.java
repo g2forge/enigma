@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 @Builder(toBuilder = true)
 @RequiredArgsConstructor
 public class TextModified implements ITextExpression {
-	protected final ITextExpression expression;
+	protected final Object expression;
 
 	protected final ITextModifier modifier;
 }

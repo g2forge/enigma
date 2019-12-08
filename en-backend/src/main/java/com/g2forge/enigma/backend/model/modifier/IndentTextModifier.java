@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.g2forge.alexandria.java.core.error.NotYetImplementedError;
 import com.g2forge.alexandria.java.function.IFunction1;
-import com.g2forge.enigma.backend.model.expression.ITextExpression;
 
 import lombok.Builder;
 import lombok.Data;
@@ -15,12 +14,12 @@ import lombok.RequiredArgsConstructor;
 @Builder(toBuilder = true)
 @RequiredArgsConstructor
 public class IndentTextModifier implements ITextModifier {
-	protected final ITextExpression indent;
+	protected final Object indent;
 
 	@Override
 	public List<List<TextUpdate>> computeUpdates(List<CharSequence> list) {
 		final List<List<TextUpdate>> retVal = new ArrayList<>(list.size());
-		final IFunction1<CharSequence, ITextExpression> function = IFunction1.create(getIndent());
+		final IFunction1<CharSequence, Object> function = IFunction1.create(getIndent());
 		for (CharSequence sequence : list) {
 			final List<TextUpdate> updates = new ArrayList<>();
 			retVal.add(updates);

@@ -19,17 +19,7 @@ import com.g2forge.enigma.backend.bash.model.expression.BashCommandSubstitution;
 import com.g2forge.enigma.backend.bash.model.expression.BashString;
 import com.g2forge.enigma.backend.convert.common.ARenderer;
 import com.g2forge.enigma.backend.model.expression.ITextExpression;
-import com.g2forge.enigma.backend.model.expression.TextBoolean;
-import com.g2forge.enigma.backend.model.expression.TextByte;
-import com.g2forge.enigma.backend.model.expression.TextCharSequence;
-import com.g2forge.enigma.backend.model.expression.TextCharacter;
-import com.g2forge.enigma.backend.model.expression.TextDouble;
-import com.g2forge.enigma.backend.model.expression.TextFloat;
-import com.g2forge.enigma.backend.model.expression.TextInteger;
-import com.g2forge.enigma.backend.model.expression.TextLong;
 import com.g2forge.enigma.backend.model.expression.TextNewline;
-import com.g2forge.enigma.backend.model.expression.TextObject;
-import com.g2forge.enigma.backend.model.expression.TextShort;
 import com.g2forge.enigma.backend.model.modifier.IndentTextModifier;
 import com.g2forge.enigma.backend.model.modifier.TextNestedModified;
 
@@ -74,61 +64,61 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 
 		@Override
 		public IBashRenderContext append(boolean bool) {
-			getBuilder().expression(new TextBoolean(bool));
+			getBuilder().expression(bool);
 			return this;
 		}
 
 		@Override
 		public IBashRenderContext append(byte number) {
-			getBuilder().expression(new TextByte(number));
+			getBuilder().expression(number);
 			return this;
 		}
 
 		@Override
 		public IBashRenderContext append(char character) {
-			getBuilder().expression(new TextCharacter(character));
+			getBuilder().expression(character);
 			return this;
 		}
 
 		@Override
 		public IBashRenderContext append(CharSequence characters) {
-			getBuilder().expression(new TextCharSequence(characters));
+			getBuilder().expression(characters);
 			return this;
 		}
 
 		@Override
 		public IBashRenderContext append(double number) {
-			getBuilder().expression(new TextDouble(number));
+			getBuilder().expression(number);
 			return this;
 		}
 
 		@Override
 		public IBashRenderContext append(float number) {
-			getBuilder().expression(new TextFloat(number));
+			getBuilder().expression(number);
 			return this;
 		}
 
 		@Override
 		public IBashRenderContext append(int number) {
-			getBuilder().expression(new TextInteger(number));
+			getBuilder().expression(number);
 			return this;
 		}
 
 		@Override
 		public IBashRenderContext append(long number) {
-			getBuilder().expression(new TextLong(number));
+			getBuilder().expression(number);
 			return this;
 		}
 
 		@Override
 		public IBashRenderContext append(Object object) {
-			getBuilder().expression(new TextObject(object));
+			getBuilder().expression(object);
 			return this;
 		}
 
 		@Override
 		public IBashRenderContext append(short number) {
-			getBuilder().expression(new TextShort(number));
+			getBuilder().expression(number);
 			return this;
 		}
 
@@ -139,7 +129,7 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 
 		@Override
 		public TextNestedModified.IModifierHandle indent() {
-			return getBuilder().open(new IndentTextModifier(new TextCharSequence("\t")));
+			return getBuilder().open(new IndentTextModifier("\t"));
 		}
 
 		@Override
