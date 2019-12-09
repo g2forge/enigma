@@ -15,13 +15,16 @@ import com.g2forge.enigma.backend.model.expression.ITextExpression;
 import com.g2forge.enigma.backend.model.expression.TextNewline;
 import com.g2forge.enigma.backend.model.modifier.IndentTextModifier;
 import com.g2forge.enigma.backend.model.modifier.TextNestedModified;
+import com.g2forge.enigma.backend.model.modifier.TextNestedModified.IModifierHandle;
 import com.g2forge.enigma.bash.convert.textmodifiers.BashTokenModifier;
-import com.g2forge.enigma.bash.model.BashBlock;
-import com.g2forge.enigma.bash.model.BashCommand;
 import com.g2forge.enigma.bash.model.BashScript;
-import com.g2forge.enigma.bash.model.IBashBlock;
 import com.g2forge.enigma.bash.model.expression.BashCommandSubstitution;
 import com.g2forge.enigma.bash.model.expression.BashString;
+import com.g2forge.enigma.bash.model.statement.BashBlock;
+import com.g2forge.enigma.bash.model.statement.BashCommand;
+import com.g2forge.enigma.bash.model.statement.BashIf;
+import com.g2forge.enigma.bash.model.statement.IBashBlock;
+import com.g2forge.enigma.bash.model.statement.IBashStatement;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -38,7 +41,7 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 			});
 
 			builder.add(BashScript.class, e -> c -> c.append("#!/bin/bash").newline().render(e.getBody(), IBashBlock.class));
-			builder.add(BashBlock.class, e -> c -> e.getContents().forEach(x -> c.render(x, IBashBlock.class)));
+			builder.add(BashBlock.class, e -> c -> e.getContents().forEach(x -> c.render(x, IBashBlock.class).newline()));
 			builder.add(BashCommand.class, e -> c -> {
 				boolean first = true;
 				for (Object object : e.getTokens()) {
@@ -49,6 +52,20 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 					}
 				}
 			});
+			builder.add(BashIf.class, e -> c -> {
+				c.append("if ").render(e.getCondition(), null).append("; then").newline();
+				try (final IModifierHandle indent = c.indent()) {
+					c.render(e.getThenStatement(), IBashStatement.class).newline();
+				}
+				if (e.getElseStatement() != null) {
+					c.append("else").newline();
+					try (final IModifierHandle indent = c.indent()) {
+						c.render(e.getElseStatement(), IBashStatement.class).newline();
+					}
+				}
+				c.append("fi");
+			});
+
 			builder.add(BashCommandSubstitution.class, e -> c -> c.append("$(").render(e.getCommand(), BashCommand.class).append(")"));
 			builder.add(BashString.class, e -> c -> {
 				try (final ICloseable raw = c.raw()) {
@@ -129,7 +146,7 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 
 		@Override
 		public TextNestedModified.IModifierHandle indent() {
-			return getBuilder().open(new IndentTextModifier("\t"));
+			return getBuilder().open(new IndentTextModifier(true, "\t"));
 		}
 
 		@Override

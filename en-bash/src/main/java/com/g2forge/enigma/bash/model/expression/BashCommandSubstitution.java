@@ -1,6 +1,6 @@
 package com.g2forge.enigma.bash.model.expression;
 
-import com.g2forge.enigma.bash.model.BashCommand;
+import com.g2forge.enigma.bash.model.statement.BashCommand;
 
 import lombok.Builder;
 import lombok.Data;

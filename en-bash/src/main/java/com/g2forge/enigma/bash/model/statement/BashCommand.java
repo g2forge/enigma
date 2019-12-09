@@ -1,4 +1,4 @@
-package com.g2forge.enigma.bash.model;
+package com.g2forge.enigma.bash.model.statement;
 
 import java.util.List;
 

@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 @Builder(toBuilder = true)
 @RequiredArgsConstructor
 public class IndentTextModifier implements ITextModifier {
+	protected final boolean start;
+
 	protected final Object indent;
 
 	@Override
@@ -21,8 +23,10 @@ public class IndentTextModifier implements ITextModifier {
 		final List<List<TextUpdate>> retVal = new ArrayList<>(list.size());
 		final IFunction1<CharSequence, Object> function = IFunction1.create(getIndent());
 		for (CharSequence sequence : list) {
+			final boolean first = retVal.isEmpty();
 			final List<TextUpdate> updates = new ArrayList<>();
 			retVal.add(updates);
+			if (first && isStart()) updates.add(new TextUpdate(0, 0, function));
 
 			boolean found = false;
 			for (int i = 0; i < sequence.length(); i++) {
