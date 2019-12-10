@@ -19,14 +19,12 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
-import lombok.ToString;
 
 @Data
 @Builder(toBuilder = true)
 @RequiredArgsConstructor
 public class TextNestedModified implements ITextExpression {
-	@Getter
-	@ToString
+	@Data
 	@Builder(toBuilder = true)
 	@RequiredArgsConstructor
 	public static class Element {
@@ -39,8 +37,7 @@ public class TextNestedModified implements ITextExpression {
 		public IModifierHandle reactivate();
 	}
 
-	@Getter
-	@ToString
+	@Data
 	@Builder(toBuilder = true)
 	@RequiredArgsConstructor
 	public static class Modifier implements Cloneable {
@@ -108,7 +105,7 @@ public class TextNestedModified implements ITextExpression {
 			public ReactivatedModifierHandle(AModifierHandle original) {
 				this.original = original;
 				this.previous = getCurrentModifier();
-				// We clone where so that we can tell the activations appart
+				// Clone the modifier so that we can tell the activations apart
 				this.modifier = getOriginal().getModifier().clone();
 				ensureOpenOkay();
 				setCurrentModifier(getModifier());
@@ -119,10 +116,10 @@ public class TextNestedModified implements ITextExpression {
 				final Modifier originalModifier = getOriginal().getModifier();
 				Modifier current = getCurrentModifier();
 				while (current != null) {
-					if (current == originalModifier) return;
+					if (current.equals(originalModifier)) return;
 					current = current.getParent();
 				}
-				throw new IllegalStateException();
+				throw new IllegalStateException("Can't reactivate a non-ancestor modifier!");
 			}
 
 			@Override

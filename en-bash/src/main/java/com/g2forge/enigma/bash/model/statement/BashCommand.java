@@ -12,7 +12,7 @@ import lombok.Singular;
 @Data
 @Builder(toBuilder = true)
 @RequiredArgsConstructor
-public class BashCommand implements IBashStatement {
+public class BashCommand implements IBashExecutable {
 	@Singular
 	protected final List<Object> tokens;
 

@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import com.g2forge.alexandria.adt.range.IRange;
 import com.g2forge.alexandria.adt.range.IntegerRange;
+import com.g2forge.alexandria.java.core.error.UnreachableCodeError;
 import com.g2forge.alexandria.java.core.helpers.HCollection;
 import com.g2forge.alexandria.java.function.IFunction1;
 import com.g2forge.alexandria.java.function.builder.IBuilder;
@@ -83,7 +84,14 @@ public class TextRenderer implements IRenderer<Object> {
 					if (closures != null) for (Modifier modifier : closures) {
 						// Look back over the elements for those to which the modifier applies, and coalesce runs
 						final List<IRange<Integer>> ranges = IRange.coalesce(applicableMap.get(modifier).stream().map(x -> {
-							final int index = e.getElements().indexOf(x);
+							int index = -1;
+							for (int i = 0; i < e.getElements().size(); i++) {
+								if (e.getElements().get(i) == x) {
+									index = i;
+									break;
+								}
+							}
+							if (index == -1) throw new UnreachableCodeError();
 							return new IntegerRange(elementOffsets.get(index), x == element ? b.length() : elementOffsets.get(index + 1));
 						}).collect(Collectors.toList()), IntegerRange::new);
 
@@ -99,7 +107,7 @@ public class TextRenderer implements IRenderer<Object> {
 							for (int i = 0; i < nRanges; i++) {
 								// Apply updates for each range (if any)
 								final List<TextUpdate> rangeUpdates = allUpdates.get(i);
-								if (rangeUpdates.isEmpty()) continue;
+								if (rangeUpdates == null || rangeUpdates.isEmpty()) continue;
 								final IRange<Integer> range = ranges.get(i);
 
 								// Perform the update using a child renderer

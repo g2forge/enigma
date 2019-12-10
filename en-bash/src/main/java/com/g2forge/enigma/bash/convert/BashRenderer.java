@@ -24,10 +24,13 @@ import com.g2forge.enigma.bash.model.expression.BashCommandSubstitution;
 import com.g2forge.enigma.bash.model.expression.BashExpansion;
 import com.g2forge.enigma.bash.model.expression.BashString;
 import com.g2forge.enigma.bash.model.statement.BashAssignment;
+import com.g2forge.enigma.bash.model.statement.BashBlank;
 import com.g2forge.enigma.bash.model.statement.BashBlock;
 import com.g2forge.enigma.bash.model.statement.BashCommand;
 import com.g2forge.enigma.bash.model.statement.BashIf;
+import com.g2forge.enigma.bash.model.statement.BashOperation;
 import com.g2forge.enigma.bash.model.statement.IBashBlock;
+import com.g2forge.enigma.bash.model.statement.IBashExecutable;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -53,8 +56,6 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 				}
 			});
 
-			builder.add(BashScript.class, e -> c -> c.append("#!/bin/bash").newline().render(e.getBody(), IBashBlock.class));
-			builder.add(BashBlock.class, e -> c -> e.getContents().forEach(x -> c.render(x, IBashBlock.class)));
 			builder.add(BashCommand.class, e -> c -> {
 				boolean first = true;
 				for (Object object : e.getTokens()) {
@@ -64,7 +65,30 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 				}
 				if (c.isBlockMode()) c.newline();
 			});
+			builder.add(BashOperation.class, e -> c -> {
+				final String operator;
+				switch (e.getOperator()) {
+					case And:
+						operator = " && ";
+						break;
+					case Or:
+						operator = " || ";
+						break;
+					default:
+						throw new EnumException(BashOperation.Operator.class, e.getOperator());
+				}
+				boolean first = true;
+				for (IBashExecutable operand : e.getOperands()) {
+					if (first) first = false;
+					else c.append(operator);
+					c.render(operand, IBashExecutable.class);
+				}
+			});
+
+			builder.add(BashScript.class, e -> c -> c.append("#!/bin/bash").newline().render(e.getBody(), IBashBlock.class));
+			builder.add(BashBlock.class, e -> c -> e.getContents().forEach(x -> c.render(x, IBashBlock.class)));
 			builder.add(BashAssignment.class, e -> c -> c.append(e.getName()).append("=").render(e.getExpression(), Object.class).newline());
+			builder.add(BashBlank.class, e -> c -> c.newline());
 			builder.add(BashIf.class, e -> c -> {
 				c.append("if ").render(e.getCondition(), null).append("; then").newline();
 				try (final ICloseable indent = c.indent()) {
@@ -83,7 +107,7 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 				try (final ICloseable token = c.token()) {
 					c.append("$(");
 					try (final ICloseable line = c.line()) {
-						c.render(e.getCommand(), BashCommand.class);
+						c.render(e.getExecutable(), IBashExecutable.class);
 					}
 					c.append(")");
 				}
