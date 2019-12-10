@@ -1,6 +1,6 @@
-package com.g2forge.enigma.backend.bash.model.expression;
+package com.g2forge.enigma.bash.model.expression;
 
-import com.g2forge.enigma.backend.bash.model.BashCommand;
+import com.g2forge.enigma.bash.model.statement.IBashExecutable;
 
 import lombok.Builder;
 import lombok.Data;
@@ -10,5 +10,5 @@ import lombok.RequiredArgsConstructor;
 @Builder(toBuilder = true)
 @RequiredArgsConstructor
 public class BashCommandSubstitution implements IBashExpression {
-	protected final BashCommand command;
+	protected final IBashExecutable executable;
 }

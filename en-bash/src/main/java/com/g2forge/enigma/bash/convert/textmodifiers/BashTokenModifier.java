@@ -1,4 +1,4 @@
-package com.g2forge.enigma.backend.bash.convert.textmodifiers;
+package com.g2forge.enigma.bash.convert.textmodifiers;
 
 import java.util.List;
 

@@ -10,13 +10,13 @@ import java.util.stream.Collectors;
 
 import com.g2forge.alexandria.adt.range.IRange;
 import com.g2forge.alexandria.adt.range.IntegerRange;
+import com.g2forge.alexandria.java.core.error.UnreachableCodeError;
 import com.g2forge.alexandria.java.core.helpers.HCollection;
 import com.g2forge.alexandria.java.function.IFunction1;
 import com.g2forge.alexandria.java.function.builder.IBuilder;
 import com.g2forge.alexandria.java.text.CharSubSequence;
 import com.g2forge.alexandria.java.type.function.TypeSwitch1;
 import com.g2forge.enigma.backend.convert.common.IRenderer;
-import com.g2forge.enigma.backend.model.ITextRenderable;
 import com.g2forge.enigma.backend.model.expression.TextConcatenation;
 import com.g2forge.enigma.backend.model.expression.TextNewline;
 import com.g2forge.enigma.backend.model.expression.TextRepeat;
@@ -29,7 +29,7 @@ import com.g2forge.enigma.backend.model.modifier.TextUpdate;
 
 import lombok.Getter;
 
-public class TextRenderer implements IRenderer<ITextRenderable> {
+public class TextRenderer implements IRenderer<Object> {
 	protected static class TextRenderContext implements ITextRenderContext, IBuilder<String> {
 		protected static final IFunction1<Object, IExplicitTextRenderable> toExplicit = new TypeSwitch1.FunctionBuilder<Object, IExplicitTextRenderable>().with(builder -> {
 			builder.add(Object.class, e -> c -> c.getBuilder().append(e));
@@ -43,7 +43,7 @@ public class TextRenderer implements IRenderer<ITextRenderable> {
 			builder.add(Long.class, e -> c -> c.getBuilder().append(e.longValue()));
 			builder.add(Float.class, e -> c -> c.getBuilder().append(e.floatValue()));
 			builder.add(Double.class, e -> c -> c.getBuilder().append(e.doubleValue()));
-			
+
 			builder.add(TextNewline.class, e -> c -> c.getBuilder().append("\n"));
 			builder.add(TextConcatenation.class, e -> c -> e.getElements().forEach(x -> c.render(x, Object.class)));
 			builder.add(TextRepeat.class, e -> c -> {
@@ -84,40 +84,50 @@ public class TextRenderer implements IRenderer<ITextRenderable> {
 					if (closures != null) for (Modifier modifier : closures) {
 						// Look back over the elements for those to which the modifier applies, and coalesce runs
 						final List<IRange<Integer>> ranges = IRange.coalesce(applicableMap.get(modifier).stream().map(x -> {
-							final int index = e.getElements().indexOf(x);
+							int index = -1;
+							for (int i = 0; i < e.getElements().size(); i++) {
+								if (e.getElements().get(i) == x) {
+									index = i;
+									break;
+								}
+							}
+							if (index == -1) throw new UnreachableCodeError();
 							return new IntegerRange(elementOffsets.get(index), x == element ? b.length() : elementOffsets.get(index + 1));
 						}).collect(Collectors.toList()), IntegerRange::new);
 
 						// Compute the updates
-						final List<List<TextUpdate>> allUpdates = modifier.getModifier().computeUpdates(ranges.stream().map(r -> new CharSubSequence(b, r.getMin(), r.getMax() - r.getMin())).collect(Collectors.toList()));
+						final List<CharSequence> list = ranges.stream().map(r -> new CharSubSequence(b, r.getMin(), r.getMax() - r.getMin())).collect(Collectors.toList());
+						final List<List<TextUpdate>> allUpdates = modifier.getModifier().computeUpdates(list);
 						if (allUpdates != null) {
 							// Apply the updates
 							final int nRanges = ranges.size();
 							// Make sure we got as many update lists as we sent in ranges
 							if (allUpdates.size() != nRanges) throw new RuntimeException();
+							int cumulative = 0; // Cumulative offset update from previous ranges
 							for (int i = 0; i < nRanges; i++) {
 								// Apply updates for each range (if any)
 								final List<TextUpdate> rangeUpdates = allUpdates.get(i);
-								if (rangeUpdates.isEmpty()) continue;
+								if (rangeUpdates == null || rangeUpdates.isEmpty()) continue;
 								final IRange<Integer> range = ranges.get(i);
 
 								// Perform the update using a child renderer
 								final int unchanged = rangeUpdates.get(0).getOffset();
-								final String string = b.substring(range.getMin() + unchanged, range.getMax());
+								final String string = b.substring(range.getMin() + cumulative + unchanged, range.getMax() + cumulative);
 								final TextRenderContext child = new TextRenderContext();
 								final List<Integer> updateLengths = child.modify(string, rangeUpdates, unchanged);
-								b.replace(range.getMin(), range.getMax(), child.build());
+								b.replace(range.getMin() + cumulative + unchanged, range.getMax() + cumulative, child.build());
 
 								// Update the element offsets (resultlength - length = expansion)
 								for (int j = 0; j < rangeUpdates.size(); j++) {
 									final TextUpdate textUpdate = rangeUpdates.get(j);
-									final int offset = textUpdate.getOffset() + range.getMin();
+									final int offset = textUpdate.getOffset() + range.getMin() + cumulative;
 									final int index = Collections.binarySearch(elementOffsets, offset);
 									final int updateFrom = index > 0 ? index + 1 : -(index + 1);
 									for (int k = updateFrom; k < elementOffsets.size(); k++) {
 										elementOffsets.set(k, elementOffsets.get(k) + updateLengths.get(j));
 									}
 								}
+								cumulative += updateLengths.stream().collect(Collectors.summingInt(Integer::intValue));
 							}
 						}
 					}
@@ -164,7 +174,7 @@ public class TextRenderer implements IRenderer<ITextRenderable> {
 	}
 
 	@Override
-	public String render(ITextRenderable renderable) {
+	public String render(Object renderable) {
 		final TextRenderContext context = new TextRenderContext();
 		context.render(renderable, null);
 		return context.build();
