@@ -17,10 +17,12 @@ import com.g2forge.enigma.backend.model.expression.ITextExpression;
 import com.g2forge.enigma.backend.model.expression.TextNewline;
 import com.g2forge.enigma.backend.model.modifier.IndentTextModifier;
 import com.g2forge.enigma.backend.model.modifier.TextNestedModified;
+import com.g2forge.enigma.backend.model.modifier.TextNestedModified.IModifierHandle;
 import com.g2forge.enigma.bash.convert.textmodifiers.BashTokenModifier;
 import com.g2forge.enigma.bash.model.BashScript;
 import com.g2forge.enigma.bash.model.expression.BashCommandSubstitution;
 import com.g2forge.enigma.bash.model.expression.BashString;
+import com.g2forge.enigma.bash.model.statement.BashAssignment;
 import com.g2forge.enigma.bash.model.statement.BashBlock;
 import com.g2forge.enigma.bash.model.statement.BashCommand;
 import com.g2forge.enigma.bash.model.statement.BashIf;
@@ -34,14 +36,19 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 	public static class BashRenderContext implements IBashRenderContext, IBuilder<ITextExpression> {
 		protected enum Mode {
 			Block,
-			Line;
+			Line,
+			Token;
 		}
 
 		protected static final IFunction1<Object, IExplicitBashRenderable> toExplicit = new TypeSwitch1.FunctionBuilder<Object, IExplicitBashRenderable>().with(builder -> {
 			ITextAppender.addToBuilder(builder, new ITextAppender.IExplicitFactory<IBashRenderContext, IExplicitBashRenderable>() {
 				@Override
 				public <T> IFunction1<? super T, ? extends IExplicitBashRenderable> create(IConsumer2<? super IBashRenderContext, ? super T> consumer) {
-					return e -> c -> consumer.accept(c, e);
+					return e -> c -> {
+						try (final ICloseable token = c.token()) {
+							consumer.accept(c, e);
+						}
+					};
 				}
 			});
 
@@ -52,12 +59,11 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 				for (Object object : e.getTokens()) {
 					if (first) first = false;
 					else c.append(" ");
-					try (final ICloseable token = c.token()) {
-						c.render(object, null);
-					}
+					c.render(object, null);
 				}
 				if (c.isBlockMode()) c.newline();
 			});
+			builder.add(BashAssignment.class, e -> c -> c.append(e.getName()).append("=").render(e.getExpression(), Object.class).newline());
 			builder.add(BashIf.class, e -> c -> {
 				c.append("if ").render(e.getCondition(), null).append("; then").newline();
 				try (final ICloseable indent = c.indent()) {
@@ -69,12 +75,16 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 						c.render(e.getElseStatement(), IBashBlock.class);
 					}
 				}
-				c.append("fi");
+				c.append("fi").newline();
 			});
 
 			builder.add(BashCommandSubstitution.class, e -> c -> {
-				try (final ICloseable line = c.line()) {
-					c.append("$(").render(e.getCommand(), BashCommand.class).append(")");
+				try (final ICloseable token = c.token()) {
+					c.append("$(");
+					try (final ICloseable line = c.line()) {
+						c.render(e.getCommand(), BashCommand.class);
+					}
+					c.append(")");
 				}
 			});
 			builder.add(BashString.class, e -> c -> {
@@ -160,6 +170,8 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 		@Override
 		public ICloseable indent() {
 			switch (getState().get()) {
+				case Token:
+					throw new IllegalStateException();
 				case Line:
 					return () -> {};
 				case Block:
@@ -172,6 +184,7 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 		@Override
 		public boolean isBlockMode() {
 			switch (getState().get()) {
+				case Token:
 				case Line:
 					return false;
 				case Block:
@@ -189,6 +202,8 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 		@Override
 		public IBashRenderContext newline() {
 			switch (getState().get()) {
+				case Token:
+					throw new IllegalStateException();
 				case Line:
 					getBuilder().expression(";");
 				case Block:
@@ -212,8 +227,14 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 		}
 
 		@Override
-		public TextNestedModified.IModifierHandle token() {
-			return getBuilder().open(BashTokenModifier.create());
+		public ICloseable token() {
+			if (getState().get().equals(Mode.Token)) { return () -> {}; }
+			final ICloseable state = getState().open(Mode.Token);
+			final IModifierHandle modifier = getBuilder().open(BashTokenModifier.create());
+			return () -> {
+				modifier.close();
+				state.close();
+			};
 		}
 	}
 

@@ -9,16 +9,16 @@ public interface ITextAppender<T> {
 		public <T> IFunction1<? super T, ? extends E> create(IConsumer2<? super C, ? super T> consumer);
 	}
 
-	public static <E> void addToBuilder(TypeSwitch1.FunctionBuilder<Object, E> builder, IExplicitFactory<? extends ITextAppender<?>, E> thingy) {
-		builder.add(CharSequence.class, thingy.create(ITextAppender::append));
-		builder.add(Object.class, thingy.create(ITextAppender::append));
-		builder.add(Byte.class, thingy.create(ITextAppender::append));
-		builder.add(Short.class, thingy.create(ITextAppender::append));
-		builder.add(Integer.class, thingy.create(ITextAppender::append));
-		builder.add(Long.class, thingy.create(ITextAppender::append));
-		builder.add(Float.class, thingy.create(ITextAppender::append));
-		builder.add(Double.class, thingy.create(ITextAppender::append));
-		builder.add(char[].class, thingy.create(ITextAppender::append));
+	public static <E> void addToBuilder(TypeSwitch1.FunctionBuilder<Object, E> builder, IExplicitFactory<? extends ITextAppender<?>, E> factory) {
+		builder.add(CharSequence.class, factory.create(ITextAppender::append));
+		builder.add(Object.class, factory.create(ITextAppender::append));
+		builder.add(Byte.class, factory.create(ITextAppender::append));
+		builder.add(Short.class, factory.create(ITextAppender::append));
+		builder.add(Integer.class, factory.create(ITextAppender::append));
+		builder.add(Long.class, factory.create(ITextAppender::append));
+		builder.add(Float.class, factory.create(ITextAppender::append));
+		builder.add(Double.class, factory.create(ITextAppender::append));
+		builder.add(char[].class, factory.create(ITextAppender::append));
 	}
 
 	public T append(boolean bool);
