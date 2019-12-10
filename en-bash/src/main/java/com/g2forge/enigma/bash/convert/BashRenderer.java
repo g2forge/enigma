@@ -21,6 +21,7 @@ import com.g2forge.enigma.backend.model.modifier.TextNestedModified.IModifierHan
 import com.g2forge.enigma.bash.convert.textmodifiers.BashTokenModifier;
 import com.g2forge.enigma.bash.model.BashScript;
 import com.g2forge.enigma.bash.model.expression.BashCommandSubstitution;
+import com.g2forge.enigma.bash.model.expression.BashExpansion;
 import com.g2forge.enigma.bash.model.expression.BashString;
 import com.g2forge.enigma.bash.model.statement.BashAssignment;
 import com.g2forge.enigma.bash.model.statement.BashBlock;
@@ -92,6 +93,15 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 					try (final ICloseable token = c.token()) {
 						e.getElements().forEach(x -> c.render(x, null));
 					}
+				}
+			});
+			builder.add(BashExpansion.class, e -> c -> {
+				try (final ICloseable token = c.token()) {
+					c.append("${");
+					try (final ICloseable expansion = c.raw()) {
+						c.append(e.getName());
+					}
+					c.append("}");
 				}
 			});
 		}).build();

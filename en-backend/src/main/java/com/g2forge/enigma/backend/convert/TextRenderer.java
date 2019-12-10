@@ -42,7 +42,7 @@ public class TextRenderer implements IRenderer<Object> {
 			builder.add(Long.class, e -> c -> c.getBuilder().append(e.longValue()));
 			builder.add(Float.class, e -> c -> c.getBuilder().append(e.floatValue()));
 			builder.add(Double.class, e -> c -> c.getBuilder().append(e.doubleValue()));
-			
+
 			builder.add(TextNewline.class, e -> c -> c.getBuilder().append("\n"));
 			builder.add(TextConcatenation.class, e -> c -> e.getElements().forEach(x -> c.render(x, Object.class)));
 			builder.add(TextRepeat.class, e -> c -> {
@@ -95,6 +95,7 @@ public class TextRenderer implements IRenderer<Object> {
 							final int nRanges = ranges.size();
 							// Make sure we got as many update lists as we sent in ranges
 							if (allUpdates.size() != nRanges) throw new RuntimeException();
+							int cumulative = 0; // Cumulative offset update from previous ranges
 							for (int i = 0; i < nRanges; i++) {
 								// Apply updates for each range (if any)
 								final List<TextUpdate> rangeUpdates = allUpdates.get(i);
@@ -103,21 +104,22 @@ public class TextRenderer implements IRenderer<Object> {
 
 								// Perform the update using a child renderer
 								final int unchanged = rangeUpdates.get(0).getOffset();
-								final String string = b.substring(range.getMin() + unchanged, range.getMax());
+								final String string = b.substring(range.getMin() + cumulative + unchanged, range.getMax() + cumulative);
 								final TextRenderContext child = new TextRenderContext();
 								final List<Integer> updateLengths = child.modify(string, rangeUpdates, unchanged);
-								b.replace(range.getMin(), range.getMax(), child.build());
+								b.replace(range.getMin() + cumulative + unchanged, range.getMax() + cumulative, child.build());
 
 								// Update the element offsets (resultlength - length = expansion)
 								for (int j = 0; j < rangeUpdates.size(); j++) {
 									final TextUpdate textUpdate = rangeUpdates.get(j);
-									final int offset = textUpdate.getOffset() + range.getMin();
+									final int offset = textUpdate.getOffset() + range.getMin() + cumulative;
 									final int index = Collections.binarySearch(elementOffsets, offset);
 									final int updateFrom = index > 0 ? index + 1 : -(index + 1);
 									for (int k = updateFrom; k < elementOffsets.size(); k++) {
 										elementOffsets.set(k, elementOffsets.get(k) + updateLengths.get(j));
 									}
 								}
+								cumulative += updateLengths.stream().collect(Collectors.summingInt(Integer::intValue));
 							}
 						}
 					}
