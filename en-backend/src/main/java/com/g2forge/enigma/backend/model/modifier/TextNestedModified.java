@@ -19,12 +19,14 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import lombok.ToString;
 
 @Data
 @Builder(toBuilder = true)
 @RequiredArgsConstructor
 public class TextNestedModified implements ITextExpression {
-	@Data
+	@Getter
+	@ToString
 	@Builder(toBuilder = true)
 	@RequiredArgsConstructor
 	public static class Element {
@@ -37,7 +39,8 @@ public class TextNestedModified implements ITextExpression {
 		public IModifierHandle reactivate();
 	}
 
-	@Data
+	@Getter
+	@ToString
 	@Builder(toBuilder = true)
 	@RequiredArgsConstructor
 	public static class Modifier implements Cloneable {

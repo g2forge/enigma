@@ -5,9 +5,11 @@ import java.lang.reflect.Type;
 import com.g2forge.alexandria.annotations.note.Note;
 import com.g2forge.alexandria.annotations.note.NoteType;
 import com.g2forge.alexandria.java.close.ICloseable;
+import com.g2forge.alexandria.java.core.enums.EnumException;
 import com.g2forge.alexandria.java.function.IConsumer2;
 import com.g2forge.alexandria.java.function.IFunction1;
 import com.g2forge.alexandria.java.function.builder.IBuilder;
+import com.g2forge.alexandria.java.nestedstate.StackGlobalState;
 import com.g2forge.alexandria.java.type.function.TypeSwitch1;
 import com.g2forge.enigma.backend.ITextAppender;
 import com.g2forge.enigma.backend.convert.common.ARenderer;
@@ -15,7 +17,6 @@ import com.g2forge.enigma.backend.model.expression.ITextExpression;
 import com.g2forge.enigma.backend.model.expression.TextNewline;
 import com.g2forge.enigma.backend.model.modifier.IndentTextModifier;
 import com.g2forge.enigma.backend.model.modifier.TextNestedModified;
-import com.g2forge.enigma.backend.model.modifier.TextNestedModified.IModifierHandle;
 import com.g2forge.enigma.bash.convert.textmodifiers.BashTokenModifier;
 import com.g2forge.enigma.bash.model.BashScript;
 import com.g2forge.enigma.bash.model.expression.BashCommandSubstitution;
@@ -24,7 +25,6 @@ import com.g2forge.enigma.bash.model.statement.BashBlock;
 import com.g2forge.enigma.bash.model.statement.BashCommand;
 import com.g2forge.enigma.bash.model.statement.BashIf;
 import com.g2forge.enigma.bash.model.statement.IBashBlock;
-import com.g2forge.enigma.bash.model.statement.IBashStatement;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -32,6 +32,11 @@ import lombok.Getter;
 @Note(type = NoteType.TODO, value = "Add a method which renders a list of strings for a one-liner")
 public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRenderContext> {
 	public static class BashRenderContext implements IBashRenderContext, IBuilder<ITextExpression> {
+		protected enum Mode {
+			Block,
+			Line;
+		}
+
 		protected static final IFunction1<Object, IExplicitBashRenderable> toExplicit = new TypeSwitch1.FunctionBuilder<Object, IExplicitBashRenderable>().with(builder -> {
 			ITextAppender.addToBuilder(builder, new ITextAppender.IExplicitFactory<IBashRenderContext, IExplicitBashRenderable>() {
 				@Override
@@ -41,7 +46,7 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 			});
 
 			builder.add(BashScript.class, e -> c -> c.append("#!/bin/bash").newline().render(e.getBody(), IBashBlock.class));
-			builder.add(BashBlock.class, e -> c -> e.getContents().forEach(x -> c.render(x, IBashBlock.class).newline()));
+			builder.add(BashBlock.class, e -> c -> e.getContents().forEach(x -> c.render(x, IBashBlock.class)));
 			builder.add(BashCommand.class, e -> c -> {
 				boolean first = true;
 				for (Object object : e.getTokens()) {
@@ -51,22 +56,27 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 						c.render(object, null);
 					}
 				}
+				if (c.isBlockMode()) c.newline();
 			});
 			builder.add(BashIf.class, e -> c -> {
 				c.append("if ").render(e.getCondition(), null).append("; then").newline();
-				try (final IModifierHandle indent = c.indent()) {
-					c.render(e.getThenStatement(), IBashStatement.class).newline();
+				try (final ICloseable indent = c.indent()) {
+					c.render(e.getThenStatement(), IBashBlock.class);
 				}
 				if (e.getElseStatement() != null) {
 					c.append("else").newline();
-					try (final IModifierHandle indent = c.indent()) {
-						c.render(e.getElseStatement(), IBashStatement.class).newline();
+					try (final ICloseable indent = c.indent()) {
+						c.render(e.getElseStatement(), IBashBlock.class);
 					}
 				}
 				c.append("fi");
 			});
 
-			builder.add(BashCommandSubstitution.class, e -> c -> c.append("$(").render(e.getCommand(), BashCommand.class).append(")"));
+			builder.add(BashCommandSubstitution.class, e -> c -> {
+				try (final ICloseable line = c.line()) {
+					c.append("$(").render(e.getCommand(), BashCommand.class).append(")");
+				}
+			});
 			builder.add(BashString.class, e -> c -> {
 				try (final ICloseable raw = c.raw()) {
 					try (final ICloseable token = c.token()) {
@@ -78,6 +88,9 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 
 		@Getter(AccessLevel.PROTECTED)
 		protected final TextNestedModified.TextNestedModifiedBuilder builder = TextNestedModified.builder();
+
+		@Getter(AccessLevel.PROTECTED)
+		protected final StackGlobalState<Mode> state = new StackGlobalState<Mode>(Mode.Block);
 
 		@Override
 		public IBashRenderContext append(boolean bool) {
@@ -145,13 +158,45 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 		}
 
 		@Override
-		public TextNestedModified.IModifierHandle indent() {
-			return getBuilder().open(new IndentTextModifier(true, "\t"));
+		public ICloseable indent() {
+			switch (getState().get()) {
+				case Line:
+					return () -> {};
+				case Block:
+					return getBuilder().open(new IndentTextModifier(true, "\t"));
+				default:
+					throw new EnumException(Mode.class, getState().get());
+			}
+		}
+
+		@Override
+		public boolean isBlockMode() {
+			switch (getState().get()) {
+				case Line:
+					return false;
+				case Block:
+					return true;
+				default:
+					throw new EnumException(Mode.class, getState().get());
+			}
+		}
+
+		@Override
+		public ICloseable line() {
+			return getState().open(Mode.Line);
 		}
 
 		@Override
 		public IBashRenderContext newline() {
-			getBuilder().expression(TextNewline.create());
+			switch (getState().get()) {
+				case Line:
+					getBuilder().expression(";");
+				case Block:
+					getBuilder().expression(TextNewline.create());
+					break;
+				default:
+					throw new EnumException(Mode.class, getState().get());
+			}
 			return this;
 		}
 

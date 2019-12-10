@@ -25,6 +25,6 @@ public class TestBashIf {
 	@Test
 	public void thenElse() {
 		final String actual = new BashRenderer().render(new BashScript(new BashIf("false", new BashCommand("echo", "true"), new BashCommand("echo", "false"))));
-		HAssert.assertEquals("#!/bin/bash\nif true; then\n\techo true\nelse\n\techo false\nfi", actual);
+		HAssert.assertEquals("#!/bin/bash\nif false; then\n\techo true\nelse\n\techo false\nfi", actual);
 	}
 }

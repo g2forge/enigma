@@ -88,7 +88,8 @@ public class TextRenderer implements IRenderer<Object> {
 						}).collect(Collectors.toList()), IntegerRange::new);
 
 						// Compute the updates
-						final List<List<TextUpdate>> allUpdates = modifier.getModifier().computeUpdates(ranges.stream().map(r -> new CharSubSequence(b, r.getMin(), r.getMax() - r.getMin())).collect(Collectors.toList()));
+						final List<CharSequence> list = ranges.stream().map(r -> new CharSubSequence(b, r.getMin(), r.getMax() - r.getMin())).collect(Collectors.toList());
+						final List<List<TextUpdate>> allUpdates = modifier.getModifier().computeUpdates(list);
 						if (allUpdates != null) {
 							// Apply the updates
 							final int nRanges = ranges.size();
