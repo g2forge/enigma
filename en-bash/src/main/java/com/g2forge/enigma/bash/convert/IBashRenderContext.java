@@ -5,13 +5,17 @@ import com.g2forge.enigma.backend.ITextBuilder;
 import com.g2forge.enigma.backend.convert.common.IRenderContext;
 
 public interface IBashRenderContext extends IRenderContext<IBashRenderContext>, ITextBuilder<IBashRenderContext> {
-	public boolean isBlockMode();
+	public ICloseable block();
 
 	public ICloseable indent();
 
-	public ICloseable token();
+	public boolean isBlockMode();
+
+	public ICloseable line();
+
+	public ICloseable quote();
 
 	public ICloseable raw();
 
-	public ICloseable line();
+	public ICloseable token(boolean quote);
 }
