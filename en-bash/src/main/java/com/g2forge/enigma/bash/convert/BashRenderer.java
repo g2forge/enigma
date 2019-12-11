@@ -18,6 +18,7 @@ import com.g2forge.enigma.backend.model.expression.TextNewline;
 import com.g2forge.enigma.backend.model.modifier.IndentTextModifier;
 import com.g2forge.enigma.backend.model.modifier.TextNestedModified;
 import com.g2forge.enigma.backend.model.modifier.TextNestedModified.IModifierHandle;
+import com.g2forge.enigma.bash.convert.textmodifiers.BashDoubleQuoteModifier;
 import com.g2forge.enigma.bash.convert.textmodifiers.BashTokenModifier;
 import com.g2forge.enigma.bash.model.BashScript;
 import com.g2forge.enigma.bash.model.expression.BashCommandSubstitution;
@@ -31,6 +32,15 @@ import com.g2forge.enigma.bash.model.statement.BashIf;
 import com.g2forge.enigma.bash.model.statement.BashOperation;
 import com.g2forge.enigma.bash.model.statement.IBashBlock;
 import com.g2forge.enigma.bash.model.statement.IBashExecutable;
+import com.g2forge.enigma.bash.model.statement.redirect.BashRedirectHandle;
+import com.g2forge.enigma.bash.model.statement.redirect.BashRedirectHereDoc;
+import com.g2forge.enigma.bash.model.statement.redirect.BashRedirectHereString;
+import com.g2forge.enigma.bash.model.statement.redirect.BashRedirectIO;
+import com.g2forge.enigma.bash.model.statement.redirect.BashRedirectInput;
+import com.g2forge.enigma.bash.model.statement.redirect.BashRedirectOutput;
+import com.g2forge.enigma.bash.model.statement.redirect.BashRedirection;
+import com.g2forge.enigma.bash.model.statement.redirect.HBashHandle;
+import com.g2forge.enigma.bash.model.statement.redirect.IBashRedirect;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -49,7 +59,7 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 				@Override
 				public <T> IFunction1<? super T, ? extends IExplicitBashRenderable> create(IConsumer2<? super IBashRenderContext, ? super T> consumer) {
 					return e -> c -> {
-						try (final ICloseable token = c.token()) {
+						try (final ICloseable token = c.token(true)) {
 							consumer.accept(c, e);
 						}
 					};
@@ -84,6 +94,68 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 					c.render(operand, IBashExecutable.class);
 				}
 			});
+			builder.add(BashRedirection.class, e -> c -> {
+				try (final ICloseable line = c.line()) {
+					c.render(e.getExecutable(), IBashExecutable.class);
+					for (IBashRedirect redirect : e.getRedirects()) {
+						c.append(" ").render(redirect, IBashRedirect.class);
+					}
+				}
+				if (c.isBlockMode()) c.newline();
+			});
+
+			builder.add(BashRedirectInput.class, e -> c -> {
+				if (e.getHandle() != HBashHandle.UNSPECIFIED) {
+					if (e.getHandle() < 0) throw new IllegalArgumentException();
+					else c.append(e.getHandle());
+				}
+				c.append("<").render(e.getTarget(), null);
+			});
+			builder.add(BashRedirectOutput.class, e -> c -> {
+				if (e.getHandle() != HBashHandle.UNSPECIFIED) {
+					if (e.getHandle() == HBashHandle.BOTH) c.append("&");
+					else if (e.getHandle() < 0) throw new IllegalArgumentException();
+					else c.append(e.getHandle());
+				}
+				c.append(e.isAppend() ? ">>" : ">");
+				if (!e.isClobber()) c.append("|");
+				c.render(e.getTarget(), null);
+			});
+			builder.add(BashRedirectIO.class, e -> c -> {
+				if (e.getHandle() != HBashHandle.UNSPECIFIED) {
+					if (e.getHandle() < 0) throw new IllegalArgumentException();
+					else c.append(e.getHandle());
+				}
+				c.append("<>").render(e.getTarget(), null);
+			});
+			builder.add(BashRedirectHandle.class, e -> c -> {
+				try (final ICloseable token = c.token(false)) {
+					c.append("&").append(e.getHandle());
+					if (BashRedirectHandle.Operation.Move.equals(e.getOperation())) c.append("-");
+				}
+			});
+			builder.add(BashRedirectHereString.class, e -> c -> {
+				if (e.getHandle() != HBashHandle.UNSPECIFIED) {
+					if (e.getHandle() < 0) throw new IllegalArgumentException();
+					else c.append(e.getHandle());
+				}
+				c.append("<<< ").render(e.getString(), null);
+			});
+			builder.add(BashRedirectHereDoc.class, e -> c -> {
+				if (e.getHandle() != HBashHandle.UNSPECIFIED) {
+					if (e.getHandle() < 0) throw new IllegalArgumentException();
+					else c.append(e.getHandle());
+				}
+				c.append("<<");
+				if (e.isStripTabs()) c.append("-");
+				try (final ICloseable block = c.block()) {
+					try (final ICloseable token = e.isExpand() ? c.token(false) : c.quote()) {
+						c.render(e.getDelimiter(), null);
+					}
+					c.newline().append(e.getDocument()).newline().render(e.getDelimiter(), null);
+				}
+				if (c.isBlockMode()) c.newline();
+			});
 
 			builder.add(BashScript.class, e -> c -> c.append("#!/bin/bash").newline().render(e.getBody(), IBashBlock.class));
 			builder.add(BashBlock.class, e -> c -> e.getContents().forEach(x -> c.render(x, IBashBlock.class)));
@@ -104,7 +176,7 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 			});
 
 			builder.add(BashCommandSubstitution.class, e -> c -> {
-				try (final ICloseable token = c.token()) {
+				try (final ICloseable token = c.token(true)) {
 					c.append("$(");
 					try (final ICloseable line = c.line()) {
 						c.render(e.getExecutable(), IBashExecutable.class);
@@ -114,13 +186,13 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 			});
 			builder.add(BashString.class, e -> c -> {
 				try (final ICloseable raw = c.raw()) {
-					try (final ICloseable token = c.token()) {
+					try (final ICloseable token = c.token(true)) {
 						e.getElements().forEach(x -> c.render(x, null));
 					}
 				}
 			});
 			builder.add(BashExpansion.class, e -> c -> {
-				try (final ICloseable token = c.token()) {
+				try (final ICloseable token = c.token(true)) {
 					c.append("${");
 					try (final ICloseable expansion = c.raw()) {
 						c.append(e.getName());
@@ -234,6 +306,11 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 		}
 
 		@Override
+		public ICloseable block() {
+			return getState().open(Mode.Block);
+		}
+
+		@Override
 		public IBashRenderContext newline() {
 			switch (getState().get()) {
 				case Token:
@@ -261,10 +338,21 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 		}
 
 		@Override
-		public ICloseable token() {
-			if (getState().get().equals(Mode.Token)) { return () -> {}; }
+		public ICloseable token(boolean quote) {
+			if (getState().get().equals(Mode.Token)) return () -> {};
 			final ICloseable state = getState().open(Mode.Token);
+			if (!quote) return state;
 			final IModifierHandle modifier = getBuilder().open(BashTokenModifier.create());
+			return () -> {
+				modifier.close();
+				state.close();
+			};
+		}
+
+		@Override
+		public ICloseable quote() {
+			final ICloseable state = getState().open(Mode.Token);
+			final IModifierHandle modifier = getBuilder().open(BashDoubleQuoteModifier.create());
 			return () -> {
 				modifier.close();
 				state.close();
