@@ -23,6 +23,7 @@ import com.g2forge.enigma.bash.convert.textmodifiers.BashTokenModifier;
 import com.g2forge.enigma.bash.model.BashScript;
 import com.g2forge.enigma.bash.model.expression.BashCommandSubstitution;
 import com.g2forge.enigma.bash.model.expression.BashExpansion;
+import com.g2forge.enigma.bash.model.expression.BashProcessSubstitution;
 import com.g2forge.enigma.bash.model.expression.BashString;
 import com.g2forge.enigma.bash.model.statement.BashAssignment;
 import com.g2forge.enigma.bash.model.statement.BashBlank;
@@ -84,15 +85,24 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 					case Or:
 						operator = " || ";
 						break;
+					case Pipe:
+						operator = " | ";
+						break;
+					case Sequence:
+						operator = "; ";
+						break;
 					default:
 						throw new EnumException(BashOperation.Operator.class, e.getOperator());
 				}
-				boolean first = true;
-				for (IBashExecutable operand : e.getOperands()) {
-					if (first) first = false;
-					else c.append(operator);
-					c.render(operand, IBashExecutable.class);
+				try (final ICloseable line = c.line()) {
+					boolean first = true;
+					for (IBashExecutable operand : e.getOperands()) {
+						if (first) first = false;
+						else c.append(operator);
+						c.render(operand, IBashExecutable.class);
+					}
 				}
+				if (c.isBlockMode()) c.newline();
 			});
 			builder.add(BashRedirection.class, e -> c -> {
 				try (final ICloseable line = c.line()) {
@@ -178,6 +188,25 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 			builder.add(BashCommandSubstitution.class, e -> c -> {
 				try (final ICloseable token = c.token(true)) {
 					c.append("$(");
+					try (final ICloseable line = c.line()) {
+						c.render(e.getExecutable(), IBashExecutable.class);
+					}
+					c.append(")");
+				}
+			});
+			builder.add(BashProcessSubstitution.class, e -> c -> {
+				try (final ICloseable token = c.token(false)) {
+					switch (e.getDirection()) {
+						case Input:
+							c.append("<");
+							break;
+						case Output:
+							c.append(">");
+							break;
+						default:
+							throw new EnumException(BashProcessSubstitution.Direction.class, e.getDirection());
+					}
+					c.append("(");
 					try (final ICloseable line = c.line()) {
 						c.render(e.getExecutable(), IBashExecutable.class);
 					}

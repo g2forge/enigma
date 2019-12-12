@@ -13,7 +13,9 @@ import lombok.Singular;
 public class BashOperation implements IBashExecutable {
 	public enum Operator {
 		And,
-		Or;
+		Or,
+		Pipe,
+		Sequence;
 
 		public BashOperation.BashOperationBuilder builder() {
 			return BashOperation.builder().operator(this);
