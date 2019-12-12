@@ -24,22 +24,4 @@ public class TestBash {
 		final String actual = new BashRenderer().render(new BashScript(block.build()));
 		HAssert.assertEquals("#!/bin/bash\n\nSELF_DIR=\"$(cd \"$(dirname \"${0}\")\" && pwd -P)\"\nSELF=\"${SELF_DIR}/$(basename \"${0}\")\"\n", actual);
 	}
-
-	@Test
-	public void simple() {
-		final String actual = new BashRenderer().render(new BashScript(new BashCommand("echo", "Hello, World!")));
-		HAssert.assertEquals("#!/bin/bash\necho \"Hello, World!\"\n", actual);
-	}
-
-	@Test
-	public void substitution() {
-		final String actual = new BashRenderer().render(new BashScript(new BashCommand("echo", new BashCommandSubstitution(new BashCommand("echo", "Hello")))));
-		HAssert.assertEquals("#!/bin/bash\necho \"$(echo Hello)\"\n", actual);
-	}
-
-	@Test
-	public void substitutionQuoting() {
-		final String actual = new BashRenderer().render(new BashScript(new BashCommand("echo", new BashString("Hello,", new BashCommandSubstitution(new BashCommand("echo", " World!"))))));
-		HAssert.assertEquals("#!/bin/bash\necho \"Hello,$(echo \" World!\")\"\n", actual);
-	}
 }
