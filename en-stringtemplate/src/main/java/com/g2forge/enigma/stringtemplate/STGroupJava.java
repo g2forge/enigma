@@ -65,7 +65,45 @@ public class STGroupJava extends STGroup {
 		}
 	}
 
-	protected final Map<String, Class<?>> types = new HashMap<>();
+	protected class ThreadSafeTypeMap extends TypeMap {
+		public synchronized Class<?> getTemplateType(String name) {
+			return super.getTemplateType(name);
+		}
+
+		protected synchronized void recordType(Class<?> type, final String name) throws Error {
+			super.recordType(type, name);
+		}
+	}
+
+	protected class TypeMap {
+		protected final Map<String, Class<?>> types = new HashMap<>();
+
+		public ST getInstanceOf(Class<?> type) {
+			if (!type.isEnum() && Enum.class.isAssignableFrom(type)) type = type.getSuperclass();
+			final String name = getTemplateName(type);
+			recordType(type, name);
+			return STGroupJava.this.getInstanceOf(getTemplateName(type));
+		}
+
+		public String getTemplateName(Class<?> type) {
+			return type.getName().replace('.', '_').replace('$', '_');
+		}
+
+		public Class<?> getTemplateType(String name) {
+			return types.get(name);
+		}
+
+		protected void recordType(Class<?> type, final String name) throws Error {
+			final Class<?> prior = types.get(name);
+			if (prior == null) types.put("/" + name, type);
+			else if (!prior.equals(type)) throw new Error("Cannot process two classes with the same simple name");
+		}
+
+		@Override
+		public String toString() {
+			return types.toString();
+		}
+	}
 
 	protected final String lineSeparator;
 
@@ -73,43 +111,27 @@ public class STGroupJava extends STGroup {
 
 	protected final Function<? super Class<?>, ? extends IRecordType> recordFunction;
 
-	public STGroupJava(String encoding, char delimiterStartChar, char delimiterStopChar, String lineSeparator, Function<? super Object, ? extends Object> adapter, Function<? super Class<?>, ? extends IRecordType> recordFunction) {
+	protected final TypeMap types;
+
+	public STGroupJava(String encoding, char delimiterStartChar, char delimiterStopChar, String lineSeparator, Function<? super Object, ? extends Object> adapter, Function<? super Class<?>, ? extends IRecordType> recordFunction, boolean threadSafe) {
 		super(delimiterStartChar, delimiterStopChar);
 		this.encoding = encoding;
 		this.registerRenderer(Object.class, new JavaStringRenderer(this));
 		this.lineSeparator = lineSeparator;
 		this.adapter = adapter == null ? Function.identity() : adapter;
 		this.recordFunction = recordFunction;
+		this.types = threadSafe ? new ThreadSafeTypeMap() : new TypeMap();
 	}
 
 	public ST createStringTemplate(CompiledST impl) {
 		return new STAdvanced(super.createStringTemplate(impl), lineSeparator);
 	}
 
-	public ST getInstanceOf(Class<?> type) {
-		if (!type.isEnum() && Enum.class.isAssignableFrom(type)) type = type.getSuperclass();
-		final String name = getTemplateName(type);
-
-		final Class<?> prior = types.get(name);
-		if (prior == null) types.put("/" + name, type);
-		else if (!prior.equals(type)) throw new Error("Cannot process two classes with the same simple name");
-
-		return this.getInstanceOf(getTemplateName(type));
-	}
-
-	protected String getTemplateName(Class<?> type) {
-		return type.getName().replace('.', '_').replace('$', '_');
-	}
-
-	protected Class<?> getTemplateType(String name) {
-		return types.get(name);
-	}
-
 	@Override
 	protected CompiledST load(String name) {
-		final Class<?> type = getTemplateType(name);
+		final Class<?> type = types.getTemplateType(name);
 		if (type == null) throw new NullPointerException("Failed to load template \"" + name + "\", there was an internal error! Valid templates: " + types);
-		final String templateName = getTemplateName(type);
+		final String templateName = types.getTemplateName(type);
 		final String fileName = templateName + ".st";
 
 		final InputStream stream;
@@ -151,7 +173,7 @@ public class STGroupJava extends STGroup {
 		final Object adapted = adapter.apply(raw);
 
 		final Class<? extends Object> type = adapted.getClass();
-		final ST retVal = getInstanceOf(type);
+		final ST retVal = types.getInstanceOf(type);
 		if (retVal == null) throw new NoTemplateException("Template could not be found in either a file or field for " + type);
 		recordFunction.apply(type).getProperties().forEach(property -> retVal.add(property.getName(), (STAttributeGenerator) () -> property.getValue(adapted)));
 		return retVal.render();

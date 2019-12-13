@@ -13,14 +13,7 @@ import lombok.Getter;
 public class EmbeddedTemplateRenderer {
 	/** A function which is used to abstract a record from a java type. This must be initialized before {@link #DEFAULT} or {@link #STRING}. */
 	@Getter(value = AccessLevel.PROTECTED, lazy = true)
-	private static final IFunction1<? super Class<?>, ? extends ReflectedRecordType> recordFunction = new IFunction1<Class<?>, ReflectedRecordType>() {
-		protected final IFunction1<? super Class<?>, ? extends ReflectedRecordType> cache = new Cache<>(ReflectedRecordType::new, new LRUCacheEvictionPolicy<>(30));
-
-		@Override
-		public synchronized ReflectedRecordType apply(Class<?> argument) {
-			return cache.apply(argument);
-		}
-	};
+	private static final IFunction1<? super Class<?>, ? extends ReflectedRecordType> recordFunction = new Cache<Class<?>, ReflectedRecordType>(ReflectedRecordType::new, new LRUCacheEvictionPolicy<>(30)).sync(new Object());
 
 	public final static EmbeddedTemplateRenderer DEFAULT = new EmbeddedTemplateRenderer();
 
@@ -37,7 +30,7 @@ public class EmbeddedTemplateRenderer {
 	}
 
 	protected EmbeddedTemplateRenderer(char delimiterStartChar, char delimiterStopChar, String lineSeparator, Function<? super Object, ? extends Object> adapter) {
-		this.group = new STGroupJava("UTF-8", delimiterStartChar, delimiterStopChar, lineSeparator, adapter, getRecordFunction());
+		this.group = new STGroupJava("UTF-8", delimiterStartChar, delimiterStopChar, lineSeparator, adapter, getRecordFunction(), true);
 	}
 
 	public EmbeddedTemplateRenderer(String lineSeparator) {
