@@ -12,7 +12,7 @@ import lombok.Singular;
 @Data
 @Builder(toBuilder = true)
 @RequiredArgsConstructor
-public class BashString {
+public class BashString implements IBashExpression {
 	@Singular
 	protected final List<Object> elements;
 
