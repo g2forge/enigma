@@ -45,17 +45,15 @@ import com.g2forge.enigma.bash.model.statement.redirect.IBashRedirect;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
+@Getter
+@RequiredArgsConstructor
 @Note(type = NoteType.TODO, value = "Add a method which renders a list of strings for a one-liner")
-public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRenderContext> {
+public class BashRenderer extends ARenderer<Object, BashRenderer.BashRenderContext> {
 	public static class BashRenderContext implements IBashRenderContext, IBuilder<ITextExpression> {
-		protected enum Mode {
-			Block,
-			Line,
-			Token;
-		}
-
 		protected static final IFunction1<Object, IExplicitBashRenderable> toExplicit = new TypeSwitch1.FunctionBuilder<Object, IExplicitBashRenderable>().with(builder -> {
+			builder.add(IExplicitBashRenderable.class, e -> c -> e.render(c));
 			ITextAppender.addToBuilder(builder, new ITextAppender.IExplicitFactory<IBashRenderContext, IExplicitBashRenderable>() {
 				@Override
 				public <T> IFunction1<? super T, ? extends IExplicitBashRenderable> create(IConsumer2<? super IBashRenderContext, ? super T> consumer) {
@@ -235,7 +233,11 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 		protected final TextNestedModified.TextNestedModifiedBuilder builder = TextNestedModified.builder();
 
 		@Getter(AccessLevel.PROTECTED)
-		protected final StackGlobalState<Mode> state = new StackGlobalState<Mode>(Mode.Block);
+		protected final StackGlobalState<Mode> state;
+
+		public BashRenderContext(Mode mode) {
+			this.state = new StackGlobalState<Mode>(mode);
+		}
 
 		@Override
 		public IBashRenderContext append(boolean bool) {
@@ -298,6 +300,11 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 		}
 
 		@Override
+		public ICloseable block() {
+			return getState().open(Mode.Block);
+		}
+
+		@Override
 		public ITextExpression build() {
 			return getBuilder().build();
 		}
@@ -335,11 +342,6 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 		}
 
 		@Override
-		public ICloseable block() {
-			return getState().open(Mode.Block);
-		}
-
-		@Override
 		public IBashRenderContext newline() {
 			switch (getState().get()) {
 				case Token:
@@ -353,6 +355,16 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 					throw new EnumException(Mode.class, getState().get());
 			}
 			return this;
+		}
+
+		@Override
+		public ICloseable quote() {
+			final ICloseable state = getState().open(Mode.Token);
+			final IModifierHandle modifier = getBuilder().open(BashDoubleQuoteModifier.create());
+			return () -> {
+				modifier.close();
+				state.close();
+			};
 		}
 
 		@Override
@@ -377,20 +389,22 @@ public class BashRenderer extends ARenderer<IBashRenderable, BashRenderer.BashRe
 				state.close();
 			};
 		}
+	}
 
-		@Override
-		public ICloseable quote() {
-			final ICloseable state = getState().open(Mode.Token);
-			final IModifierHandle modifier = getBuilder().open(BashDoubleQuoteModifier.create());
-			return () -> {
-				modifier.close();
-				state.close();
-			};
-		}
+	public enum Mode {
+		Block,
+		Line,
+		Token;
+	}
+
+	protected final Mode mode;
+
+	public BashRenderer() {
+		this(Mode.Block);
 	}
 
 	@Override
 	protected BashRenderContext createContext() {
-		return new BashRenderContext();
+		return new BashRenderContext(getMode());
 	}
 }

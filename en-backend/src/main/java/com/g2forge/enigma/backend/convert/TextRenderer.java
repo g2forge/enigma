@@ -122,7 +122,7 @@ public class TextRenderer implements IRenderer<Object> {
 									final TextUpdate textUpdate = rangeUpdates.get(j);
 									final int offset = textUpdate.getOffset() + range.getMin() + cumulative;
 									final int index = Collections.binarySearch(elementOffsets, offset);
-									final int updateFrom = index > 0 ? index + 1 : -(index + 1);
+									final int updateFrom = index >= 0 ? index + 1 : -(index + 1);
 									for (int k = updateFrom; k < elementOffsets.size(); k++) {
 										elementOffsets.set(k, elementOffsets.get(k) + updateLengths.get(j));
 									}
