@@ -167,7 +167,10 @@ public class BashRenderer extends ARenderer<Object, BashRenderer.BashRenderConte
 
 			builder.add(BashScript.class, e -> c -> c.append("#!/bin/bash").newline().render(e.getBody(), IBashBlock.class));
 			builder.add(BashBlock.class, e -> c -> e.getContents().forEach(x -> c.render(x, IBashBlock.class)));
-			builder.add(BashAssignment.class, e -> c -> c.append(e.getName()).append("=").render(e.getExpression(), Object.class).newline());
+			builder.add(BashAssignment.class, e -> c -> {
+				c.append(e.getName()).append("=").render(e.getExpression(), Object.class);
+				if (c.isBlockMode()) c.newline();
+			});
 			builder.add(BashBlank.class, e -> c -> c.newline());
 			builder.add(BashIf.class, e -> c -> {
 				c.append("if ").render(e.getCondition(), null).append("; then").newline();
