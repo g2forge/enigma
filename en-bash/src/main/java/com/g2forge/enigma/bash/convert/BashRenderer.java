@@ -173,17 +173,24 @@ public class BashRenderer extends ARenderer<Object, BashRenderer.BashRenderConte
 			});
 			builder.add(BashBlank.class, e -> c -> c.newline());
 			builder.add(BashIf.class, e -> c -> {
-				c.append("if ").render(e.getCondition(), null).append("; then").newline();
-				try (final ICloseable indent = c.indent()) {
-					c.render(e.getThenStatement(), IBashBlock.class);
-				}
-				if (e.getElseStatement() != null) {
-					c.append("else").newline();
+				c.append("if ").render(e.getCondition(), null).append("; then");
+				if (c.isBlockMode()) {
+					c.newline();
 					try (final ICloseable indent = c.indent()) {
-						c.render(e.getElseStatement(), IBashBlock.class);
+						c.render(e.getThenStatement(), IBashBlock.class);
 					}
+					if (e.getElseStatement() != null) {
+						c.append("else").newline();
+						try (final ICloseable indent = c.indent()) {
+							c.render(e.getElseStatement(), IBashBlock.class);
+						}
+					}
+					c.append("fi").newline();
+				} else {
+					c.append(' ').render(e.getThenStatement(), IBashBlock.class);
+					if (e.getElseStatement() != null) c.append("; else ").render(e.getElseStatement(), IBashBlock.class);
+					c.append("; fi");
 				}
-				c.append("fi").newline();
 			});
 
 			builder.add(BashCommandSubstitution.class, e -> c -> {

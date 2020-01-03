@@ -11,9 +11,15 @@ import com.g2forge.enigma.bash.model.statement.BashIf;
 
 public class TestBashIf {
 	@Test
-	public void thenSimple() {
-		final String actual = new BashRenderer().render(new BashScript(new BashIf("true", new BashCommand("echo", "Hello, World!"))));
-		HAssert.assertEquals("#!/bin/bash\nif true; then\n\techo \"Hello, World!\"\nfi\n", actual);
+	public void lineElse() {
+		final String actual = new BashRenderer(BashRenderer.Mode.Line).render(new BashIf("true", new BashCommand("echo", "A"), new BashCommand("echo", "B")));
+		HAssert.assertEquals("if true; then echo A; else echo B; fi", actual);
+	}
+
+	@Test
+	public void lineThen() {
+		final String actual = new BashRenderer(BashRenderer.Mode.Line).render(new BashIf("true", new BashCommand("echo", "Hello, World!")));
+		HAssert.assertEquals("if true; then echo \"Hello, World!\"; fi", actual);
 	}
 
 	@Test
@@ -26,5 +32,11 @@ public class TestBashIf {
 	public void thenElse() {
 		final String actual = new BashRenderer().render(new BashScript(new BashIf("false", new BashCommand("echo", "true"), new BashCommand("echo", "false"))));
 		HAssert.assertEquals("#!/bin/bash\nif false; then\n\techo true\nelse\n\techo false\nfi\n", actual);
+	}
+
+	@Test
+	public void thenSimple() {
+		final String actual = new BashRenderer().render(new BashScript(new BashIf("true", new BashCommand("echo", "Hello, World!"))));
+		HAssert.assertEquals("#!/bin/bash\nif true; then\n\techo \"Hello, World!\"\nfi\n", actual);
 	}
 }
