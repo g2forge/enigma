@@ -16,6 +16,12 @@ public class TestBashOperation {
 	}
 
 	@Test
+	public void line() {
+		final String actual = new BashRenderer(BashRenderer.Mode.Line).render(BashOperation.Operator.Sequence.builder().operand(new BashCommand("echo", "-n", "Hello, ")).operand(new BashCommand("echo", "World!")).build());
+		HAssert.assertEquals("echo -n \"Hello, \"; echo World!", actual);
+	}
+
+	@Test
 	public void or() {
 		final String actual = new BashRenderer().render(new BashScript(BashOperation.Operator.Or.builder().operand(new BashCommand("false")).operand(new BashCommand("true")).build()));
 		HAssert.assertEquals("#!/bin/bash\nfalse || true\n", actual);
