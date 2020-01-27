@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.g2forge.enigma</groupId>
 	<artifactId>en-project</artifactId>
-	<version>0.0.7</version>
+	<version>0.0.8-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<parent>
@@ -44,7 +44,7 @@
 		<connection>scm:git:git://github.com/${enigma.organization}/${enigma.repository}.git</connection>
 		<developerConnection>scm:git:ssh://github.com:${enigma.organization}/${enigma.repository}.git</developerConnection>
 		<url>http://github.com/${enigma.organization}/${enigma.repository}/tree/${project.version}</url>
-		<tag>0.0.7</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<build>
