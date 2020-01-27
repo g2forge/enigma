@@ -9,14 +9,14 @@
 	<parent>
 		<groupId>com.g2forge.alexandria</groupId>
 		<artifactId>ax-project</artifactId>
-		<version>0.0.13</version>
+		<version>0.0.13-SNAPSHOT</version>
 	</parent>
 
 	<properties>
 		<stringtemplate.version>4.0.8</stringtemplate.version>
 		<antlr.version>4.7.1</antlr.version>
 
-		<alexandria.version>0.0.13</alexandria.version>
+		<alexandria.version>0.0.13-SNAPSHOT</alexandria.version>
 
 		<enigma.organization>g2forge</enigma.organization>
 		<enigma.name>Enigma</enigma.name>
