@@ -3,20 +3,20 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.g2forge.enigma</groupId>
 	<artifactId>en-project</artifactId>
-	<version>0.0.7-SNAPSHOT</version>
+	<version>0.0.8-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<parent>
 		<groupId>com.g2forge.alexandria</groupId>
 		<artifactId>ax-project</artifactId>
-		<version>0.0.12-SNAPSHOT</version>
+		<version>0.0.14-SNAPSHOT</version>
 	</parent>
 
 	<properties>
 		<stringtemplate.version>4.0.8</stringtemplate.version>
 		<antlr.version>4.7.1</antlr.version>
 
-		<alexandria.version>0.0.12-SNAPSHOT</alexandria.version>
+		<alexandria.version>0.0.14-SNAPSHOT</alexandria.version>
 
 		<enigma.organization>g2forge</enigma.organization>
 		<enigma.name>Enigma</enigma.name>
