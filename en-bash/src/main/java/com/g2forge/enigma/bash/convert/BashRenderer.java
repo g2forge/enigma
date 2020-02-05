@@ -1,6 +1,8 @@
 package com.g2forge.enigma.bash.convert;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.g2forge.alexandria.annotations.note.Note;
 import com.g2forge.alexandria.annotations.note.NoteType;
@@ -405,6 +407,15 @@ public class BashRenderer extends ARenderer<Object, BashRenderer.BashRenderConte
 		Block,
 		Line,
 		Token;
+	}
+
+	public static List<String> toTokens(BashCommand command) {
+		final BashRenderer renderer = new BashRenderer(Mode.Token);
+		final List<String> retVal = new ArrayList<>();
+		for (Object token : command.getTokens()) {
+			retVal.add(renderer.render(token));
+		}
+		return retVal;
 	}
 
 	protected final Mode mode;
