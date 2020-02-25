@@ -18,7 +18,7 @@ public class TestBashOperation {
 	@Test
 	public void line() {
 		final String actual = new BashRenderer(BashRenderer.Mode.Line).render(BashOperation.Operator.Sequence.builder().operand(new BashCommand("echo", "-n", "Hello, ")).operand(new BashCommand("echo", "World!")).build());
-		HAssert.assertEquals("echo -n \"Hello, \"; echo World!", actual);
+		HAssert.assertEquals("echo -n \"Hello, \"; echo \"World!\"", actual);
 	}
 
 	@Test
@@ -36,6 +36,6 @@ public class TestBashOperation {
 	@Test
 	public void sequence() {
 		final String actual = new BashRenderer().render(new BashScript(BashOperation.Operator.Sequence.builder().operand(new BashCommand("echo", "-n", "Hello, ")).operand(new BashCommand("echo", "World!")).build()));
-		HAssert.assertEquals("#!/bin/bash\necho -n \"Hello, \"; echo World!\n", actual);
+		HAssert.assertEquals("#!/bin/bash\necho -n \"Hello, \"; echo \"World!\"\n", actual);
 	}
 }

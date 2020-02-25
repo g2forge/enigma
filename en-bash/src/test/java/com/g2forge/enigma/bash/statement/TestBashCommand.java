@@ -17,6 +17,12 @@ public class TestBashCommand {
 	}
 
 	@Test
+	public void opchars() {
+		final String actual = new BashRenderer().render(new BashScript(new BashCommand("echo", "|")));
+		HAssert.assertEquals("#!/bin/bash\necho |\n", actual);
+	}
+
+	@Test
 	public void simple() {
 		final String actual = new BashRenderer().render(new BashScript(new BashCommand("echo", "Hello, World!")));
 		HAssert.assertEquals("#!/bin/bash\necho \"Hello, World!\"\n", actual);

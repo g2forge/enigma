@@ -9,8 +9,7 @@ import com.g2forge.enigma.backend.model.modifier.TextUpdate;
 
 public class BashTokenModifier implements ITextModifier, ISingleton {
 	protected static final String WHITESPACE = " \t\n\r";
-	protected static final String OPCHARACTERS = "|&;()<>";
-	protected static final String METACHARACTERS = WHITESPACE + OPCHARACTERS;
+	protected static final String OPCHARACTERS = "|&;()<>!#";
 
 	protected static final BashTokenModifier INSTANCE = new BashTokenModifier();
 
@@ -37,10 +36,16 @@ public class BashTokenModifier implements ITextModifier, ISingleton {
 					if (WHITESPACE.charAt(j) == character) return true;
 				}
 
+				boolean isOpCharacter = false;
 				for (int j = 0; j < OPCHARACTERS.length(); j++) {
-					if (OPCHARACTERS.charAt(j) == character) containsOpCharacters = true;
-					else containsNonOpCharacters = true;
+					if (OPCHARACTERS.charAt(j) == character) {
+						isOpCharacter = true;
+						break;
+					}
 				}
+				if (isOpCharacter) containsOpCharacters = true;
+				else containsNonOpCharacters = true;
+
 				if (containsOpCharacters && containsNonOpCharacters) return true;
 			}
 		}
