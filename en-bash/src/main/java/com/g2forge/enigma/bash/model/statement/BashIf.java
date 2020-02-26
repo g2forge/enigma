@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 @Builder(toBuilder = true)
 @RequiredArgsConstructor
-public class BashIf implements IBashStatement {
+public class BashIf implements IBashExecutable {
 	protected final Object condition;
 
 	protected final IBashBlock thenStatement;
