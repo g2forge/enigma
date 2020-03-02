@@ -22,6 +22,12 @@ public class TestBashOperation {
 	}
 
 	@Test
+	public void not() {
+		final String actual = new BashRenderer(BashRenderer.Mode.Line).render(BashOperation.Operator.Parentheses.builder().operand(BashOperation.Operator.Not.builder().operand(new BashCommand("false")).build()).build());
+		HAssert.assertEquals("(! false)", actual);
+	}
+
+	@Test
 	public void or() {
 		final String actual = new BashRenderer().render(new BashScript(BashOperation.Operator.Or.builder().operand(new BashCommand("false")).operand(new BashCommand("true")).build()));
 		HAssert.assertEquals("#!/bin/bash\nfalse || true\n", actual);

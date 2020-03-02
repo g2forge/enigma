@@ -1,3 +1,5 @@
 package com.g2forge.enigma.bash.model.expression;
 
-public interface IBashExpression {}
+import com.g2forge.enigma.bash.model.test.IBashTestExpression;
+
+public interface IBashExpression extends IBashTestExpression {}
