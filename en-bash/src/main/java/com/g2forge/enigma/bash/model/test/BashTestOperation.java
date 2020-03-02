@@ -1,7 +1,8 @@
-package com.g2forge.enigma.bash.model.statement;
+package com.g2forge.enigma.bash.model.test;
 
 import java.util.List;
 
+import com.g2forge.alexandria.java.core.helpers.HCollection;
 import com.g2forge.enigma.backend.model.IOperator;
 
 import lombok.AccessLevel;
@@ -13,8 +14,7 @@ import lombok.Singular;
 
 @Data
 @Builder(toBuilder = true)
-@RequiredArgsConstructor
-public class BashOperation implements IBashExecutable {
+public class BashTestOperation implements IBashTestExpression {
 	@Getter(AccessLevel.PROTECTED)
 	@RequiredArgsConstructor
 	public enum Operator implements IOperator {
@@ -30,18 +30,22 @@ public class BashOperation implements IBashExecutable {
 				return "(";
 			}
 		},
-		And(" && ", 0),
-		Or(" || ", 0),
-		Pipe(" | ", 0),
-		Sequence("; ", 0);
+		LogicalAnd(" && ", 0),
+		LogicalOr(" || ", 0),
+		NumericEqual(" -eq ", 2),
+		NumericNotEqual(" -ne ", 2),
+		NumericLessThan(" -lt ", 2),
+		NumericLessThanOrEqual(" -le ", 2),
+		NumericGreaterThan(" -gt ", 2),
+		NumericGreaterThanOrEqual(" -ge ", 2);
 
 		protected final String symbol;
 
 		protected final int numArguments;
 
 		@Override
-		public BashOperation.BashOperationBuilder builder() {
-			return BashOperation.builder().operator(this);
+		public BashTestOperation.BashTestOperationBuilder builder() {
+			return BashTestOperation.builder().operator(this);
 		}
 
 		@Override
@@ -69,5 +73,15 @@ public class BashOperation implements IBashExecutable {
 	protected final Operator operator;
 
 	@Singular
-	protected final List<IBashExecutable> operands;
+	protected final List<?> operands;
+
+	public BashTestOperation(Operator operator, List<?> operands) {
+		if (!operator.isValidNumArguments(operands.size())) throw new IllegalArgumentException(String.format("Invalid number of arguments for %1$s, received %2$d: %3$s", operator, operands.size(), operands));
+		this.operator = operator;
+		this.operands = operands;
+	}
+
+	public BashTestOperation(Operator operator, Object... operands) {
+		this(operator, HCollection.asList(operands));
+	}
 }

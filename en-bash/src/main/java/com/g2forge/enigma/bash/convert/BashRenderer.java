@@ -15,6 +15,7 @@ import com.g2forge.alexandria.java.nestedstate.StackGlobalState;
 import com.g2forge.alexandria.java.type.function.TypeSwitch1;
 import com.g2forge.enigma.backend.ITextAppender;
 import com.g2forge.enigma.backend.convert.common.ARenderer;
+import com.g2forge.enigma.backend.model.IOperator;
 import com.g2forge.enigma.backend.model.expression.ITextExpression;
 import com.g2forge.enigma.backend.model.expression.TextNewline;
 import com.g2forge.enigma.backend.model.modifier.IndentTextModifier;
@@ -44,6 +45,9 @@ import com.g2forge.enigma.bash.model.statement.redirect.BashRedirectOutput;
 import com.g2forge.enigma.bash.model.statement.redirect.BashRedirection;
 import com.g2forge.enigma.bash.model.statement.redirect.HBashHandle;
 import com.g2forge.enigma.bash.model.statement.redirect.IBashRedirect;
+import com.g2forge.enigma.bash.model.test.BashTest;
+import com.g2forge.enigma.bash.model.test.BashTestOperation;
+import com.g2forge.enigma.bash.model.test.IBashTestExpression;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -77,30 +81,8 @@ public class BashRenderer extends ARenderer<Object, BashRenderer.BashRenderConte
 				if (c.isBlockMode()) c.newline();
 			});
 			builder.add(BashOperation.class, e -> c -> {
-				final String operator;
-				switch (e.getOperator()) {
-					case And:
-						operator = " && ";
-						break;
-					case Or:
-						operator = " || ";
-						break;
-					case Pipe:
-						operator = " | ";
-						break;
-					case Sequence:
-						operator = "; ";
-						break;
-					default:
-						throw new EnumException(BashOperation.Operator.class, e.getOperator());
-				}
 				try (final ICloseable line = c.line()) {
-					boolean first = true;
-					for (IBashExecutable operand : e.getOperands()) {
-						if (first) first = false;
-						else c.append(operator);
-						c.render(operand, IBashExecutable.class);
-					}
+					IOperator.render(e.getOperator(), c, e.getOperands(), IBashExecutable.class);
 				}
 				if (c.isBlockMode()) c.newline();
 			});
@@ -236,9 +218,12 @@ public class BashRenderer extends ARenderer<Object, BashRenderer.BashRenderConte
 					try (final ICloseable expansion = c.raw()) {
 						c.append(e.getName());
 					}
-					c.append("}");
+					c.append('}');
 				}
 			});
+
+			builder.add(BashTest.class, e -> c -> c.append("[[ ").render(e.getExpression(), IBashTestExpression.class).append(" ]]"));
+			builder.add(BashTestOperation.class, e -> c -> IOperator.render(e.getOperator(), c, e.getOperands(), IBashTestExpression.class));
 		}).build();
 
 		@Getter(AccessLevel.PROTECTED)
