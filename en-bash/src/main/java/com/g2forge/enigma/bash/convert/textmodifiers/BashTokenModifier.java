@@ -3,14 +3,13 @@ package com.g2forge.enigma.bash.convert.textmodifiers;
 import java.util.List;
 
 import com.g2forge.alexandria.java.core.error.NotYetImplementedError;
+import com.g2forge.alexandria.java.core.helpers.HCollection;
 import com.g2forge.alexandria.java.core.marker.ISingleton;
+import com.g2forge.alexandria.java.text.quote.BashQuoteType;
 import com.g2forge.enigma.backend.model.modifier.ITextModifier;
 import com.g2forge.enigma.backend.model.modifier.TextUpdate;
 
 public class BashTokenModifier implements ITextModifier, ISingleton {
-	protected static final String WHITESPACE = " \t\n\r";
-	protected static final String OPCHARACTERS = "|&;()<>!#";
-
 	protected static final BashTokenModifier INSTANCE = new BashTokenModifier();
 
 	public static BashTokenModifier create() {
@@ -26,30 +25,7 @@ public class BashTokenModifier implements ITextModifier, ISingleton {
 	protected boolean isRequiresQuote(List<CharSequence> list) {
 		// If there's a gap in the middle, always quote since we never know what someone will put in there...
 		if (list.size() > 1) return true;
-
-		boolean containsOpCharacters = false, containsNonOpCharacters = false;
-		for (CharSequence sequence : list) {
-			for (int i = 0; i < sequence.length(); i++) {
-				final char character = sequence.charAt(i);
-				// If we find whitespace this thing definitely needs to be quoted
-				for (int j = 0; j < WHITESPACE.length(); j++) {
-					if (WHITESPACE.charAt(j) == character) return true;
-				}
-
-				boolean isOpCharacter = false;
-				for (int j = 0; j < OPCHARACTERS.length(); j++) {
-					if (OPCHARACTERS.charAt(j) == character) {
-						isOpCharacter = true;
-						break;
-					}
-				}
-				if (isOpCharacter) containsOpCharacters = true;
-				else containsNonOpCharacters = true;
-
-				if (containsOpCharacters && containsNonOpCharacters) return true;
-			}
-		}
-		return false;
+		return BashQuoteType.BashDoubleExpand.isQuoteNeeded(HCollection.getOne(list));
 	}
 
 	@Override
