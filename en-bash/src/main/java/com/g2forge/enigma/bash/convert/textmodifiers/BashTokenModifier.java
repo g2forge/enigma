@@ -2,53 +2,54 @@ package com.g2forge.enigma.bash.convert.textmodifiers;
 
 import java.util.List;
 
+import com.g2forge.alexandria.java.core.enums.EnumException;
 import com.g2forge.alexandria.java.core.error.NotYetImplementedError;
-import com.g2forge.alexandria.java.core.marker.ISingleton;
+import com.g2forge.alexandria.java.core.helpers.HCollection;
+import com.g2forge.alexandria.java.text.TextUpdate;
+import com.g2forge.alexandria.java.text.quote.BashQuoteType;
+import com.g2forge.alexandria.java.text.quote.QuoteControl;
 import com.g2forge.enigma.backend.model.modifier.ITextModifier;
-import com.g2forge.enigma.backend.model.modifier.TextUpdate;
 
-public class BashTokenModifier implements ITextModifier, ISingleton {
-	protected static final String WHITESPACE = " \t\n\r";
-	protected static final String OPCHARACTERS = "|&;()<>";
-	protected static final String METACHARACTERS = WHITESPACE + OPCHARACTERS;
+import lombok.Builder;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
-	protected static final BashTokenModifier INSTANCE = new BashTokenModifier();
+@Data
+@Builder(toBuilder = true)
+@RequiredArgsConstructor
+public class BashTokenModifier implements ITextModifier {
+	protected final BashQuoteType quoteType;
 
-	public static BashTokenModifier create() {
-		return INSTANCE;
-	}
+	protected final QuoteControl quoteControl;
 
 	@Override
-	public List<List<TextUpdate>> computeUpdates(List<CharSequence> list) {
-		if (isRequiresQuote(list)) return BashDoubleQuoteModifier.create().computeUpdates(list);
-		return null;
+	public List<? extends List<? extends TextUpdate<?>>> computeUpdates(List<CharSequence> list) {
+		switch (getQuoteControl()) {
+			case Never:
+				return null;
+			case IfNotAlready:
+			case IfNeeded:
+				if (!isRequiresQuote(list)) return null;
+			case Always:
+				return new BashQuoteModifier(getQuoteType()).computeUpdates(list);
+			default:
+				throw new EnumException(QuoteControl.class, getQuoteControl());
+		}
 	}
 
 	protected boolean isRequiresQuote(List<CharSequence> list) {
 		// If there's a gap in the middle, always quote since we never know what someone will put in there...
 		if (list.size() > 1) return true;
-
-		boolean containsOpCharacters = false, containsNonOpCharacters = false;
-		for (CharSequence sequence : list) {
-			for (int i = 0; i < sequence.length(); i++) {
-				final char character = sequence.charAt(i);
-				// If we find whitespace this thing definitely needs to be quoted
-				for (int j = 0; j < WHITESPACE.length(); j++) {
-					if (WHITESPACE.charAt(j) == character) return true;
-				}
-
-				for (int j = 0; j < OPCHARACTERS.length(); j++) {
-					if (OPCHARACTERS.charAt(j) == character) containsOpCharacters = true;
-					else containsNonOpCharacters = true;
-				}
-				if (containsOpCharacters && containsNonOpCharacters) return true;
-			}
-		}
-		return false;
+		return getQuoteType().isQuoteNeeded(HCollection.getOne(list));
 	}
 
 	@Override
 	public ITextModifier merge(Iterable<? extends ITextModifier> modifiers) {
 		throw new NotYetImplementedError();
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
 	}
 }

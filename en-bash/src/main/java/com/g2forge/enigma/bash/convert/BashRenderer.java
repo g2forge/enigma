@@ -12,6 +12,8 @@ import com.g2forge.alexandria.java.function.IConsumer2;
 import com.g2forge.alexandria.java.function.IFunction1;
 import com.g2forge.alexandria.java.function.builder.IBuilder;
 import com.g2forge.alexandria.java.nestedstate.StackGlobalState;
+import com.g2forge.alexandria.java.text.quote.BashQuoteType;
+import com.g2forge.alexandria.java.text.quote.QuoteControl;
 import com.g2forge.alexandria.java.type.function.TypeSwitch1;
 import com.g2forge.enigma.backend.ITextAppender;
 import com.g2forge.enigma.backend.convert.common.ARenderer;
@@ -21,7 +23,7 @@ import com.g2forge.enigma.backend.model.expression.TextNewline;
 import com.g2forge.enigma.backend.model.modifier.IndentTextModifier;
 import com.g2forge.enigma.backend.model.modifier.TextNestedModified;
 import com.g2forge.enigma.backend.model.modifier.TextNestedModified.IModifierHandle;
-import com.g2forge.enigma.bash.convert.textmodifiers.BashDoubleQuoteModifier;
+import com.g2forge.enigma.bash.convert.textmodifiers.BashQuoteModifier;
 import com.g2forge.enigma.bash.convert.textmodifiers.BashTokenModifier;
 import com.g2forge.enigma.bash.model.BashScript;
 import com.g2forge.enigma.bash.model.expression.BashCommandSubstitution;
@@ -64,7 +66,7 @@ public class BashRenderer extends ARenderer<Object, BashRenderer.BashRenderConte
 				@Override
 				public <T> IFunction1<? super T, ? extends IExplicitBashRenderable> create(IConsumer2<? super IBashRenderContext, ? super T> consumer) {
 					return e -> c -> {
-						try (final ICloseable token = c.token(true)) {
+						try (final ICloseable token = c.token(BashQuoteType.BashDoubleExpand, QuoteControl.IfNeeded)) {
 							consumer.accept(c, e);
 						}
 					};
@@ -121,7 +123,7 @@ public class BashRenderer extends ARenderer<Object, BashRenderer.BashRenderConte
 				c.append("<>").render(e.getTarget(), null);
 			});
 			builder.add(BashRedirectHandle.class, e -> c -> {
-				try (final ICloseable token = c.token(false)) {
+				try (final ICloseable token = c.token(null, QuoteControl.Never)) {
 					c.append("&").append(e.getHandle());
 					if (BashRedirectHandle.Operation.Move.equals(e.getOperation())) c.append("-");
 				}
@@ -141,7 +143,7 @@ public class BashRenderer extends ARenderer<Object, BashRenderer.BashRenderConte
 				c.append("<<");
 				if (e.isStripTabs()) c.append("-");
 				try (final ICloseable block = c.block()) {
-					try (final ICloseable token = e.isExpand() ? c.token(false) : c.quote()) {
+					try (final ICloseable token = e.isExpand() ? c.token(null, QuoteControl.Never) : c.quote()) {
 						c.render(e.getDelimiter(), null);
 					}
 					c.newline().append(e.getDocument()).newline().render(e.getDelimiter(), null);
@@ -178,16 +180,16 @@ public class BashRenderer extends ARenderer<Object, BashRenderer.BashRenderConte
 			});
 
 			builder.add(BashCommandSubstitution.class, e -> c -> {
-				try (final ICloseable token = c.token(true)) {
+				try (final ICloseable token = c.token(BashQuoteType.BashDoubleExpand, QuoteControl.IfNeeded)) {
 					c.append("$(");
-					try (final ICloseable line = c.line()) {
+					try (final ICloseable raw = c.raw(); final ICloseable line = c.line()) {
 						c.render(e.getExecutable(), IBashExecutable.class);
 					}
 					c.append(")");
 				}
 			});
 			builder.add(BashProcessSubstitution.class, e -> c -> {
-				try (final ICloseable token = c.token(false)) {
+				try (final ICloseable token = c.token(null, QuoteControl.Never)) {
 					switch (e.getDirection()) {
 						case Input:
 							c.append("<");
@@ -207,13 +209,13 @@ public class BashRenderer extends ARenderer<Object, BashRenderer.BashRenderConte
 			});
 			builder.add(BashString.class, e -> c -> {
 				try (final ICloseable raw = c.raw()) {
-					try (final ICloseable token = c.token(true)) {
+					try (final ICloseable token = c.token(e.getQuoteType(), e.getQuoteControl())) {
 						e.getElements().forEach(x -> c.render(x, null));
 					}
 				}
 			});
 			builder.add(BashExpansion.class, e -> c -> {
-				try (final ICloseable token = c.token(true)) {
+				try (final ICloseable token = c.token(BashQuoteType.BashDoubleExpand, QuoteControl.IfNeeded)) {
 					c.append("${");
 					try (final ICloseable expansion = c.raw()) {
 						c.append(e.getName());
@@ -357,7 +359,7 @@ public class BashRenderer extends ARenderer<Object, BashRenderer.BashRenderConte
 		@Override
 		public ICloseable quote() {
 			final ICloseable state = getState().open(Mode.Token);
-			final IModifierHandle modifier = getBuilder().open(BashDoubleQuoteModifier.create());
+			final IModifierHandle modifier = getBuilder().open(new BashQuoteModifier(BashQuoteType.BashDoubleExpand));
 			return () -> {
 				modifier.close();
 				state.close();
@@ -376,11 +378,11 @@ public class BashRenderer extends ARenderer<Object, BashRenderer.BashRenderConte
 		}
 
 		@Override
-		public ICloseable token(boolean quote) {
+		public ICloseable token(BashQuoteType quoteType, QuoteControl quoteControl) {
 			if (getState().get().equals(Mode.Token)) return () -> {};
 			final ICloseable state = getState().open(Mode.Token);
-			if (!quote) return state;
-			final IModifierHandle modifier = getBuilder().open(BashTokenModifier.create());
+			if ((quoteControl == null) || QuoteControl.Never.equals(quoteControl)) return state;
+			final IModifierHandle modifier = getBuilder().open(new BashTokenModifier(quoteType, quoteControl));
 			return () -> {
 				modifier.close();
 				state.close();

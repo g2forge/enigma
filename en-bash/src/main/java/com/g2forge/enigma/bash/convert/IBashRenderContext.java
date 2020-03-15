@@ -1,6 +1,8 @@
 package com.g2forge.enigma.bash.convert;
 
 import com.g2forge.alexandria.java.close.ICloseable;
+import com.g2forge.alexandria.java.text.quote.BashQuoteType;
+import com.g2forge.alexandria.java.text.quote.QuoteControl;
 import com.g2forge.enigma.backend.ITextBuilder;
 import com.g2forge.enigma.backend.convert.common.IRenderContext;
 
@@ -17,5 +19,5 @@ public interface IBashRenderContext extends IRenderContext<IBashRenderContext>, 
 
 	public ICloseable raw();
 
-	public ICloseable token(boolean quote);
+	public ICloseable token(BashQuoteType quoteType, QuoteControl quoteControl);
 }
