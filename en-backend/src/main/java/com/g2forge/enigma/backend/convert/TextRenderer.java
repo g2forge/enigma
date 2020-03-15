@@ -15,6 +15,7 @@ import com.g2forge.alexandria.java.core.helpers.HCollection;
 import com.g2forge.alexandria.java.function.IFunction1;
 import com.g2forge.alexandria.java.function.builder.IBuilder;
 import com.g2forge.alexandria.java.text.CharSubSequence;
+import com.g2forge.alexandria.java.text.TextUpdate;
 import com.g2forge.alexandria.java.type.function.TypeSwitch1;
 import com.g2forge.enigma.backend.convert.common.IRenderer;
 import com.g2forge.enigma.backend.model.expression.TextConcatenation;
@@ -25,7 +26,6 @@ import com.g2forge.enigma.backend.model.modifier.TextModified;
 import com.g2forge.enigma.backend.model.modifier.TextNestedModified;
 import com.g2forge.enigma.backend.model.modifier.TextNestedModified.Element;
 import com.g2forge.enigma.backend.model.modifier.TextNestedModified.Modifier;
-import com.g2forge.enigma.backend.model.modifier.TextUpdate;
 
 import lombok.Getter;
 
@@ -57,9 +57,9 @@ public class TextRenderer implements IRenderer<Object> {
 				c.render(e.getExpression(), Object.class);
 
 				final ITextModifier modifier = e.getModifier();
-				final List<List<TextUpdate>> updates = modifier.computeUpdates(HCollection.asList(new CharSubSequence(b, priorOffset)));
+				final List<? extends List<? extends TextUpdate<?>>> updates = modifier.computeUpdates(HCollection.asList(new CharSubSequence(b, priorOffset)));
 				if (updates != null) {
-					final List<TextUpdate> stringUpdates = HCollection.getOne(updates);
+					final List<? extends TextUpdate<?>> stringUpdates = HCollection.getOne(updates);
 					if (!stringUpdates.isEmpty()) {
 						final int unchanged = stringUpdates.get(0).getOffset();
 						final String string = b.substring(priorOffset + unchanged, b.length());
@@ -97,7 +97,7 @@ public class TextRenderer implements IRenderer<Object> {
 
 						// Compute the updates
 						final List<CharSequence> list = ranges.stream().map(r -> new CharSubSequence(b, r.getMin(), r.getMax() - r.getMin())).collect(Collectors.toList());
-						final List<List<TextUpdate>> allUpdates = modifier.getModifier().computeUpdates(list);
+						final List<? extends List<? extends TextUpdate<?>>> allUpdates = modifier.getModifier().computeUpdates(list);
 						if (allUpdates != null) {
 							// Apply the updates
 							final int nRanges = ranges.size();
@@ -106,7 +106,7 @@ public class TextRenderer implements IRenderer<Object> {
 							int cumulative = 0; // Cumulative offset update from previous ranges
 							for (int i = 0; i < nRanges; i++) {
 								// Apply updates for each range (if any)
-								final List<TextUpdate> rangeUpdates = allUpdates.get(i);
+								final List<? extends TextUpdate<?>> rangeUpdates = allUpdates.get(i);
 								if (rangeUpdates == null || rangeUpdates.isEmpty()) continue;
 								final IRange<Integer> range = ranges.get(i);
 
@@ -119,7 +119,7 @@ public class TextRenderer implements IRenderer<Object> {
 
 								// Update the element offsets (resultlength - length = expansion)
 								for (int j = 0; j < rangeUpdates.size(); j++) {
-									final TextUpdate textUpdate = rangeUpdates.get(j);
+									final TextUpdate<?> textUpdate = rangeUpdates.get(j);
 									final int offset = textUpdate.getOffset() + range.getMin() + cumulative;
 									final int index = Collections.binarySearch(elementOffsets, offset);
 									final int updateFrom = index >= 0 ? index + 1 : -(index + 1);
@@ -149,12 +149,12 @@ public class TextRenderer implements IRenderer<Object> {
 		 * @param unchanged
 		 * @return A list of the lengths of the updates.
 		 */
-		protected List<Integer> modify(final String string, final List<TextUpdate> updates, int unchanged) {
+		protected List<Integer> modify(final String string, final List<? extends TextUpdate<?>> updates, int unchanged) {
 			final StringBuilder builder = getBuilder();
 
 			final List<Integer> retVal = new ArrayList<>();
 			int stringOffset = 0;
-			for (TextUpdate update : updates) {
+			for (TextUpdate<?> update : updates) {
 				final int updateOffset = update.getOffset() - unchanged;
 				if (updateOffset > stringOffset) builder.append(string.substring(stringOffset, updateOffset));
 				final int prelength = builder.length();

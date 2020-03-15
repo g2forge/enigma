@@ -21,7 +21,7 @@ import com.g2forge.enigma.backend.model.expression.TextNewline;
 import com.g2forge.enigma.backend.model.modifier.IndentTextModifier;
 import com.g2forge.enigma.backend.model.modifier.TextNestedModified;
 import com.g2forge.enigma.backend.model.modifier.TextNestedModified.IModifierHandle;
-import com.g2forge.enigma.bash.convert.textmodifiers.BashDoubleQuoteModifier;
+import com.g2forge.enigma.bash.convert.textmodifiers.BashDoubleExpandQuoteModifier;
 import com.g2forge.enigma.bash.convert.textmodifiers.BashTokenModifier;
 import com.g2forge.enigma.bash.model.BashScript;
 import com.g2forge.enigma.bash.model.expression.BashCommandSubstitution;
@@ -357,7 +357,7 @@ public class BashRenderer extends ARenderer<Object, BashRenderer.BashRenderConte
 		@Override
 		public ICloseable quote() {
 			final ICloseable state = getState().open(Mode.Token);
-			final IModifierHandle modifier = getBuilder().open(BashDoubleQuoteModifier.create());
+			final IModifierHandle modifier = getBuilder().open(BashDoubleExpandQuoteModifier.create());
 			return () -> {
 				modifier.close();
 				state.close();

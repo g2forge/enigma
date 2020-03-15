@@ -3,6 +3,7 @@ package com.g2forge.enigma.backend.model.modifier;
 import java.util.List;
 
 import com.g2forge.alexandria.java.core.helpers.HCollection;
+import com.g2forge.alexandria.java.text.TextUpdate;
 
 public interface ITextModifier {
 	/**
@@ -15,7 +16,7 @@ public interface ITextModifier {
 	 *            correspond to regions where other modifiers apply we should not therefore not take action.
 	 * @return A list of updates to make.
 	 */
-	public List<List<TextUpdate>> computeUpdates(List<CharSequence> list);
+	public List<? extends List<? extends TextUpdate<?>>> computeUpdates(List<CharSequence> list);
 
 	/**
 	 * Try to merge as many as possible together. Use an RLE-like scheme to create a minimal modifier.
