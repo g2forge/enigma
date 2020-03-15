@@ -180,7 +180,7 @@ public class BashRenderer extends ARenderer<Object, BashRenderer.BashRenderConte
 			builder.add(BashCommandSubstitution.class, e -> c -> {
 				try (final ICloseable token = c.token(true)) {
 					c.append("$(");
-					try (final ICloseable line = c.line()) {
+					try (final ICloseable raw = c.raw(); final ICloseable line = c.line()) {
 						c.render(e.getExecutable(), IBashExecutable.class);
 					}
 					c.append(")");
