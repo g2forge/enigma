@@ -32,4 +32,9 @@ public class BashTokenModifier implements ITextModifier, ISingleton {
 	public ITextModifier merge(Iterable<? extends ITextModifier> modifiers) {
 		throw new NotYetImplementedError();
 	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
+	}
 }

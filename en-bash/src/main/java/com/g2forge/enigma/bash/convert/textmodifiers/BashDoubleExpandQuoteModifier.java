@@ -25,8 +25,11 @@ public class BashDoubleExpandQuoteModifier implements ITextModifier, ISingleton 
 		for (int i = 0; i < list.size(); i++) {
 			final List<TextUpdate<?>> updates = new ArrayList<>();
 			if (i == 0) updates.add(new TextUpdate<>(0, 0, IFunction1.create(HQuote.QUOTE_DOUBLE)));
+			BashEscapeType.DoubleExpand.getEscaper().computeEscape(list.get(i).toString(), update -> {
+				if (update.getFunction() instanceof IFunction1.Identity) return;
+				updates.add(update);
+			});
 			if (i == list.size() - 1) updates.add(new TextUpdate<>(HCollection.getLast(list).length(), 0, IFunction1.create(HQuote.QUOTE_DOUBLE)));
-
 			retVal.add(updates.isEmpty() ? null : updates);
 		}
 		return retVal;
