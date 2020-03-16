@@ -40,14 +40,16 @@ public class TextNestedModified implements ITextExpression {
 	@Data
 	@Builder(toBuilder = true)
 	@RequiredArgsConstructor
-	public static class Modifier implements Cloneable {
+	public static class Modifier {
 		protected final Modifier parent;
 
 		protected final ITextModifier modifier;
 
-		@Override
-		public Modifier clone() {
-			return new Modifier(getParent(), getModifier());
+		protected Modifier reactivate() {
+			final Modifier parent = getParent();
+			final ITextModifier modifier = getModifier();
+			if ((parent == null) && (modifier == null)) return this;
+			return new Modifier(parent, modifier);
 		}
 	}
 
@@ -106,7 +108,7 @@ public class TextNestedModified implements ITextExpression {
 				this.original = original;
 				this.previous = getCurrentModifier();
 				// Clone the modifier so that we can tell the activations apart
-				this.modifier = getOriginal().getModifier().clone();
+				this.modifier = getOriginal().getModifier().reactivate();
 				ensureOpenOkay();
 				setCurrentModifier(getModifier());
 			}
@@ -116,7 +118,7 @@ public class TextNestedModified implements ITextExpression {
 				final Modifier originalModifier = getOriginal().getModifier();
 				Modifier current = getCurrentModifier();
 				while (current != null) {
-					if (current.equals(originalModifier)) return;
+					if (current == originalModifier) return;
 					current = current.getParent();
 				}
 				throw new IllegalStateException("Can't reactivate a non-ancestor modifier!");
