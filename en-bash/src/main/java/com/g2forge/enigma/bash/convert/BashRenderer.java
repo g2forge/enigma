@@ -4,8 +4,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.g2forge.alexandria.annotations.note.Note;
-import com.g2forge.alexandria.annotations.note.NoteType;
 import com.g2forge.alexandria.java.close.ICloseable;
 import com.g2forge.alexandria.java.core.enums.EnumException;
 import com.g2forge.alexandria.java.function.IConsumer2;
@@ -57,7 +55,6 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-@Note(type = NoteType.TODO, value = "Add a method which renders a list of strings for a one-liner")
 public class BashRenderer extends ARenderer<Object, BashRenderer.BashRenderContext> {
 	public static class BashRenderContext implements IBashRenderContext, IBuilder<ITextExpression> {
 		protected static final IFunction1<Object, IExplicitBashRenderable> toExplicit = new TypeSwitch1.FunctionBuilder<Object, IExplicitBashRenderable>().with(builder -> {
