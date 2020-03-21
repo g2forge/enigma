@@ -14,7 +14,7 @@
 
 	<properties>
 		<stringtemplate.version>4.0.8</stringtemplate.version>
-		<antlr.version>4.7.1</antlr.version>
+		<antlr.version>4.8-1</antlr.version>
 
 		<alexandria.version>0.0.14-SNAPSHOT</alexandria.version>
 
