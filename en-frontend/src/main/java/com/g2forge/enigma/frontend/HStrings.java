@@ -1,7 +1,7 @@
 package com.g2forge.enigma.frontend;
 
-import com.g2forge.alexandria.java.core.helpers.HString;
 import com.g2forge.alexandria.java.core.marker.Helpers;
+import com.g2forge.alexandria.java.text.HString;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
