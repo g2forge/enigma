@@ -1,4 +1,4 @@
-package com.g2forge.enigma.bash.statement.redirect;
+package com.g2forge.enigma.bash.model.statement.redirect;
 
 import org.junit.Test;
 

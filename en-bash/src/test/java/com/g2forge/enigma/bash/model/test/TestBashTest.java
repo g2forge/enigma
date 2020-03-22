@@ -1,4 +1,4 @@
-package com.g2forge.enigma.bash.test;
+package com.g2forge.enigma.bash.model.test;
 
 import org.junit.Test;
 
