@@ -15,6 +15,7 @@ import com.g2forge.alexandria.java.text.quote.QuoteControl;
 import com.g2forge.alexandria.java.type.function.TypeSwitch1;
 import com.g2forge.enigma.backend.ITextAppender;
 import com.g2forge.enigma.backend.convert.common.ARenderer;
+import com.g2forge.enigma.backend.convert.common.IExplicitRenderable;
 import com.g2forge.enigma.backend.model.IOperator;
 import com.g2forge.enigma.backend.model.expression.ITextExpression;
 import com.g2forge.enigma.backend.model.expression.TextNewline;
@@ -56,12 +57,12 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public class BashRenderer extends ARenderer<Object, BashRenderer.BashRenderContext> {
-	public static class BashRenderContext implements IBashRenderContext, IBuilder<ITextExpression> {
-		protected static final IFunction1<Object, IExplicitBashRenderable> toExplicit = new TypeSwitch1.FunctionBuilder<Object, IExplicitBashRenderable>().with(builder -> {
+	protected static class BashRenderContext implements IBashRenderContext, IBuilder<ITextExpression> {
+		protected static final IFunction1<Object, ? extends IExplicitRenderable<? super IBashRenderContext>> toExplicit = new TypeSwitch1.FunctionBuilder<Object, IExplicitRenderable<? super IBashRenderContext>>().with(builder -> {
 			builder.add(IExplicitBashRenderable.class, e -> c -> e.render(c));
-			ITextAppender.addToBuilder(builder, new ITextAppender.IExplicitFactory<IBashRenderContext, IExplicitBashRenderable>() {
+			ITextAppender.addToBuilder(builder, new ITextAppender.IExplicitFactory<IBashRenderContext, IExplicitRenderable<? super IBashRenderContext>>() {
 				@Override
-				public <T> IFunction1<? super T, ? extends IExplicitBashRenderable> create(IConsumer2<? super IBashRenderContext, ? super T> consumer) {
+				public <T> IFunction1<? super T, ? extends IExplicitRenderable<? super IBashRenderContext>> create(IConsumer2<? super IBashRenderContext, ? super T> consumer) {
 					return e -> c -> {
 						try (final ICloseable token = c.token(BashQuoteType.BashDoubleExpand, QuoteControl.IfNeeded)) {
 							consumer.accept(c, e);
