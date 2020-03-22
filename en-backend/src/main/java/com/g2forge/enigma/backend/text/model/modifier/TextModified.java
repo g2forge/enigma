@@ -1,6 +1,6 @@
-package com.g2forge.enigma.backend.model.modifier;
+package com.g2forge.enigma.backend.text.model.modifier;
 
-import com.g2forge.enigma.backend.model.expression.ITextExpression;
+import com.g2forge.enigma.backend.text.model.expression.ITextExpression;
 
 import lombok.Builder;
 import lombok.Data;

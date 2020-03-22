@@ -3,7 +3,7 @@ package com.g2forge.enigma.bash.model.test;
 import java.util.List;
 
 import com.g2forge.alexandria.java.core.helpers.HCollection;
-import com.g2forge.enigma.backend.model.IOperator;
+import com.g2forge.enigma.backend.text.model.IOperator;
 
 import lombok.AccessLevel;
 import lombok.Builder;

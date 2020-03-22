@@ -1,4 +1,4 @@
-package com.g2forge.enigma.backend.model.modifier;
+package com.g2forge.enigma.backend.text.model.modifier;
 
 import java.util.List;
 

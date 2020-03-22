@@ -14,14 +14,14 @@ import com.g2forge.alexandria.java.text.quote.BashQuoteType;
 import com.g2forge.alexandria.java.text.quote.QuoteControl;
 import com.g2forge.alexandria.java.type.function.TypeSwitch1;
 import com.g2forge.enigma.backend.ITextAppender;
-import com.g2forge.enigma.backend.convert.common.ARenderer;
-import com.g2forge.enigma.backend.convert.common.IExplicitRenderable;
-import com.g2forge.enigma.backend.model.IOperator;
-import com.g2forge.enigma.backend.model.expression.ITextExpression;
-import com.g2forge.enigma.backend.model.expression.TextNewline;
-import com.g2forge.enigma.backend.model.modifier.IndentTextModifier;
-import com.g2forge.enigma.backend.model.modifier.TextNestedModified;
-import com.g2forge.enigma.backend.model.modifier.TextNestedModified.IModifierHandle;
+import com.g2forge.enigma.backend.convert.ATextualRenderer;
+import com.g2forge.enigma.backend.convert.IExplicitRenderable;
+import com.g2forge.enigma.backend.text.model.IOperator;
+import com.g2forge.enigma.backend.text.model.expression.ITextExpression;
+import com.g2forge.enigma.backend.text.model.expression.TextNewline;
+import com.g2forge.enigma.backend.text.model.modifier.IndentTextModifier;
+import com.g2forge.enigma.backend.text.model.modifier.TextNestedModified;
+import com.g2forge.enigma.backend.text.model.modifier.TextNestedModified.IModifierHandle;
 import com.g2forge.enigma.bash.convert.textmodifiers.BashQuoteModifier;
 import com.g2forge.enigma.bash.convert.textmodifiers.BashTokenModifier;
 import com.g2forge.enigma.bash.model.BashScript;
@@ -56,7 +56,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class BashRenderer extends ARenderer<Object, BashRenderer.BashRenderContext> {
+public class BashRenderer extends ATextualRenderer<Object, BashRenderer.BashRenderContext> {
 	protected static class BashRenderContext implements IBashRenderContext, IBuilder<ITextExpression> {
 		protected static final IFunction1<Object, ? extends IExplicitRenderable<? super IBashRenderContext>> toExplicit = new TypeSwitch1.FunctionBuilder<Object, IExplicitRenderable<? super IBashRenderContext>>().with(builder -> {
 			builder.add(IExplicitBashRenderable.class, e -> c -> e.render(c));

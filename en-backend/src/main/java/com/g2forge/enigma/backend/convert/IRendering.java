@@ -1,4 +1,4 @@
-package com.g2forge.enigma.backend.convert.common;
+package com.g2forge.enigma.backend.convert;
 
 import java.lang.reflect.Type;
 

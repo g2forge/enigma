@@ -1,10 +1,10 @@
-package com.g2forge.enigma.backend.convert;
+package com.g2forge.enigma.backend.text.convert;
 
 import java.util.List;
 
 import com.g2forge.alexandria.java.function.builder.IBuilder;
 import com.g2forge.alexandria.java.text.TextUpdate;
-import com.g2forge.enigma.backend.convert.common.IRenderContext;
+import com.g2forge.enigma.backend.convert.IRenderContext;
 
 public interface ITextRenderContext extends IRenderContext<ITextRenderContext>, IBuilder<String> {
 	public ITextRenderContext createContext();

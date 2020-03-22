@@ -4,7 +4,7 @@ import com.g2forge.alexandria.java.close.ICloseable;
 import com.g2forge.alexandria.java.text.quote.BashQuoteType;
 import com.g2forge.alexandria.java.text.quote.QuoteControl;
 import com.g2forge.enigma.backend.ITextBuilder;
-import com.g2forge.enigma.backend.convert.common.IRenderContext;
+import com.g2forge.enigma.backend.convert.IRenderContext;
 
 public interface IBashRenderContext extends IRenderContext<IBashRenderContext>, ITextBuilder<IBashRenderContext> {
 	public ICloseable block();

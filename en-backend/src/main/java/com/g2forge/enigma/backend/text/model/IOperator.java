@@ -1,9 +1,9 @@
-package com.g2forge.enigma.backend.model;
+package com.g2forge.enigma.backend.text.model;
 
 import java.lang.reflect.Type;
 
 import com.g2forge.enigma.backend.ITextAppender;
-import com.g2forge.enigma.backend.convert.common.IRenderContext;
+import com.g2forge.enigma.backend.convert.IRenderContext;
 
 public interface IOperator {
 	public static <T extends IRenderContext<?> & ITextAppender<?>> void render(IOperator _this, T context, Iterable<?> operands, Type type) {

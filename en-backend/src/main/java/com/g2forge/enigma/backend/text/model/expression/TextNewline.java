@@ -1,4 +1,4 @@
-package com.g2forge.enigma.backend.model.expression;
+package com.g2forge.enigma.backend.text.model.expression;
 
 import com.g2forge.alexandria.java.core.marker.ISingleton;
 

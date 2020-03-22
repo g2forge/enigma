@@ -1,4 +1,4 @@
-package com.g2forge.enigma.backend.convert;
+package com.g2forge.enigma.backend.text.convert;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -16,21 +16,21 @@ import com.g2forge.alexandria.java.function.IFunction1;
 import com.g2forge.alexandria.java.text.CharSubSequence;
 import com.g2forge.alexandria.java.text.TextUpdate;
 import com.g2forge.alexandria.java.type.function.TypeSwitch1;
-import com.g2forge.enigma.backend.convert.common.IRenderer;
-import com.g2forge.enigma.backend.convert.common.IRendering;
-import com.g2forge.enigma.backend.model.expression.TextConcatenation;
-import com.g2forge.enigma.backend.model.expression.TextNewline;
-import com.g2forge.enigma.backend.model.expression.TextRepeat;
-import com.g2forge.enigma.backend.model.modifier.ITextModifier;
-import com.g2forge.enigma.backend.model.modifier.TextModified;
-import com.g2forge.enigma.backend.model.modifier.TextNestedModified;
-import com.g2forge.enigma.backend.model.modifier.TextNestedModified.Element;
-import com.g2forge.enigma.backend.model.modifier.TextNestedModified.Modifier;
+import com.g2forge.enigma.backend.convert.ARenderer;
+import com.g2forge.enigma.backend.convert.IRendering;
+import com.g2forge.enigma.backend.text.model.expression.TextConcatenation;
+import com.g2forge.enigma.backend.text.model.expression.TextNewline;
+import com.g2forge.enigma.backend.text.model.expression.TextRepeat;
+import com.g2forge.enigma.backend.text.model.modifier.ITextModifier;
+import com.g2forge.enigma.backend.text.model.modifier.TextModified;
+import com.g2forge.enigma.backend.text.model.modifier.TextNestedModified;
+import com.g2forge.enigma.backend.text.model.modifier.TextNestedModified.Element;
+import com.g2forge.enigma.backend.text.model.modifier.TextNestedModified.Modifier;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 
-public class TextRenderer implements IRenderer<Object> {
+public class TextRenderer extends ARenderer<Object, ITextRenderContext> {
 	protected class TextRenderContext implements ITextRenderContext {
 		@Getter
 		protected final StringBuilder builder = new StringBuilder();
@@ -199,6 +199,7 @@ public class TextRenderer implements IRenderer<Object> {
 		return new TextRendering();
 	}
 
+	@Override
 	protected TextRenderContext createContext() {
 		return new TextRenderContext();
 	}

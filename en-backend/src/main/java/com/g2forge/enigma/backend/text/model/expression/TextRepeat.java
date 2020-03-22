@@ -1,4 +1,4 @@
-package com.g2forge.enigma.backend.model.expression;
+package com.g2forge.enigma.backend.text.model.expression;
 
 import lombok.Builder;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.g2forge.enigma.backend.model.modifier;
+package com.g2forge.enigma.backend.text.model.modifier;
 
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import com.g2forge.alexandria.java.close.ICloseable;
 import com.g2forge.alexandria.java.core.helpers.HCollector;
 import com.g2forge.alexandria.java.function.builder.IBuilder;
-import com.g2forge.enigma.backend.model.expression.ITextExpression;
+import com.g2forge.enigma.backend.text.model.expression.ITextExpression;
 
 import lombok.AccessLevel;
 import lombok.Builder;

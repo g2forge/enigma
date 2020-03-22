@@ -8,7 +8,7 @@ import com.g2forge.alexandria.java.core.helpers.HCollection;
 import com.g2forge.alexandria.java.text.TextUpdate;
 import com.g2forge.alexandria.java.text.quote.BashQuoteType;
 import com.g2forge.alexandria.java.text.quote.QuoteControl;
-import com.g2forge.enigma.backend.model.modifier.ITextModifier;
+import com.g2forge.enigma.backend.text.model.modifier.ITextModifier;
 
 import lombok.Builder;
 import lombok.Data;

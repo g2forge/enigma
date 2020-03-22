@@ -3,7 +3,7 @@ package com.g2forge.enigma.backend;
 import org.junit.Test;
 
 import com.g2forge.alexandria.test.HAssert;
-import com.g2forge.enigma.backend.convert.TextRenderer;
+import com.g2forge.enigma.backend.text.convert.TextRenderer;
 
 public class TestText {
 	@Test

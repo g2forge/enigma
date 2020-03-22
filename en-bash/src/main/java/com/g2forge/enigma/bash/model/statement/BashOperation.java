@@ -2,7 +2,7 @@ package com.g2forge.enigma.bash.model.statement;
 
 import java.util.List;
 
-import com.g2forge.enigma.backend.model.IOperator;
+import com.g2forge.enigma.backend.text.model.IOperator;
 
 import lombok.AccessLevel;
 import lombok.Builder;
