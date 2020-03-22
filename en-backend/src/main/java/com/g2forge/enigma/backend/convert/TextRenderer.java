@@ -13,11 +13,11 @@ import com.g2forge.alexandria.adt.range.IntegerRange;
 import com.g2forge.alexandria.java.core.error.UnreachableCodeError;
 import com.g2forge.alexandria.java.core.helpers.HCollection;
 import com.g2forge.alexandria.java.function.IFunction1;
-import com.g2forge.alexandria.java.function.builder.IBuilder;
 import com.g2forge.alexandria.java.text.CharSubSequence;
 import com.g2forge.alexandria.java.text.TextUpdate;
 import com.g2forge.alexandria.java.type.function.TypeSwitch1;
 import com.g2forge.enigma.backend.convert.common.IRenderer;
+import com.g2forge.enigma.backend.convert.common.IRendering;
 import com.g2forge.enigma.backend.model.expression.TextConcatenation;
 import com.g2forge.enigma.backend.model.expression.TextNewline;
 import com.g2forge.enigma.backend.model.expression.TextRepeat;
@@ -27,11 +27,57 @@ import com.g2forge.enigma.backend.model.modifier.TextNestedModified;
 import com.g2forge.enigma.backend.model.modifier.TextNestedModified.Element;
 import com.g2forge.enigma.backend.model.modifier.TextNestedModified.Modifier;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 
 public class TextRenderer implements IRenderer<Object> {
-	protected static class TextRenderContext implements ITextRenderContext, IBuilder<String> {
-		protected static final IFunction1<Object, IExplicitTextRenderable> toExplicit = new TypeSwitch1.FunctionBuilder<Object, IExplicitTextRenderable>().with(builder -> {
+	protected class TextRenderContext implements ITextRenderContext {
+		@Getter
+		protected final StringBuilder builder = new StringBuilder();
+
+		@Override
+		public String build() {
+			return getBuilder().toString();
+		}
+
+		@Override
+		public ITextRenderContext createContext() {
+			return new TextRenderContext();
+		}
+
+		@Override
+		public List<Integer> modify(final String string, final List<? extends TextUpdate<?>> updates, int unchanged) {
+			final StringBuilder builder = getBuilder();
+
+			final List<Integer> retVal = new ArrayList<>();
+			int stringOffset = 0;
+			for (TextUpdate<?> update : updates) {
+				final int updateOffset = update.getOffset() - unchanged;
+				if (updateOffset > stringOffset) builder.append(string.substring(stringOffset, updateOffset));
+				final int prelength = builder.length();
+				render(update.getFunction().apply(string.substring(updateOffset, updateOffset + update.getLength())), Object.class);
+				retVal.add(builder.length() - prelength);
+				stringOffset = updateOffset + update.getLength();
+			}
+			if (stringOffset < string.length()) builder.append(string.substring(stringOffset, string.length()));
+			return retVal;
+		}
+
+		@Override
+		public ITextRenderContext render(Object object, Type type) {
+			getRendering().toExplicit(object, type).render(this);
+			return this;
+		}
+	}
+
+	protected static class TextRendering implements IRendering<ITextRenderContext, IExplicitTextRenderable> {
+		@Getter(lazy = true, value = AccessLevel.PROTECTED)
+		private final IFunction1<Object, IExplicitTextRenderable> toExplicit = computeToExplicit();
+
+		protected IFunction1<Object, IExplicitTextRenderable> computeToExplicit() {
+			final TypeSwitch1.FunctionBuilder<Object, IExplicitTextRenderable> builder = new TypeSwitch1.FunctionBuilder<Object, IExplicitTextRenderable>();
+
+			// Primitive java objects
 			builder.add(Object.class, e -> c -> c.getBuilder().append(e));
 			builder.add(CharSequence.class, e -> c -> c.getBuilder().append(e));
 			builder.add(String.class, e -> c -> c.getBuilder().append(e));
@@ -44,6 +90,7 @@ public class TextRenderer implements IRenderer<Object> {
 			builder.add(Float.class, e -> c -> c.getBuilder().append(e.floatValue()));
 			builder.add(Double.class, e -> c -> c.getBuilder().append(e.doubleValue()));
 
+			// Text model
 			builder.add(TextNewline.class, e -> c -> c.getBuilder().append("\n"));
 			builder.add(TextConcatenation.class, e -> c -> e.getElements().forEach(x -> c.render(x, Object.class)));
 			builder.add(TextRepeat.class, e -> c -> {
@@ -113,7 +160,7 @@ public class TextRenderer implements IRenderer<Object> {
 								// Perform the update using a child renderer
 								final int unchanged = rangeUpdates.get(0).getOffset();
 								final String string = b.substring(range.getMin() + cumulative + unchanged, range.getMax() + cumulative);
-								final TextRenderContext child = new TextRenderContext();
+								final ITextRenderContext child = c.createContext();
 								final List<Integer> updateLengths = child.modify(string, rangeUpdates, unchanged);
 								b.replace(range.getMin() + cumulative + unchanged, range.getMax() + cumulative, child.build());
 
@@ -133,49 +180,32 @@ public class TextRenderer implements IRenderer<Object> {
 					}
 				}
 			});
-		}).build();
 
-		@Getter
-		protected final StringBuilder builder = new StringBuilder();
+			return builder.with(this::extend).build();
+		}
+
+		protected void extend(TypeSwitch1.FunctionBuilder<Object, IExplicitTextRenderable> builder) {}
 
 		@Override
-		public String build() {
-			return getBuilder().toString();
+		public IExplicitTextRenderable toExplicit(Object object, Type type) {
+			return getToExplicit().apply(object);
 		}
+	}
 
-		/**
-		 * @param string
-		 * @param updates
-		 * @param unchanged
-		 * @return A list of the lengths of the updates.
-		 */
-		protected List<Integer> modify(final String string, final List<? extends TextUpdate<?>> updates, int unchanged) {
-			final StringBuilder builder = getBuilder();
+	@Getter(lazy = true, value = AccessLevel.PROTECTED)
+	private static final IRendering<ITextRenderContext, IExplicitTextRenderable> rendering = computeRendering();
 
-			final List<Integer> retVal = new ArrayList<>();
-			int stringOffset = 0;
-			for (TextUpdate<?> update : updates) {
-				final int updateOffset = update.getOffset() - unchanged;
-				if (updateOffset > stringOffset) builder.append(string.substring(stringOffset, updateOffset));
-				final int prelength = builder.length();
-				render(update.getFunction().apply(string.substring(updateOffset, updateOffset + update.getLength())), Object.class);
-				retVal.add(builder.length() - prelength);
-				stringOffset = updateOffset + update.getLength();
-			}
-			if (stringOffset < string.length()) builder.append(string.substring(stringOffset, string.length()));
-			return retVal;
-		}
+	protected static IRendering<ITextRenderContext, IExplicitTextRenderable> computeRendering() {
+		return new TextRendering();
+	}
 
-		@Override
-		public ITextRenderContext render(Object object, Type type) {
-			toExplicit.apply(object).render(this);
-			return this;
-		}
+	protected TextRenderContext createContext() {
+		return new TextRenderContext();
 	}
 
 	@Override
 	public String render(Object renderable) {
-		final TextRenderContext context = new TextRenderContext();
+		final TextRenderContext context = createContext();
 		context.render(renderable, null);
 		return context.build();
 	}
