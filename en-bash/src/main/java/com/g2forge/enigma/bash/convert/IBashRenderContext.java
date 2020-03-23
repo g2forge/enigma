@@ -3,13 +3,10 @@ package com.g2forge.enigma.bash.convert;
 import com.g2forge.alexandria.java.close.ICloseable;
 import com.g2forge.alexandria.java.text.quote.BashQuoteType;
 import com.g2forge.alexandria.java.text.quote.QuoteControl;
-import com.g2forge.enigma.backend.ITextBuilder;
-import com.g2forge.enigma.backend.convert.common.IRenderContext;
+import com.g2forge.enigma.backend.convert.textual.ITextualRenderContext;
 
-public interface IBashRenderContext extends IRenderContext<IBashRenderContext>, ITextBuilder<IBashRenderContext> {
+public interface IBashRenderContext extends ITextualRenderContext<Object, IBashRenderContext> {
 	public ICloseable block();
-
-	public ICloseable indent();
 
 	public boolean isBlockMode();
 
