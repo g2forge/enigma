@@ -8,8 +8,8 @@ import com.g2forge.alexandria.java.type.function.TypeSwitch1;
 import lombok.AccessLevel;
 import lombok.Getter;
 
-public abstract class ARenderer<R, C extends IRenderContext<? super C>> implements IRenderer<R> {
-	protected static abstract class ARendering<R, C extends IRenderContext<? super C>, E extends IExplicitRenderable<C>> implements IRendering<R, C, E> {
+public abstract class ARenderer<R, C extends IRenderContext<R, ? super C>> implements IRenderer<R> {
+	protected static abstract class ARendering<R, C extends IRenderContext<R, ? super C>, E extends IExplicitRenderable<? super C>> implements IRendering<R, C, E> {
 		@Getter(lazy = true, value = AccessLevel.PROTECTED)
 		private final IFunction1<R, E> toExplicit = computeToExplicit();
 
@@ -24,6 +24,8 @@ public abstract class ARenderer<R, C extends IRenderContext<? super C>> implemen
 			return getToExplicit().apply(object);
 		}
 	}
+
+	protected abstract IRendering<R, C, ? extends IExplicitRenderable<? super C>> getRendering();
 
 	protected abstract String build(final C context);
 

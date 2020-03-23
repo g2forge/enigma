@@ -6,7 +6,7 @@ import com.g2forge.alexandria.java.function.builder.IBuilder;
 import com.g2forge.alexandria.java.text.TextUpdate;
 import com.g2forge.enigma.backend.convert.IRenderContext;
 
-public interface ITextRenderContext extends IRenderContext<ITextRenderContext>, IBuilder<String> {
+public interface ITextRenderContext extends IRenderContext<Object, ITextRenderContext>, IBuilder<String> {
 	public ITextRenderContext createContext();
 
 	public StringBuilder getBuilder();

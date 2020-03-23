@@ -16,6 +16,7 @@ import com.g2forge.alexandria.java.text.CharSubSequence;
 import com.g2forge.alexandria.java.text.TextUpdate;
 import com.g2forge.alexandria.java.type.function.TypeSwitch1;
 import com.g2forge.enigma.backend.convert.ARenderer;
+import com.g2forge.enigma.backend.convert.IExplicitRenderable;
 import com.g2forge.enigma.backend.convert.IRendering;
 import com.g2forge.enigma.backend.text.model.expression.TextConcatenation;
 import com.g2forge.enigma.backend.text.model.expression.TextNewline;
@@ -178,11 +179,7 @@ public class TextRenderer extends ARenderer<Object, ITextRenderContext> {
 	}
 
 	@Getter(lazy = true, value = AccessLevel.PROTECTED)
-	private static final IRendering<Object, ITextRenderContext, IExplicitTextRenderable> rendering = computeRendering();
-
-	protected static IRendering<Object, ITextRenderContext, IExplicitTextRenderable> computeRendering() {
-		return new TextRendering();
-	}
+	private static final IRendering<Object, ITextRenderContext, IExplicitTextRenderable> renderingStatic = new TextRendering();
 
 	@Override
 	protected String build(final ITextRenderContext context) {
@@ -192,5 +189,10 @@ public class TextRenderer extends ARenderer<Object, ITextRenderContext> {
 	@Override
 	protected ITextRenderContext createContext() {
 		return new TextRenderContext();
+	}
+
+	@Override
+	protected IRendering<Object, ITextRenderContext, ? extends IExplicitRenderable<? super ITextRenderContext>> getRendering() {
+		return getRenderingStatic();
 	}
 }

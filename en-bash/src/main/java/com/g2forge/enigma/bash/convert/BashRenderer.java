@@ -1,6 +1,5 @@
 package com.g2forge.enigma.bash.convert;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,18 +7,16 @@ import com.g2forge.alexandria.java.close.ICloseable;
 import com.g2forge.alexandria.java.core.enums.EnumException;
 import com.g2forge.alexandria.java.function.IConsumer2;
 import com.g2forge.alexandria.java.function.IFunction1;
-import com.g2forge.alexandria.java.function.builder.IBuilder;
 import com.g2forge.alexandria.java.nestedstate.StackGlobalState;
 import com.g2forge.alexandria.java.text.quote.BashQuoteType;
 import com.g2forge.alexandria.java.text.quote.QuoteControl;
 import com.g2forge.alexandria.java.type.function.TypeSwitch1;
 import com.g2forge.enigma.backend.ITextAppender;
-import com.g2forge.enigma.backend.convert.ATextualRenderer;
+import com.g2forge.enigma.backend.convert.ARenderer;
 import com.g2forge.enigma.backend.convert.IExplicitRenderable;
+import com.g2forge.enigma.backend.convert.IRendering;
+import com.g2forge.enigma.backend.convert.textual.ATextualRenderer;
 import com.g2forge.enigma.backend.text.model.IOperator;
-import com.g2forge.enigma.backend.text.model.expression.ITextExpression;
-import com.g2forge.enigma.backend.text.model.expression.TextNewline;
-import com.g2forge.enigma.backend.text.model.modifier.IndentTextModifier;
 import com.g2forge.enigma.backend.text.model.modifier.TextNestedModified;
 import com.g2forge.enigma.backend.text.model.modifier.TextNestedModified.IModifierHandle;
 import com.g2forge.enigma.bash.convert.textmodifiers.BashQuoteModifier;
@@ -56,9 +53,103 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class BashRenderer extends ATextualRenderer<Object, BashRenderer.BashRenderContext> {
-	protected static class BashRenderContext implements IBashRenderContext, IBuilder<ITextExpression> {
-		protected static final IFunction1<Object, ? extends IExplicitRenderable<? super IBashRenderContext>> toExplicit = new TypeSwitch1.FunctionBuilder<Object, IExplicitRenderable<? super IBashRenderContext>>().with(builder -> {
+public class BashRenderer extends ATextualRenderer<Object, IBashRenderContext> {
+	protected class BashRenderContext extends ARenderContext implements IBashRenderContext {
+		@Getter(AccessLevel.PROTECTED)
+		protected final StackGlobalState<Mode> state;
+
+		public BashRenderContext(Mode mode) {
+			this.state = new StackGlobalState<Mode>(mode);
+		}
+
+		@Override
+		public ICloseable block() {
+			return getState().open(Mode.Block);
+		}
+
+		@Override
+		protected IBashRenderContext getThis() {
+			return this;
+		}
+
+		@Override
+		public ICloseable indent() {
+			switch (getState().get()) {
+				case Token:
+					throw new IllegalStateException();
+				case Line:
+					return () -> {};
+				case Block:
+					return super.indent();
+				default:
+					throw new EnumException(Mode.class, getState().get());
+			}
+		}
+
+		@Override
+		public boolean isBlockMode() {
+			switch (getState().get()) {
+				case Token:
+				case Line:
+					return false;
+				case Block:
+					return true;
+				default:
+					throw new EnumException(Mode.class, getState().get());
+			}
+		}
+
+		@Override
+		public ICloseable line() {
+			return getState().open(Mode.Line);
+		}
+
+		@Override
+		public IBashRenderContext newline() {
+			switch (getState().get()) {
+				case Token:
+					throw new IllegalStateException();
+				case Line:
+					getBuilder().expression(";");
+					return this;
+				case Block:
+					return super.newline();
+				default:
+					throw new EnumException(Mode.class, getState().get());
+			}
+		}
+
+		@Override
+		public ICloseable quote() {
+			final ICloseable state = getState().open(Mode.Token);
+			final IModifierHandle modifier = getBuilder().open(new BashQuoteModifier(BashQuoteType.BashDoubleExpand));
+			return () -> {
+				modifier.close();
+				state.close();
+			};
+		}
+
+		@Override
+		public TextNestedModified.IModifierHandle raw() {
+			return getBuilder().getRoot().reactivate();
+		}
+
+		@Override
+		public ICloseable token(BashQuoteType quoteType, QuoteControl quoteControl) {
+			if (getState().get().equals(Mode.Token)) return () -> {};
+			final ICloseable state = getState().open(Mode.Token);
+			if ((quoteControl == null) || QuoteControl.Never.equals(quoteControl)) return state;
+			final IModifierHandle modifier = getBuilder().open(new BashTokenModifier(quoteType, quoteControl));
+			return () -> {
+				modifier.close();
+				state.close();
+			};
+		}
+	}
+
+	protected static class BashRendering extends ARenderer.ARendering<Object, IBashRenderContext, IExplicitRenderable<? super IBashRenderContext>> {
+		@Override
+		protected void extend(TypeSwitch1.FunctionBuilder<Object, IExplicitRenderable<? super IBashRenderContext>> builder) {
 			builder.add(IExplicitBashRenderable.class, e -> c -> e.render(c));
 			ITextAppender.addToBuilder(builder, new ITextAppender.IExplicitFactory<IBashRenderContext, IExplicitRenderable<? super IBashRenderContext>>() {
 				@Override
@@ -224,167 +315,6 @@ public class BashRenderer extends ATextualRenderer<Object, BashRenderer.BashRend
 
 			builder.add(BashTest.class, e -> c -> c.append("[[ ").render(e.getExpression(), IBashTestExpression.class).append(" ]]"));
 			builder.add(BashTestOperation.class, e -> c -> IOperator.render(e.getOperator(), c, e.getOperands(), IBashTestExpression.class));
-		}).build();
-
-		@Getter(AccessLevel.PROTECTED)
-		protected final TextNestedModified.TextNestedModifiedBuilder builder = TextNestedModified.builder();
-
-		@Getter(AccessLevel.PROTECTED)
-		protected final StackGlobalState<Mode> state;
-
-		public BashRenderContext(Mode mode) {
-			this.state = new StackGlobalState<Mode>(mode);
-		}
-
-		@Override
-		public IBashRenderContext append(boolean bool) {
-			getBuilder().expression(bool);
-			return this;
-		}
-
-		@Override
-		public IBashRenderContext append(byte number) {
-			getBuilder().expression(number);
-			return this;
-		}
-
-		@Override
-		public IBashRenderContext append(char character) {
-			getBuilder().expression(character);
-			return this;
-		}
-
-		@Override
-		public IBashRenderContext append(CharSequence characters) {
-			getBuilder().expression(characters);
-			return this;
-		}
-
-		@Override
-		public IBashRenderContext append(double number) {
-			getBuilder().expression(number);
-			return this;
-		}
-
-		@Override
-		public IBashRenderContext append(float number) {
-			getBuilder().expression(number);
-			return this;
-		}
-
-		@Override
-		public IBashRenderContext append(int number) {
-			getBuilder().expression(number);
-			return this;
-		}
-
-		@Override
-		public IBashRenderContext append(long number) {
-			getBuilder().expression(number);
-			return this;
-		}
-
-		@Override
-		public IBashRenderContext append(Object object) {
-			getBuilder().expression(object);
-			return this;
-		}
-
-		@Override
-		public IBashRenderContext append(short number) {
-			getBuilder().expression(number);
-			return this;
-		}
-
-		@Override
-		public ICloseable block() {
-			return getState().open(Mode.Block);
-		}
-
-		@Override
-		public ITextExpression build() {
-			return getBuilder().build();
-		}
-
-		@Override
-		public ICloseable indent() {
-			switch (getState().get()) {
-				case Token:
-					throw new IllegalStateException();
-				case Line:
-					return () -> {};
-				case Block:
-					return getBuilder().open(new IndentTextModifier(true, "\t"));
-				default:
-					throw new EnumException(Mode.class, getState().get());
-			}
-		}
-
-		@Override
-		public boolean isBlockMode() {
-			switch (getState().get()) {
-				case Token:
-				case Line:
-					return false;
-				case Block:
-					return true;
-				default:
-					throw new EnumException(Mode.class, getState().get());
-			}
-		}
-
-		@Override
-		public ICloseable line() {
-			return getState().open(Mode.Line);
-		}
-
-		@Override
-		public IBashRenderContext newline() {
-			switch (getState().get()) {
-				case Token:
-					throw new IllegalStateException();
-				case Line:
-					getBuilder().expression(";");
-				case Block:
-					getBuilder().expression(TextNewline.create());
-					break;
-				default:
-					throw new EnumException(Mode.class, getState().get());
-			}
-			return this;
-		}
-
-		@Override
-		public ICloseable quote() {
-			final ICloseable state = getState().open(Mode.Token);
-			final IModifierHandle modifier = getBuilder().open(new BashQuoteModifier(BashQuoteType.BashDoubleExpand));
-			return () -> {
-				modifier.close();
-				state.close();
-			};
-		}
-
-		@Override
-		public TextNestedModified.IModifierHandle raw() {
-			return getBuilder().getRoot().reactivate();
-		}
-
-		@Override
-		public IBashRenderContext render(Object object, Type type) {
-			toExplicit.apply(object).render(this);
-			return this;
-		}
-
-		@Override
-		public ICloseable token(BashQuoteType quoteType, QuoteControl quoteControl) {
-			if (getState().get().equals(Mode.Token)) return () -> {};
-			final ICloseable state = getState().open(Mode.Token);
-			if ((quoteControl == null) || QuoteControl.Never.equals(quoteControl)) return state;
-			final IModifierHandle modifier = getBuilder().open(new BashTokenModifier(quoteType, quoteControl));
-			return () -> {
-				modifier.close();
-				state.close();
-			};
 		}
 	}
 
@@ -394,8 +324,15 @@ public class BashRenderer extends ATextualRenderer<Object, BashRenderer.BashRend
 		Token;
 	}
 
+	@Getter(lazy = true, value = AccessLevel.PROTECTED)
+	private static final IRendering<Object, IBashRenderContext, IExplicitRenderable<? super IBashRenderContext>> renderingStatic = new BashRendering();
+
 	public static List<String> toTokens(BashCommand command) {
-		final BashRenderer renderer = new BashRenderer(Mode.Token);
+		return toTokens(BashRenderer::new, command);
+	}
+
+	public static List<String> toTokens(IFunction1<? super Mode, ? extends BashRenderer> constructor, BashCommand command) {
+		final BashRenderer renderer = constructor.apply(Mode.Token);
 		final List<String> retVal = new ArrayList<>();
 		for (Object token : command.getTokens()) {
 			retVal.add(renderer.render(token));
@@ -412,5 +349,10 @@ public class BashRenderer extends ATextualRenderer<Object, BashRenderer.BashRend
 	@Override
 	protected BashRenderContext createContext() {
 		return new BashRenderContext(getMode());
+	}
+
+	@Override
+	protected IRendering<Object, IBashRenderContext, ? extends IExplicitRenderable<? super IBashRenderContext>> getRendering() {
+		return getRenderingStatic();
 	}
 }
