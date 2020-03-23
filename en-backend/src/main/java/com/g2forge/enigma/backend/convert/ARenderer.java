@@ -25,11 +25,11 @@ public abstract class ARenderer<R, C extends IRenderContext<R, ? super C>> imple
 		}
 	}
 
-	protected abstract IRendering<R, C, ? extends IExplicitRenderable<? super C>> getRendering();
-
 	protected abstract String build(final C context);
 
 	protected abstract C createContext();
+
+	protected abstract IRendering<? super R, ? extends C, ? extends IExplicitRenderable<? super C>> getRendering();
 
 	@Override
 	public String render(R renderable) {

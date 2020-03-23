@@ -352,7 +352,7 @@ public class BashRenderer extends ATextualRenderer<Object, IBashRenderContext> {
 	}
 
 	@Override
-	protected IRendering<Object, IBashRenderContext, ? extends IExplicitRenderable<? super IBashRenderContext>> getRendering() {
+	protected IRendering<? super Object, ? extends IBashRenderContext, ? extends IExplicitRenderable<? super IBashRenderContext>> getRendering() {
 		return getRenderingStatic();
 	}
 }
