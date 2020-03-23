@@ -12,7 +12,6 @@ import com.g2forge.alexandria.adt.range.IRange;
 import com.g2forge.alexandria.adt.range.IntegerRange;
 import com.g2forge.alexandria.java.core.error.UnreachableCodeError;
 import com.g2forge.alexandria.java.core.helpers.HCollection;
-import com.g2forge.alexandria.java.function.IFunction1;
 import com.g2forge.alexandria.java.text.CharSubSequence;
 import com.g2forge.alexandria.java.text.TextUpdate;
 import com.g2forge.alexandria.java.type.function.TypeSwitch1;
@@ -70,13 +69,8 @@ public class TextRenderer extends ARenderer<Object, ITextRenderContext> {
 		}
 	}
 
-	protected static class TextRendering implements IRendering<ITextRenderContext, IExplicitTextRenderable> {
-		@Getter(lazy = true, value = AccessLevel.PROTECTED)
-		private final IFunction1<Object, IExplicitTextRenderable> toExplicit = computeToExplicit();
-
-		protected IFunction1<Object, IExplicitTextRenderable> computeToExplicit() {
-			final TypeSwitch1.FunctionBuilder<Object, IExplicitTextRenderable> builder = new TypeSwitch1.FunctionBuilder<Object, IExplicitTextRenderable>();
-
+	protected static class TextRendering extends ARenderer.ARendering<Object, ITextRenderContext, IExplicitTextRenderable> {
+		protected void extend(TypeSwitch1.FunctionBuilder<Object, IExplicitTextRenderable> builder) {
 			// Primitive java objects
 			builder.add(Object.class, e -> c -> c.getBuilder().append(e));
 			builder.add(CharSequence.class, e -> c -> c.getBuilder().append(e));
@@ -180,34 +174,23 @@ public class TextRenderer extends ARenderer<Object, ITextRenderContext> {
 					}
 				}
 			});
-
-			return builder.with(this::extend).build();
-		}
-
-		protected void extend(TypeSwitch1.FunctionBuilder<Object, IExplicitTextRenderable> builder) {}
-
-		@Override
-		public IExplicitTextRenderable toExplicit(Object object, Type type) {
-			return getToExplicit().apply(object);
 		}
 	}
 
 	@Getter(lazy = true, value = AccessLevel.PROTECTED)
-	private static final IRendering<ITextRenderContext, IExplicitTextRenderable> rendering = computeRendering();
+	private static final IRendering<Object, ITextRenderContext, IExplicitTextRenderable> rendering = computeRendering();
 
-	protected static IRendering<ITextRenderContext, IExplicitTextRenderable> computeRendering() {
+	protected static IRendering<Object, ITextRenderContext, IExplicitTextRenderable> computeRendering() {
 		return new TextRendering();
 	}
 
 	@Override
-	protected TextRenderContext createContext() {
-		return new TextRenderContext();
+	protected String build(final ITextRenderContext context) {
+		return context.build();
 	}
 
 	@Override
-	public String render(Object renderable) {
-		final TextRenderContext context = createContext();
-		context.render(renderable, null);
-		return context.build();
+	protected ITextRenderContext createContext() {
+		return new TextRenderContext();
 	}
 }
