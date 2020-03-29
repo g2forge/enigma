@@ -13,6 +13,7 @@ import com.g2forge.alexandria.java.function.IConsumer2;
 import com.g2forge.alexandria.java.function.IFunction1;
 import com.g2forge.alexandria.java.function.IThrowFunction1;
 import com.g2forge.alexandria.java.reflect.JavaScope;
+import com.g2forge.alexandria.java.text.escape.WebEscapeType;
 import com.g2forge.alexandria.java.type.function.TypeSwitch1;
 import com.g2forge.alexandria.reflection.object.HReflection;
 import com.g2forge.enigma.web.css.convert.CSSRenderer;
@@ -38,7 +39,7 @@ public class HTMLRenderer {
 			builder.add(ICSSRenderable.class, e -> context -> context.getBuilder().append(css.render(e)));
 			builder.add(IReflectiveHTMLElement.class, e -> new ReflectiveExplicitHTMLElement(e));
 
-			builder.add(String.class, e -> context -> context.getBuilder().append(e));
+			builder.add(String.class, e -> context -> context.getBuilder().append(WebEscapeType.XML.getEscaper().escape(e)));
 			builder.add(Boolean.class, e -> context -> context.getBuilder().append(e));
 			builder.add(Integer.class, e -> context -> context.getBuilder().append(e));
 			builder.add(Long.class, e -> context -> context.getBuilder().append(e));
