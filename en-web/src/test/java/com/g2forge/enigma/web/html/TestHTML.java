@@ -35,6 +35,11 @@ public class TestHTML {
 	}
 
 	@Test
+	public void escape() {
+		Assert.assertEquals("<span id=\"a&amp;b\">&quot;</span>", renderer.render(Span.builder().id("a&b").content("\"").build()));
+	}
+
+	@Test
 	public void image() {
 		Assert.assertEquals("<img src=\"http://www.example.com/picture.jpg\"/>", renderer.render(Image.builder().src("http://www.example.com/picture.jpg").build()));
 	}
