@@ -8,9 +8,19 @@ import com.g2forge.enigma.bash.convert.BashRenderer;
 import com.g2forge.enigma.bash.model.ATestBashRendering;
 import com.g2forge.enigma.bash.model.BashScript;
 import com.g2forge.enigma.bash.model.expression.BashCommandSubstitution;
-import com.g2forge.enigma.bash.model.statement.BashCommand;
+import com.g2forge.enigma.bash.model.expression.BashString;
 
 public class TestBashCommand extends ATestBashRendering {
+	@Test
+	public void bashEchoFoo() {
+		HAssert.assertEquals(HCollection.asList("bash", "-c", "echo foo"), BashRenderer.toTokens(new BashCommand("bash", "-c", new BashCommand("echo", "foo"))));
+	}
+
+	@Test
+	public void bashEchoOpchar() {
+		HAssert.assertEquals(HCollection.asList("bash", "-c", "echo \"&\""), BashRenderer.toTokens(new BashCommand("bash", "-c", new BashCommand("echo", new BashString("&")))));
+	}
+
 	@Test
 	public void line() {
 		HAssert.assertEquals("echo \"Hello, World!\"", toLine(new BashCommand("echo", "Hello, World!")));
