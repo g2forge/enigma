@@ -3,26 +3,22 @@ package com.g2forge.enigma.bash.model.statement;
 import org.junit.Test;
 
 import com.g2forge.alexandria.test.HAssert;
-import com.g2forge.enigma.bash.convert.BashRenderer;
+import com.g2forge.enigma.bash.model.ATestBashRendering;
 import com.g2forge.enigma.bash.model.BashScript;
-import com.g2forge.enigma.bash.model.statement.BashAssignment;
 
-public class TestBashAssignment {
+public class TestBashAssignment extends ATestBashRendering {
 	@Test
 	public void line() {
-		final String actual = new BashRenderer(BashRenderer.Mode.Line).render(new BashAssignment("A", "a a"));
-		HAssert.assertEquals("A=\"a a\"", actual);
+		HAssert.assertEquals("A=\"a a\"", toLine(new BashAssignment("A", "a a")));
 	}
 
 	@Test
 	public void simple() {
-		final String actual = new BashRenderer().render(new BashScript(new BashAssignment("A", "a")));
-		HAssert.assertEquals("#!/bin/bash\nA=a\n", actual);
+		HAssert.assertEquals("#!/bin/bash\nA=a\n", toBlock(new BashScript(new BashAssignment("A", "a"))));
 	}
 
 	@Test
 	public void space() {
-		final String actual = new BashRenderer().render(new BashScript(new BashAssignment("A", "a a")));
-		HAssert.assertEquals("#!/bin/bash\nA=\"a a\"\n", actual);
+		HAssert.assertEquals("#!/bin/bash\nA=\"a a\"\n", toBlock(new BashScript(new BashAssignment("A", "a a"))));
 	}
 }

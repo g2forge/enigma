@@ -3,13 +3,11 @@ package com.g2forge.enigma.bash.model.test;
 import org.junit.Test;
 
 import com.g2forge.alexandria.test.HAssert;
-import com.g2forge.enigma.bash.convert.BashRenderer;
+import com.g2forge.enigma.bash.model.ATestBashRendering;
 import com.g2forge.enigma.bash.model.statement.BashCommand;
 import com.g2forge.enigma.bash.model.statement.BashIf;
-import com.g2forge.enigma.bash.model.test.BashTest;
-import com.g2forge.enigma.bash.model.test.BashTestOperation;
 
-public class TestBashTest {
+public class TestBashTest extends ATestBashRendering {
 	@Test
 	public void and() {
 		test("[[ 0 -ne 1 && 1 -ge -1 ]]", new BashTest(BashTestOperation.Operator.LogicalAnd.builder().operand(BashTestOperation.Operator.NumericNotEqual.builder().operand(0).operand(1).build()).operand(BashTestOperation.Operator.NumericGreaterThanOrEqual.builder().operand(1).operand(-1).build()).build()));
@@ -31,6 +29,6 @@ public class TestBashTest {
 	}
 
 	protected void test(final String expected, final Object actual) {
-		HAssert.assertEquals("if " + expected + "; then true; fi", new BashRenderer(BashRenderer.Mode.Line).render(new BashIf(actual, new BashCommand("true"))));
+		HAssert.assertEquals("if " + expected + "; then true; fi", toLine(new BashIf(actual, new BashCommand("true"))));
 	}
 }

@@ -163,11 +163,13 @@ public class BashRenderer extends ATextualRenderer<Object, IBashRenderContext> {
 			});
 
 			builder.add(BashCommand.class, e -> c -> {
-				boolean first = true;
-				for (Object object : e.getTokens()) {
-					if (first) first = false;
-					else c.append(" ");
-					c.render(object, null);
+				try (final ICloseable line = c.line()) {
+					boolean first = true;
+					for (Object object : e.getTokens()) {
+						if (first) first = false;
+						else c.append(" ");
+						c.render(object, null);
+					}
 				}
 				if (c.isBlockMode()) c.newline();
 			});
