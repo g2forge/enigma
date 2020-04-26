@@ -26,7 +26,7 @@ jobs:
         path: alexandria
     - name: Build Alexandria
       working-directory: ./alexandria
-      run: mvn -B install --file pom.xml -P release
+      run: mvn -B install --file pom.xml -P release -DskipTests -Dgpg.skip
     - name: Checkout
       uses: actions/checkout@v2
       with:
