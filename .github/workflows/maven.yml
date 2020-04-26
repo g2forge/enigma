@@ -33,4 +33,4 @@ jobs:
         path: enigma
     - name: Build with Maven
       working-directory: ./enigma
-      run: mvn -B package --file pom.xml -P release
+      run: mvn -B package --file pom.xml -P release -Dgpg.skip
