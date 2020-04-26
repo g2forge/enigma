@@ -22,15 +22,15 @@ jobs:
     - name: Checkout Alexandria
       uses: actions/checkout@v2
       with:
-        name: g2forge/alexandria
+        repository: g2forge/alexandria
         path: alexandria
     - name: Build Alexandria
       working-directory: ./alexandria
-      run: pwd -P && ls -al && mvn -B install --file pom.xml -P release
+      run: mvn -B install --file pom.xml -P release
     - name: Checkout
       uses: actions/checkout@v2
       with:
         path: enigma
     - name: Build with Maven
       working-directory: ./enigma
-      run: pwd -P && ls -al && mvn -B package --file pom.xml -P release
+      run: mvn -B package --file pom.xml -P release
