@@ -1,4 +1,4 @@
-package com.g2forge.enigma.diagram.sequence;
+package com.g2forge.enigma.diagram.plantuml.model.sequence;
 
 import com.g2forge.alexandria.java.adt.name.IStringNamed;
 

@@ -1,4 +1,4 @@
-package com.g2forge.enigma.diagram;
+package com.g2forge.enigma.diagram.plantuml.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

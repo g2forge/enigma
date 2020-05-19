@@ -1,20 +1,18 @@
-package com.g2forge.enigma.diagram.component;
+package com.g2forge.enigma.diagram.plantuml.model.component;
 
 import java.util.List;
 
-import com.g2forge.enigma.diagram.IPUMLDiagram;
+import com.g2forge.enigma.diagram.plantuml.model.IPUMLDiagram;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.Singular;
 
 @Data
-@Builder
-@AllArgsConstructor
+@Builder(toBuilder = true)
+@RequiredArgsConstructor
 public class PUMLComponentDiagram implements IPUMLDiagram {
-	protected static final String TEMPLATE = "<components:{c|<c><\\n>}><links:{l|<l><\\n>}>";
-
 	@Singular
 	protected final List<PUMLComponent> components;
 

@@ -1,8 +1,8 @@
-package com.g2forge.enigma.diagram.klass;
+package com.g2forge.enigma.diagram.plantuml.model.klass;
 
 import java.util.List;
 
-import com.g2forge.enigma.diagram.IPUMLDiagram;
+import com.g2forge.enigma.diagram.plantuml.model.IPUMLDiagram;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

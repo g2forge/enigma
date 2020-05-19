@@ -1,4 +1,4 @@
-package com.g2forge.enigma.diagram;
+package com.g2forge.enigma.diagram.plantuml.model;
 
 import java.io.BufferedOutputStream;
 import java.io.FileNotFoundException;
