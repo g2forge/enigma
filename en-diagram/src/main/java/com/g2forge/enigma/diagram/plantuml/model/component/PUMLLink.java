@@ -15,6 +15,14 @@ public class PUMLLink {
 		Hidden;
 	}
 
+	public static PUMLLinkBuilder builder() {
+		return new PUMLLinkBuilder();
+	}
+
+	public static PUMLLinkBuilder builder(String left, String right) {
+		return builder().left(left).right(right);
+	}
+
 	protected final String left;
 
 	protected final boolean vertical;

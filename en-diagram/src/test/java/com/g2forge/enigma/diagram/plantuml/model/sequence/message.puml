@@ -1,0 +1,4 @@
+participant alice
+participant bob
+
+alice -> bob : message
