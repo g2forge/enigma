@@ -10,7 +10,5 @@ import lombok.Data;
 @Builder
 @AllArgsConstructor
 public class PUMLParticipant implements IStringNamed {
-	protected static final String TEMPLATE = "participant <name>";
-
 	protected final String name;
 }

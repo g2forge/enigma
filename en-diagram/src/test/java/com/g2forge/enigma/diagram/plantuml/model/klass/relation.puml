@@ -1,0 +1,8 @@
+class Car {
+	Wheel[] wheels
+}
+class Tesla
+class Wheel
+
+Car <|-- Tesla
+Car *- "0..n" Wheel : wheels >

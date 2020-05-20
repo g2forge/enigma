@@ -14,15 +14,22 @@ import lombok.Singular;
 class PUMLRelationship {
 	@Getter
 	@RequiredArgsConstructor
-	protected enum RelationshipArrowStyle {
-		Normal("<", ">");
+	protected enum ArrowStyle {
+		Normal("<", ">"),
+		Extension("<|", "|>"),
+		Composition("*"),
+		Aggregation("o");
 
 		protected final String back, forward;
+
+		private ArrowStyle(String head) {
+			this(head, head);
+		}
 	}
 
 	@Getter
 	@RequiredArgsConstructor
-	protected enum RelationshipLineStyle {
+	protected enum LineStyle {
 		Dash('-'),
 		Dot('.');
 
@@ -42,10 +49,10 @@ class PUMLRelationship {
 	protected final String right;
 
 	@Builder.Default
-	protected final RelationshipLineStyle line = RelationshipLineStyle.Dash;
+	protected final LineStyle line = LineStyle.Dash;
 
 	@Builder.Default
-	protected final RelationshipArrowStyle arrow = RelationshipArrowStyle.Normal;
+	protected final ArrowStyle arrow = ArrowStyle.Normal;
 
 	protected final boolean two;
 
@@ -55,4 +62,8 @@ class PUMLRelationship {
 	protected final Collection<String> modifiers;
 
 	protected final String label;
+
+	protected final String leftLabel;
+
+	protected final String rightLabel;
 }

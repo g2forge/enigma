@@ -13,8 +13,6 @@ import lombok.Singular;
 @Builder
 @AllArgsConstructor
 public class PUMLSequenceDiagram implements IPUMLDiagram {
-	protected static final String TEMPLATE = "hide footbox<\\n><participants:{p|<p><\\n>}><events:{e|<e><\\n>}>";
-
 	@Singular
 	protected final List<PUMLParticipant> participants;
 

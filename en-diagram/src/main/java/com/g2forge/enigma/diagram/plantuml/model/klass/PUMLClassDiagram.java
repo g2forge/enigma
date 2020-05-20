@@ -4,14 +4,14 @@ import java.util.List;
 
 import com.g2forge.enigma.diagram.plantuml.model.IPUMLDiagram;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.Singular;
 
 @Data
-@Builder
-@AllArgsConstructor
+@Builder(toBuilder = true)
+@RequiredArgsConstructor
 public class PUMLClassDiagram implements IPUMLDiagram {
 	protected static final String TEMPLATE = "<uclasses:{c|<c><\\n>}><relations:{r|<r><\\n>}>";
 

@@ -2,37 +2,47 @@ package com.g2forge.enigma.diagram.plantuml.model.klass;
 
 import java.util.List;
 
-import lombok.AllArgsConstructor;
+import com.g2forge.alexandria.java.function.builder.IBuilder;
+
 import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.Singular;
 
 @Data
-@Builder
-@AllArgsConstructor
+@Builder(toBuilder = true)
+@RequiredArgsConstructor
 public class PUMLClass {
 	public enum MetaType {
 		Class,
-		Enum;
-
-		protected static final String TEMPLATE = "<name;format=\"lower\">";
+		Enum
 	}
 
-	protected static final String TEMPLATE = "<metaType> <name><if(stereotypes)> \\<\\< <stereotypes;separator=\" \"> >\\><endif><if(members)> {<\\n><members:{m|<\\t><m><\\n>}>}<endif>";
+	public static class PUMLClassBuilder implements IBuilder<PUMLClass> {
+		public PUMLClassBuilder stereotypeNamed(String name) {
+			return stereotype(new PUMLNamedStereotype(name));
+		}
+		
+		public PUMLClassBuilder stereotypeSpot(char letter, String color) {
+			return stereotype(new PUMLSpotStereotype(letter, color));
+		}
+	}
 
-	public static final String SPOT_C_COLOR = "#ADD1B2";
+	public static PUMLClassBuilder builder() {
+		return new PUMLClassBuilder();
+	}
 
-	public static String createSpotStereotype(String letter, String color) {
-		return "(" + letter + "," + color + ")";
+	public static PUMLClassBuilder builder(String name) {
+		return builder().name(name);
 	}
 
 	@Builder.Default
 	protected final MetaType metaType = MetaType.Class;
 
-	protected final PUMLClassName name;
+	protected final String name;
 
 	@Singular
-	protected final List<String> stereotypes;
+	protected final List<IPUMLStereotype> stereotypes;
 
 	@Singular
 	protected final List<String> members;

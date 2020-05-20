@@ -1,8 +1,11 @@
 package com.g2forge.enigma.diagram.plantuml.convert;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
+import com.g2forge.alexandria.java.close.ICloseable;
+import com.g2forge.alexandria.java.core.enums.EnumException;
 import com.g2forge.alexandria.java.function.IConsumer2;
 import com.g2forge.alexandria.java.function.IFunction1;
 import com.g2forge.alexandria.java.type.function.TypeSwitch1;
@@ -11,9 +14,16 @@ import com.g2forge.enigma.backend.convert.ARenderer;
 import com.g2forge.enigma.backend.convert.IExplicitRenderable;
 import com.g2forge.enigma.backend.convert.IRendering;
 import com.g2forge.enigma.backend.convert.textual.ATextualRenderer;
+import com.g2forge.enigma.diagram.plantuml.convert.PUMLRelationship.PUMLRelationshipBuilder;
 import com.g2forge.enigma.diagram.plantuml.model.component.PUMLComponent;
 import com.g2forge.enigma.diagram.plantuml.model.component.PUMLComponentDiagram;
 import com.g2forge.enigma.diagram.plantuml.model.component.PUMLLink;
+import com.g2forge.enigma.diagram.plantuml.model.klass.IPUMLStereotype;
+import com.g2forge.enigma.diagram.plantuml.model.klass.PUMLClass;
+import com.g2forge.enigma.diagram.plantuml.model.klass.PUMLClassDiagram;
+import com.g2forge.enigma.diagram.plantuml.model.klass.PUMLNamedStereotype;
+import com.g2forge.enigma.diagram.plantuml.model.klass.PUMLRelation;
+import com.g2forge.enigma.diagram.plantuml.model.klass.PUMLSpotStereotype;
 import com.g2forge.enigma.diagram.plantuml.model.sequence.IPUMLEvent;
 import com.g2forge.enigma.diagram.plantuml.model.sequence.PUMLMessage;
 import com.g2forge.enigma.diagram.plantuml.model.sequence.PUMLParticipant;
@@ -36,6 +46,10 @@ public class PUMLRenderer extends ATextualRenderer<Object, IPUMLRenderContext> {
 	protected static class PUMLRendering extends ARenderer.ARendering<Object, IPUMLRenderContext, IExplicitRenderable<? super IPUMLRenderContext>> {
 		protected static String mangle(final String name) {
 			return name.replaceAll("[^a-zA-Z0-9_]", "_");
+		}
+
+		protected static boolean isQuoteRequired(final String name) {
+			return !name.matches("[a-zA-Z_][0-9a-zA-Z_]*");
 		}
 
 		@Override
@@ -66,6 +80,7 @@ public class PUMLRenderer extends ATextualRenderer<Object, IPUMLRenderContext> {
 			});
 			builder.add(PUMLRelationship.class, e -> c -> {
 				c.append(mangle(e.getLeft())).append(' ');
+				if (e.getLeftLabel() != null) c.append(" \"").append(e.getLeftLabel()).append('"');
 
 				if (e.isBack()) {
 					c.append(e.getArrow().getBack());
@@ -88,6 +103,7 @@ public class PUMLRenderer extends ATextualRenderer<Object, IPUMLRenderContext> {
 					c.append(e.getArrow().getForward());
 				} else c.append(e.getLine().getCharacter());
 
+				if (e.getRightLabel() != null) c.append(" \"").append(e.getRightLabel()).append('"');
 				c.append(' ').append(mangle(e.getRight()));
 
 				if (e.getLabel() != null) {
@@ -117,6 +133,84 @@ public class PUMLRenderer extends ATextualRenderer<Object, IPUMLRenderContext> {
 				if (!name.equals(mangled)) c.append(" as ").append(mangled);
 			});
 			builder.add(PUMLMessage.class, e -> c -> c.render(PUMLRelationship.builder(e.getSource(), e.getDestination()).label(e.getLabel()).build(), PUMLRelationship.class));
+
+			builder.add(PUMLClassDiagram.class, e -> c -> c.render(new PUMLDiagram<>(e.getUclasses(), e.getRelations(), PUMLClass.class, PUMLRelation.class), PUMLDiagram.class));
+			builder.add(PUMLClass.class, e -> c -> {
+				switch (e.getMetaType()) {
+					case Class:
+					case Enum:
+						c.append(e.getMetaType().name().toLowerCase()).append(' ');
+						break;
+					default:
+						throw new EnumException(PUMLClass.MetaType.class, e.getMetaType());
+				}
+
+				final String name = e.getName();
+				final boolean quote = isQuoteRequired(name);
+				if (quote) c.append('\"');
+				c.append(name);
+				if (quote) c.append('\"');
+
+				final List<IPUMLStereotype> stereotypes = e.getStereotypes();
+				if ((stereotypes != null) && !stereotypes.isEmpty()) {
+					c.append(" <<");
+					for (IPUMLStereotype stereotype : stereotypes) {
+						c.append(' ').render(stereotype, IPUMLStereotype.class);
+					}
+					c.append(" >>");
+				}
+
+				final List<String> members = e.getMembers();
+				if ((members != null) && !members.isEmpty()) {
+					c.append(" {").newline();
+					try (final ICloseable indent = c.indent()) {
+						for (String member : members) {
+							c.append(member).newline();
+						}
+					}
+					c.append('}');
+				}
+			});
+			builder.add(PUMLNamedStereotype.class, e -> c -> c.append(e.getName()));
+			builder.add(PUMLSpotStereotype.class, e -> c -> c.append('(').append(e.getLetter()).append(',').append(e.getColor()).append(')'));
+			builder.add(PUMLRelation.class, e -> c -> {
+				final PUMLRelationship.PUMLRelationshipBuilder b = PUMLRelationship.builder(e.getLeft(), e.getRight());
+				b.leftLabel(e.getLeftLabel()).rightLabel(e.getRightLabel());
+				b.back(e.isBack()).two(e.isVertical());
+				switch (e.getType()) {
+					case Arrow:
+						b.arrow(PUMLRelationship.ArrowStyle.Normal);
+						break;
+					case Extension:
+						b.arrow(PUMLRelationship.ArrowStyle.Extension);
+						break;
+					case Composition:
+						b.arrow(PUMLRelationship.ArrowStyle.Composition);
+						break;
+					case Aggregation:
+						b.arrow(PUMLRelationship.ArrowStyle.Aggregation);
+						break;
+					default:
+						throw new EnumException(PUMLRelation.Type.class, e.getType());
+				}
+
+				if (e.getLabel() != null) {
+					final String suffix;
+					switch (e.getArrow()) {
+						case Left:
+							suffix = " <";
+							break;
+						case Right:
+							suffix = " >";
+							break;
+						default:
+							throw new EnumException(PUMLRelation.Direction.class, e.getArrow());
+					}
+					b.label(e.getLabel() + suffix);
+				}
+
+				c.render(b.build(), PUMLRelationship.class);
+			});
 		}
 	}
 

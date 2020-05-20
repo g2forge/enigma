@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import com.g2forge.enigma.diagram.plantuml.model.style.PUMLControl;
 import com.g2forge.enigma.stringtemplate.EmbeddedTemplateRenderer;
 
 import lombok.AllArgsConstructor;
