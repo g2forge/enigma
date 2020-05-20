@@ -3,6 +3,7 @@ package com.g2forge.enigma.diagram.plantuml.model.klass;
 import java.util.List;
 
 import com.g2forge.alexandria.java.function.builder.IBuilder;
+import com.g2forge.enigma.diagram.plantuml.model.style.IPUMLColor;
 
 import lombok.Builder;
 import lombok.Data;
@@ -20,11 +21,11 @@ public class PUMLClass {
 
 	public static class PUMLClassBuilder implements IBuilder<PUMLClass> {
 		public PUMLClassBuilder stereotypeNamed(String name) {
-			return stereotype(new PUMLNamedStereotype(name));
+			return stereotype(new NamedPUMLStereotype(name));
 		}
 		
-		public PUMLClassBuilder stereotypeSpot(char letter, String color) {
-			return stereotype(new PUMLSpotStereotype(letter, color));
+		public PUMLClassBuilder stereotypeSpot(char letter, IPUMLColor color) {
+			return stereotype(new SpotPUMLStereotype(letter, color));
 		}
 	}
 

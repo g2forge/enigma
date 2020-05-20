@@ -1,9 +1,7 @@
 package com.g2forge.enigma.diagram.plantuml.model.klass;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Data
@@ -15,8 +13,6 @@ public class PUMLRelation {
 		Right
 	}
 
-	@AllArgsConstructor
-	@Getter
 	public enum Type {
 		Arrow,
 		Extension,
@@ -39,6 +35,6 @@ public class PUMLRelation {
 	protected final Direction arrow;
 
 	protected final boolean vertical;
-	
+
 	protected final boolean back;
 }

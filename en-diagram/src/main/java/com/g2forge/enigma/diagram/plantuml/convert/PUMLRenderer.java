@@ -1,5 +1,12 @@
 package com.g2forge.enigma.diagram.plantuml.convert;
 
+import java.io.BufferedOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,24 +21,32 @@ import com.g2forge.enigma.backend.convert.ARenderer;
 import com.g2forge.enigma.backend.convert.IExplicitRenderable;
 import com.g2forge.enigma.backend.convert.IRendering;
 import com.g2forge.enigma.backend.convert.textual.ATextualRenderer;
-import com.g2forge.enigma.diagram.plantuml.convert.PUMLRelationship.PUMLRelationshipBuilder;
+import com.g2forge.enigma.diagram.plantuml.model.IPUMLDiagram;
+import com.g2forge.enigma.diagram.plantuml.model.PUMLContent;
 import com.g2forge.enigma.diagram.plantuml.model.component.PUMLComponent;
 import com.g2forge.enigma.diagram.plantuml.model.component.PUMLComponentDiagram;
 import com.g2forge.enigma.diagram.plantuml.model.component.PUMLLink;
 import com.g2forge.enigma.diagram.plantuml.model.klass.IPUMLStereotype;
+import com.g2forge.enigma.diagram.plantuml.model.klass.NamedPUMLStereotype;
 import com.g2forge.enigma.diagram.plantuml.model.klass.PUMLClass;
 import com.g2forge.enigma.diagram.plantuml.model.klass.PUMLClassDiagram;
-import com.g2forge.enigma.diagram.plantuml.model.klass.PUMLNamedStereotype;
 import com.g2forge.enigma.diagram.plantuml.model.klass.PUMLRelation;
-import com.g2forge.enigma.diagram.plantuml.model.klass.PUMLSpotStereotype;
+import com.g2forge.enigma.diagram.plantuml.model.klass.SpotPUMLStereotype;
 import com.g2forge.enigma.diagram.plantuml.model.sequence.IPUMLEvent;
 import com.g2forge.enigma.diagram.plantuml.model.sequence.PUMLMessage;
 import com.g2forge.enigma.diagram.plantuml.model.sequence.PUMLParticipant;
 import com.g2forge.enigma.diagram.plantuml.model.sequence.PUMLSequenceDiagram;
+import com.g2forge.enigma.diagram.plantuml.model.style.IPUMLColor;
+import com.g2forge.enigma.diagram.plantuml.model.style.PUMLControl;
+import com.g2forge.enigma.diagram.plantuml.model.style.StringPUMLColor;
+import com.g2forge.enigma.diagram.plantuml.model.style.TransparentPUMLColor;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.sourceforge.plantuml.FileFormat;
+import net.sourceforge.plantuml.FileFormatOption;
+import net.sourceforge.plantuml.SourceStringReader;
 
 @Getter
 @RequiredArgsConstructor
@@ -44,12 +59,12 @@ public class PUMLRenderer extends ATextualRenderer<Object, IPUMLRenderContext> {
 	}
 
 	protected static class PUMLRendering extends ARenderer.ARendering<Object, IPUMLRenderContext, IExplicitRenderable<? super IPUMLRenderContext>> {
-		protected static String mangle(final String name) {
-			return name.replaceAll("[^a-zA-Z0-9_]", "_");
-		}
-
 		protected static boolean isQuoteRequired(final String name) {
 			return !name.matches("[a-zA-Z_][0-9a-zA-Z_]*");
+		}
+
+		protected static String mangle(final String name) {
+			return name.replaceAll("[^a-zA-Z0-9_]", "_");
 		}
 
 		@Override
@@ -62,6 +77,8 @@ public class PUMLRenderer extends ATextualRenderer<Object, IPUMLRenderContext> {
 				}
 			});
 
+			builder.add(StringPUMLColor.class, e -> c -> c.append(e.getColor()));
+			builder.add(TransparentPUMLColor.class, e -> c -> c.append("transparent"));
 			builder.add(PUMLDiagram.class, e -> c -> {
 				final Collection<?> entities = e.getEntities();
 				final Collection<?> relationships = e.getRelationships();
@@ -110,6 +127,18 @@ public class PUMLRenderer extends ATextualRenderer<Object, IPUMLRenderContext> {
 					final String trimmed = e.getLabel().trim();
 					if (!trimmed.isEmpty()) c.append(" : ").append(trimmed);
 				}
+			});
+			builder.add(PUMLControl.class, e -> c -> {
+				if (e.getDpi() != null) c.append("skinparam dpi ").append(e.getDpi()).newline();
+				c.append("skinparam shadowing ").append(e.isShadowing()).newline();
+				if (e.getBackground() != null) c.append("skinparam backgroundcolor ").render(e.getBackground(), IPUMLColor.class).newline();
+				if (e.getPx() != null) c.append("skinparam scale ").append(e.getPx()).append('x').append(e.getPx()).newline();
+			});
+			builder.add(PUMLContent.class, e -> c -> {
+				c.append("@startuml").newline().newline();
+				if (e.getControl() != null) c.render(e.getControl(), PUMLControl.class).newline();
+				c.render(e.getDiagram(), IPUMLDiagram.class).newline().newline();
+				c.append("@enduml");
 			});
 
 			builder.add(PUMLComponentDiagram.class, e -> c -> c.render(new PUMLDiagram<>(e.getComponents(), e.getLinks(), PUMLComponent.class, PUMLLink.class), PUMLDiagram.class));
@@ -171,8 +200,8 @@ public class PUMLRenderer extends ATextualRenderer<Object, IPUMLRenderContext> {
 					c.append('}');
 				}
 			});
-			builder.add(PUMLNamedStereotype.class, e -> c -> c.append(e.getName()));
-			builder.add(PUMLSpotStereotype.class, e -> c -> c.append('(').append(e.getLetter()).append(',').append(e.getColor()).append(')'));
+			builder.add(NamedPUMLStereotype.class, e -> c -> c.append(e.getName()));
+			builder.add(SpotPUMLStereotype.class, e -> c -> c.append('(').append(e.getLetter()).append(',').render(e.getColor(), IPUMLColor.class).append(')'));
 			builder.add(PUMLRelation.class, e -> c -> {
 				final PUMLRelationship.PUMLRelationshipBuilder b = PUMLRelationship.builder(e.getLeft(), e.getRight());
 				b.leftLabel(e.getLeftLabel()).rightLabel(e.getRightLabel());
@@ -225,5 +254,44 @@ public class PUMLRenderer extends ATextualRenderer<Object, IPUMLRenderContext> {
 	@Override
 	protected IRendering<? super Object, ? extends IPUMLRenderContext, ? extends IExplicitRenderable<? super IPUMLRenderContext>> getRendering() {
 		return getRenderingStatic();
+	}
+
+	/**
+	 * Render some plant UML content.
+	 * 
+	 * @param content The content to render.
+	 * @param path The path to the file to put the content in, which should inclde the filename but not a file extension. For example
+	 *            {@code Paths.get("/tmp/diagram")}.
+	 * @param format The format to render the content in. For example {@code FileFormat.PNG}.
+	 * @return The actual file path. For example {@code Paths.get("/tmp/diagram.png")}.
+	 * @throws IOException
+	 * @throws FileNotFoundException
+	 */
+	public Path toFile(PUMLContent content, Path path, FileFormat format) throws IOException, FileNotFoundException {
+		final String filename = path.getFileName().toString() + format.getFileSuffix();
+		final Path retVal = path.getParent() != null ? path.getParent().resolve(filename) : Paths.get(filename);
+
+		final String string = render(content);
+		final SourceStringReader reader = new SourceStringReader(string);
+		try (final OutputStream os = new BufferedOutputStream(new FileOutputStream(retVal.toFile()))) {
+			reader.generateImage(os, new FileFormatOption(format));
+		}
+		return retVal;
+	}
+
+	/**
+	 * Wrap a diagram in standard plant UML control, and render it to a PNG. See {@link #toFile(PUMLContent, Path, FileFormat)} to understand the {@code path}
+	 * argument and return value.
+	 * 
+	 * @param diagram The diagram to render.
+	 * @param path The path to the PNG file, where the filename should not have the PNG extension.
+	 * @return The path to the resulting PNG.
+	 * @throws IOException
+	 * @throws FileNotFoundException
+	 */
+	public Path toPNG(final IPUMLDiagram diagram, final Path path) throws IOException, FileNotFoundException {
+		final PUMLContent.PUMLContentBuilder builder = PUMLContent.builder().diagram(diagram);
+		builder.control(PUMLControl.builder().shadowing(false).dpi(600).background(TransparentPUMLColor.create()).build());
+		return toFile(builder.build(), path, FileFormat.PNG);
 	}
 }

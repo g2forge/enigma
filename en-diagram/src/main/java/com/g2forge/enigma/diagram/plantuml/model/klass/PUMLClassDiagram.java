@@ -13,8 +13,6 @@ import lombok.Singular;
 @Builder(toBuilder = true)
 @RequiredArgsConstructor
 public class PUMLClassDiagram implements IPUMLDiagram {
-	protected static final String TEMPLATE = "<uclasses:{c|<c><\\n>}><relations:{r|<r><\\n>}>";
-
 	@Singular
 	protected final List<PUMLClass> uclasses;
 

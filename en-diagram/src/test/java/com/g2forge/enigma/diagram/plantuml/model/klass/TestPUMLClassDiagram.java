@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import com.g2forge.enigma.diagram.plantuml.model.ATestPUMLDiagram;
 import com.g2forge.enigma.diagram.plantuml.model.klass.PUMLClassDiagram.PUMLClassDiagramBuilder;
+import com.g2forge.enigma.diagram.plantuml.model.style.StringPUMLColor;
 
 public class TestPUMLClassDiagram extends ATestPUMLDiagram {
 	@Test
@@ -36,13 +37,13 @@ public class TestPUMLClassDiagram extends ATestPUMLDiagram {
 		builder.relation(PUMLRelation.builder().left("Car").right("Wheel").type(PUMLRelation.Type.Composition).arrow(PUMLRelation.Direction.Right).label("wheels").rightLabel("0..n").back(true).build());
 		assertDiagram("relation", builder.build());
 	}
-	
+
 	@Test
 	public void stereotypes() {
 		final PUMLClassDiagramBuilder builder = PUMLClassDiagram.builder();
 		builder.uclass(PUMLClass.builder().name("Object").stereotypeNamed("general").build());
-		builder.uclass(PUMLClass.builder().name("System").stereotypeSpot('S', "#FF7700").stereotypeNamed("Singleton").build());
-		builder.uclass(PUMLClass.builder().name("Date").stereotypeSpot('D', "orchid").build());
+		builder.uclass(PUMLClass.builder().name("System").stereotypeSpot('S', new StringPUMLColor("#FF7700")).stereotypeNamed("Singleton").build());
+		builder.uclass(PUMLClass.builder().name("Date").stereotypeSpot('D', new StringPUMLColor("orchid")).build());
 		assertDiagram("stereotypes", builder.build());
 	}
 }
