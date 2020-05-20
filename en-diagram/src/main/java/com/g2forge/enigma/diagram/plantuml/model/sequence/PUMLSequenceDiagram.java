@@ -13,6 +13,9 @@ import lombok.Singular;
 @Builder(toBuilder = true)
 @RequiredArgsConstructor
 public class PUMLSequenceDiagram implements IPUMLDiagram {
+	@Builder.Default
+	protected final boolean footbox = true;
+	
 	@Singular
 	protected final List<PUMLParticipant> participants;
 

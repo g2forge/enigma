@@ -154,7 +154,10 @@ public class PUMLRenderer extends ATextualRenderer<Object, IPUMLRenderContext> {
 				c.render(b.build(), PUMLRelationship.class);
 			});
 
-			builder.add(PUMLSequenceDiagram.class, e -> c -> c.render(new PUMLDiagram<>(e.getParticipants(), e.getEvents(), PUMLParticipant.class, IPUMLEvent.class), PUMLDiagram.class));
+			builder.add(PUMLSequenceDiagram.class, e -> c -> {
+				if (!e.isFootbox()) c.append("hide footbox").newline().newline();
+				c.render(new PUMLDiagram<>(e.getParticipants(), e.getEvents(), PUMLParticipant.class, IPUMLEvent.class), PUMLDiagram.class);
+			});
 			builder.add(PUMLParticipant.class, e -> c -> {
 				final String name = e.getName();
 				c.append("participant ").append(name);
