@@ -15,7 +15,7 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.g2forge.enigma</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>en-backend</artifactId>
 			<version>${project.version}</version>
 		</dependency>
