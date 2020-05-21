@@ -34,8 +34,8 @@ public class HTMLRenderer {
 	protected static class HTMLRenderContext implements IHTMLRenderContext {
 		protected static CSSRenderer css = new CSSRenderer();
 
-		protected static final IFunction1<Object, IExplicitHTMLElement> toExplicit = new TypeSwitch1.FunctionBuilder<Object, IExplicitHTMLElement>().with(builder -> {
-			builder.add(IExplicitHTMLElement.class, IFunction1.identity());
+		protected static final IFunction1<Object, IExplicitHTMLRenderable> toExplicit = new TypeSwitch1.FunctionBuilder<Object, IExplicitHTMLRenderable>().with(builder -> {
+			builder.add(IExplicitHTMLRenderable.class, IFunction1.identity());
 			builder.add(ICSSRenderable.class, e -> context -> context.getBuilder().append(css.render(e)));
 			builder.add(IReflectiveHTMLElement.class, e -> new ReflectiveExplicitHTMLElement(e));
 
@@ -69,12 +69,12 @@ public class HTMLRenderer {
 		}
 
 		@Override
-		public IExplicitHTMLElement toExplicit(final Object element, Type type) {
+		public IExplicitHTMLRenderable toExplicit(final Object element, Type type) {
 			return toExplicit.apply(element);
 		}
 	}
 
-	protected static class ReflectiveExplicitHTMLElement implements IExplicitHTMLElement {
+	protected static class ReflectiveExplicitHTMLElement implements IExplicitHTMLRenderable {
 		@Data
 		protected static class Property<T, F> {
 			protected final String name;

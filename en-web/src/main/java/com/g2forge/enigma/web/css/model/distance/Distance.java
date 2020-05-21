@@ -1,12 +1,12 @@
 package com.g2forge.enigma.web.css.model.distance;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 @Data
-@Builder
-@AllArgsConstructor
+@Builder(toBuilder = true)
+@RequiredArgsConstructor
 public class Distance implements IDistance {
 	public enum Unit {
 		PX;

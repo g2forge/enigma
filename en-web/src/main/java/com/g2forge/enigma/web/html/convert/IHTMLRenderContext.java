@@ -7,7 +7,7 @@ import com.g2forge.alexandria.java.close.ICloseable;
 public interface IHTMLRenderContext {
 	public StringBuilder getBuilder();
 
-	public IExplicitHTMLElement toExplicit(Object object, Type type);
+	public IExplicitHTMLRenderable toExplicit(Object object, Type type);
 
 	public void newline();
 

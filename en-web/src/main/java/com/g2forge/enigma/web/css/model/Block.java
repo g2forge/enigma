@@ -3,14 +3,14 @@ package com.g2forge.enigma.web.css.model;
 import java.util.Arrays;
 import java.util.List;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.Singular;
 
 @Data
-@Builder
-@AllArgsConstructor
+@Builder(toBuilder = true)
+@RequiredArgsConstructor
 public class Block implements ICSSStyle {
 	@Singular
 	protected final List<ICSSStyle> styles;
