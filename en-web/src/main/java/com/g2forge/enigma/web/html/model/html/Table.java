@@ -7,17 +7,18 @@ import com.g2forge.enigma.web.html.convert.HTMLField;
 import com.g2forge.enigma.web.html.convert.HTMLTag;
 import com.g2forge.enigma.web.html.convert.IReflectiveHTMLElement;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.Singular;
 
-@lombok.Data
-@Builder
-@AllArgsConstructor
+@Data
+@Builder(toBuilder = true)
+@RequiredArgsConstructor
 public class Table implements IBodyElement, IReflectiveHTMLElement {
 	@lombok.Data
-	@Builder
-	@AllArgsConstructor
+	@Builder(toBuilder = true)
+	@RequiredArgsConstructor
 	@HTMLTag("td")
 	public static class Data implements ICell, IReflectiveHTMLElement {
 		public static final Data EMPTY = new Data();
@@ -32,8 +33,8 @@ public class Table implements IBodyElement, IReflectiveHTMLElement {
 	}
 
 	@lombok.Data
-	@Builder
-	@AllArgsConstructor
+	@Builder(toBuilder = true)
+	@RequiredArgsConstructor
 	@HTMLTag("th")
 	public static class Header implements ICell, IReflectiveHTMLElement {
 		public static final Header EMPTY = new Header();
@@ -52,24 +53,24 @@ public class Table implements IBodyElement, IReflectiveHTMLElement {
 	}
 
 	@lombok.Data
-	@Builder
-	@AllArgsConstructor
+	@Builder(toBuilder = true)
+	@RequiredArgsConstructor
 	@HTMLTag("tr")
 	public static class Row implements IReflectiveHTMLElement {
 		@HTMLField(property = false)
 		@Singular
-		protected Collection<ICell> cells;
+		protected final Collection<ICell> cells;
 
 		public Row(ICell... cells) {
 			this(Arrays.asList(cells));
 		}
 	}
 
-	protected String style;
+	protected final String style;
 
 	@HTMLField(property = false)
 	@Singular
-	protected Collection<Row> rows;
+	protected final Collection<Row> rows;
 
 	public Table(String style, Row... rows) {
 		this(style, Arrays.asList(rows));

@@ -7,13 +7,13 @@ import com.g2forge.enigma.web.html.convert.HTMLField;
 import com.g2forge.enigma.web.html.convert.IReflectiveHTMLElement;
 import com.g2forge.enigma.web.html.model.html.IBodyElement;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 @Data
-@Builder
-@AllArgsConstructor
+@Builder(toBuilder = true)
+@RequiredArgsConstructor
 public class SVG implements IBodyElement, IReflectiveHTMLElement {
 	protected final int width;
 

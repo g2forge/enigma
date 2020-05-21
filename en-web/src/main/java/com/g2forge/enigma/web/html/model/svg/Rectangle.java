@@ -4,13 +4,13 @@ import com.g2forge.enigma.web.css.model.ICSSStyle;
 import com.g2forge.enigma.web.html.convert.HTMLTag;
 import com.g2forge.enigma.web.html.convert.IReflectiveHTMLElement;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 @Data
-@Builder
-@AllArgsConstructor
+@Builder(toBuilder = true)
+@RequiredArgsConstructor
 @HTMLTag("rect")
 public class Rectangle implements ISVGElement, IReflectiveHTMLElement {
 	protected final int x;

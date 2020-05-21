@@ -9,14 +9,14 @@ import com.g2forge.enigma.web.html.convert.HTMLTag;
 import com.g2forge.enigma.web.html.convert.IHTMLTagGenerator;
 import com.g2forge.enigma.web.html.convert.IReflectiveHTMLElement;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.Singular;
 
 @Data
-@Builder
-@AllArgsConstructor
+@Builder(toBuilder = true)
+@RequiredArgsConstructor
 @HTMLTag(generator = Header.TagGenerator.class, pretty = HTMLTag.Pretty.Inline)
 public class Header implements IBodyElement, IReflectiveHTMLElement {
 	public static class TagGenerator implements IHTMLTagGenerator {

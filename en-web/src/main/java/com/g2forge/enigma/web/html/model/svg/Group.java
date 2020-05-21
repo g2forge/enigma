@@ -7,13 +7,13 @@ import com.g2forge.enigma.web.html.convert.HTMLField;
 import com.g2forge.enigma.web.html.convert.HTMLTag;
 import com.g2forge.enigma.web.html.convert.IReflectiveHTMLElement;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 @Data
-@Builder
-@AllArgsConstructor
+@Builder(toBuilder = true)
+@RequiredArgsConstructor
 @HTMLTag("g")
 public class Group implements ISVGElement, IReflectiveHTMLElement {
 	@HTMLField(property = false)
