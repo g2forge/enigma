@@ -1,4 +1,4 @@
-package com.g2forge.enigma.document;
+package com.g2forge.enigma.document.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

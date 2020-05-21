@@ -4,12 +4,12 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.g2forge.alexandria.java.core.resource.HResource;
-import com.g2forge.enigma.document.Block;
-import com.g2forge.enigma.document.Block.BlockBuilder;
-import com.g2forge.enigma.document.Definition;
-import com.g2forge.enigma.document.DocList;
-import com.g2forge.enigma.document.Emphasis;
-import com.g2forge.enigma.document.Text;
+import com.g2forge.enigma.document.model.Block;
+import com.g2forge.enigma.document.model.Definition;
+import com.g2forge.enigma.document.model.DocList;
+import com.g2forge.enigma.document.model.Emphasis;
+import com.g2forge.enigma.document.model.Text;
+import com.g2forge.enigma.document.model.Block.BlockBuilder;
 
 public class TestMD {
 	protected final MDRenderer renderer = new MDRenderer();

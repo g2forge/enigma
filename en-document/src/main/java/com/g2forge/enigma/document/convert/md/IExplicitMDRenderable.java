@@ -1,8 +1,8 @@
 package com.g2forge.enigma.document.convert.md;
 
-import com.g2forge.enigma.document.IDocElement;
+import com.g2forge.enigma.document.model.IDocElement;
 
 @FunctionalInterface
-public interface IExplicitMDElement extends IDocElement {
+public interface IExplicitMDRenderable extends IDocElement {
 	public void render(IMDRenderContext context);
 }
