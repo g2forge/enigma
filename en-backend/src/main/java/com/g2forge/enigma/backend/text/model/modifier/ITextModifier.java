@@ -19,6 +19,16 @@ public interface ITextModifier {
 	public List<? extends List<? extends TextUpdate<?>>> computeUpdates(List<CharSequence> list);
 
 	/**
+	 * When {@code true} the {@link TextNestedModified.TextNestedModifiedBuilder} will ensure that there is always some content in this modifier, even if it is
+	 * {@link com.g2forge.enigma.backend.text.model.expression.TextNothing}.
+	 * 
+	 * @return {@code true} to ensure this modifier is always called.
+	 */
+	public default boolean isRequireSomething() {
+		return false;
+	}
+
+	/**
 	 * Try to merge as many as possible together. Use an RLE-like scheme to create a minimal modifier.
 	 * 
 	 * @param modifiers

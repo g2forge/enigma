@@ -1,3 +1,5 @@
 package com.g2forge.enigma.web.html.model.svg;
 
-public interface ISVGElement {}
+import com.g2forge.enigma.backend.convert.IRenderable;
+
+public interface ISVGElement extends IRenderable {}
