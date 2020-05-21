@@ -4,20 +4,20 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.g2forge.alexandria.java.core.resource.HResource;
-import com.g2forge.enigma.web.css.Block;
-import com.g2forge.enigma.web.css.color.Color;
-import com.g2forge.enigma.web.css.drawing.Fill;
-import com.g2forge.enigma.web.css.drawing.Stroke;
-import com.g2forge.enigma.web.css.drawing.StrokeWidth;
-import com.g2forge.enigma.web.css.text.DominantBaseline;
-import com.g2forge.enigma.web.css.text.TextAnchor;
+import com.g2forge.enigma.web.css.model.Block;
+import com.g2forge.enigma.web.css.model.color.Color;
+import com.g2forge.enigma.web.css.model.drawing.Fill;
+import com.g2forge.enigma.web.css.model.drawing.Stroke;
+import com.g2forge.enigma.web.css.model.drawing.StrokeWidth;
+import com.g2forge.enigma.web.css.model.text.DominantBaseline;
+import com.g2forge.enigma.web.css.model.text.TextAnchor;
 import com.g2forge.enigma.web.html.convert.HTMLRenderer;
-import com.g2forge.enigma.web.html.html.Body;
-import com.g2forge.enigma.web.html.html.HTML;
-import com.g2forge.enigma.web.html.svg.Group;
-import com.g2forge.enigma.web.html.svg.Rectangle;
-import com.g2forge.enigma.web.html.svg.SVG;
-import com.g2forge.enigma.web.html.svg.Text;
+import com.g2forge.enigma.web.html.model.html.Body;
+import com.g2forge.enigma.web.html.model.html.HTML;
+import com.g2forge.enigma.web.html.model.svg.Group;
+import com.g2forge.enigma.web.html.model.svg.Rectangle;
+import com.g2forge.enigma.web.html.model.svg.SVG;
+import com.g2forge.enigma.web.html.model.svg.Text;
 
 public class TestSVG {
 	@Test

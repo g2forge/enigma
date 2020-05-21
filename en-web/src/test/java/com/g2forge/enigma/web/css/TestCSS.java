@@ -4,15 +4,16 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.g2forge.enigma.web.css.convert.CSSRenderer;
-import com.g2forge.enigma.web.css.distance.Distance;
-import com.g2forge.enigma.web.css.distance.Distance.Unit;
-import com.g2forge.enigma.web.css.layout.Display;
-import com.g2forge.enigma.web.css.layout.Margin;
-import com.g2forge.enigma.web.css.layout.MarginLeft;
-import com.g2forge.enigma.web.css.layout.MarginRight;
-import com.g2forge.enigma.web.css.layout.MaxHeight;
-import com.g2forge.enigma.web.css.layout.MaxWidth;
-import com.g2forge.enigma.web.css.text.TextAnchor;
+import com.g2forge.enigma.web.css.model.Block;
+import com.g2forge.enigma.web.css.model.distance.Distance;
+import com.g2forge.enigma.web.css.model.distance.Distance.Unit;
+import com.g2forge.enigma.web.css.model.layout.Display;
+import com.g2forge.enigma.web.css.model.layout.Margin;
+import com.g2forge.enigma.web.css.model.layout.MarginLeft;
+import com.g2forge.enigma.web.css.model.layout.MarginRight;
+import com.g2forge.enigma.web.css.model.layout.MaxHeight;
+import com.g2forge.enigma.web.css.model.layout.MaxWidth;
+import com.g2forge.enigma.web.css.model.text.TextAnchor;
 
 public class TestCSS {
 	@Test

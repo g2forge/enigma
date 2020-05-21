@@ -10,11 +10,11 @@ import com.g2forge.alexandria.java.text.casing.SnakeCase;
 import com.g2forge.alexandria.java.type.function.TypeSwitch1;
 import com.g2forge.alexandria.reflection.object.HReflection;
 import com.g2forge.alexandria.reflection.object.IJavaFieldReflection;
-import com.g2forge.enigma.web.css.Block;
-import com.g2forge.enigma.web.css.ICSSRecord;
-import com.g2forge.enigma.web.css.ICSSStyle;
-import com.g2forge.enigma.web.css.color.Color;
-import com.g2forge.enigma.web.css.distance.Distance;
+import com.g2forge.enigma.web.css.model.Block;
+import com.g2forge.enigma.web.css.model.ICSSRecord;
+import com.g2forge.enigma.web.css.model.ICSSStyle;
+import com.g2forge.enigma.web.css.model.color.Color;
+import com.g2forge.enigma.web.css.model.distance.Distance;
 
 import lombok.Data;
 
