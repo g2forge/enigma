@@ -11,6 +11,7 @@ import com.g2forge.alexandria.java.close.ICloseable;
 import com.g2forge.alexandria.java.core.helpers.HCollector;
 import com.g2forge.alexandria.java.function.builder.IBuilder;
 import com.g2forge.enigma.backend.text.model.expression.ITextExpression;
+import com.g2forge.enigma.backend.text.model.expression.TextNothing;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -56,18 +57,25 @@ public class TextNestedModified implements ITextExpression {
 	public static class TextNestedModifiedBuilder implements IBuilder<TextNestedModified> {
 		@Getter(AccessLevel.PROTECTED)
 		protected abstract class AModifierHandle implements IModifierHandle {
+			protected final int initialElementCount = getElementCount();
+
 			protected boolean open = true;
 
 			@Override
 			public void close() {
 				ensureOpen();
 				if (getCurrentModifier() != getModifier()) throw new IllegalStateException();
+				if ((getModifier().getModifier() != null) && getModifier().getModifier().isRequireSomething() && (initialElementCount == getElementCount())) expression(TextNothing.create());
 				open = false;
 				setCurrentModifier(getPrevious());
 			}
 
 			protected void ensureOpen() {
 				if (!isOpen()) throw new IllegalStateException();
+			}
+
+			protected int getElementCount() {
+				return elements == null ? 0 : elements.size();
 			}
 
 			protected abstract Modifier getModifier();

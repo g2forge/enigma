@@ -20,6 +20,7 @@ import com.g2forge.enigma.backend.convert.IExplicitRenderable;
 import com.g2forge.enigma.backend.convert.IRendering;
 import com.g2forge.enigma.backend.text.model.expression.TextConcatenation;
 import com.g2forge.enigma.backend.text.model.expression.TextNewline;
+import com.g2forge.enigma.backend.text.model.expression.TextNothing;
 import com.g2forge.enigma.backend.text.model.expression.TextRepeat;
 import com.g2forge.enigma.backend.text.model.modifier.ITextModifier;
 import com.g2forge.enigma.backend.text.model.modifier.TextModified;
@@ -86,6 +87,7 @@ public class TextRenderer extends ARenderer<Object, ITextRenderContext> {
 			builder.add(Double.class, e -> c -> c.getBuilder().append(e.doubleValue()));
 
 			// Text model
+			builder.add(TextNothing.class, e -> c -> {});
 			builder.add(TextNewline.class, e -> c -> c.getBuilder().append("\n"));
 			builder.add(TextConcatenation.class, e -> c -> e.getElements().forEach(x -> c.render(x, Object.class)));
 			builder.add(TextRepeat.class, e -> c -> {
@@ -125,7 +127,7 @@ public class TextRenderer extends ARenderer<Object, ITextRenderContext> {
 					// Whenever we close a modifier, perform the modifications
 					if (closures != null) for (Modifier modifier : closures) {
 						// Look back over the elements for those to which the modifier applies, and coalesce runs
-						final List<IRange<Integer>> ranges = IRange.coalesce(applicableMap.get(modifier).stream().map(x -> {
+						final List<? extends IRange<Integer>> ranges = IRange.coalesce(applicableMap.get(modifier).stream().map(x -> {
 							int index = -1;
 							for (int i = 0; i < e.getElements().size(); i++) {
 								if (e.getElements().get(i) == x) {
@@ -144,32 +146,40 @@ public class TextRenderer extends ARenderer<Object, ITextRenderContext> {
 							// Apply the updates
 							final int nRanges = ranges.size();
 							// Make sure we got as many update lists as we sent in ranges
-							if (allUpdates.size() != nRanges) throw new RuntimeException();
-							int cumulative = 0; // Cumulative offset update from previous ranges
-							for (int i = 0; i < nRanges; i++) {
-								// Apply updates for each range (if any)
-								final List<? extends TextUpdate<?>> rangeUpdates = allUpdates.get(i);
-								if (rangeUpdates == null || rangeUpdates.isEmpty()) continue;
-								final IRange<Integer> range = ranges.get(i);
-
-								// Perform the update using a child renderer
-								final int unchanged = rangeUpdates.get(0).getOffset();
-								final String string = b.substring(range.getMin() + cumulative + unchanged, range.getMax() + cumulative);
+							if ((nRanges == 0) && (allUpdates.size() == 1)) {
+								final TextUpdate<?> update = HCollection.getOne(allUpdates.get(0));
+								if ((update.getOffset() != 0) || (update.getLength() != 0)) throw new RuntimeException("All you can do to modify nothing is to insert something!");
 								final ITextRenderContext child = c.createContext();
-								final List<Integer> updateLengths = child.modify(string, rangeUpdates, unchanged);
-								b.replace(range.getMin() + cumulative + unchanged, range.getMax() + cumulative, child.build());
+								child.render(update.getFunction().apply(""), null);
+								b.append(child.build());
+							} else {
+								if (allUpdates.size() != nRanges) throw new RuntimeException(String.format("Expected updates for %2$d ranges, found %1$d!", allUpdates.size(), nRanges));
+								int cumulative = 0; // Cumulative offset update from previous ranges
+								for (int i = 0; i < nRanges; i++) {
+									// Apply updates for each range (if any)
+									final List<? extends TextUpdate<?>> rangeUpdates = allUpdates.get(i);
+									if (rangeUpdates == null || rangeUpdates.isEmpty()) continue;
+									final IRange<Integer> range = ranges.get(i);
 
-								// Update the element offsets (resultlength - length = expansion)
-								for (int j = 0; j < rangeUpdates.size(); j++) {
-									final TextUpdate<?> textUpdate = rangeUpdates.get(j);
-									final int offset = textUpdate.getOffset() + range.getMin() + cumulative;
-									final int index = Collections.binarySearch(elementOffsets, offset);
-									final int updateFrom = index >= 0 ? index + 1 : -(index + 1);
-									for (int k = updateFrom; k < elementOffsets.size(); k++) {
-										elementOffsets.set(k, elementOffsets.get(k) + updateLengths.get(j));
+									// Perform the update using a child renderer
+									final int unchanged = rangeUpdates.get(0).getOffset();
+									final String string = b.substring(range.getMin() + cumulative + unchanged, range.getMax() + cumulative);
+									final ITextRenderContext child = c.createContext();
+									final List<Integer> updateLengths = child.modify(string, rangeUpdates, unchanged);
+									b.replace(range.getMin() + cumulative + unchanged, range.getMax() + cumulative, child.build());
+
+									// Update the element offsets (resultlength - length = expansion)
+									for (int j = 0; j < rangeUpdates.size(); j++) {
+										final TextUpdate<?> textUpdate = rangeUpdates.get(j);
+										final int offset = textUpdate.getOffset() + range.getMin() + cumulative;
+										final int index = Collections.binarySearch(elementOffsets, offset);
+										final int updateFrom = index >= 0 ? index + 1 : -(index + 1);
+										for (int k = updateFrom; k < elementOffsets.size(); k++) {
+											elementOffsets.set(k, elementOffsets.get(k) + updateLengths.get(j));
+										}
 									}
+									cumulative += updateLengths.stream().collect(Collectors.summingInt(Integer::intValue));
 								}
-								cumulative += updateLengths.stream().collect(Collectors.summingInt(Integer::intValue));
 							}
 						}
 					}

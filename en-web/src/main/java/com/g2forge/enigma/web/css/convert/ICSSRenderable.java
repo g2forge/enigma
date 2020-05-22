@@ -1,3 +1,5 @@
 package com.g2forge.enigma.web.css.convert;
 
-public interface ICSSRenderable {}
+import com.g2forge.enigma.backend.convert.IRenderable;
+
+public interface ICSSRenderable extends IRenderable {}

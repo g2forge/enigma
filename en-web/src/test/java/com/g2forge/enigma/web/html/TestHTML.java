@@ -5,14 +5,14 @@ import org.junit.Test;
 
 import com.g2forge.alexandria.java.core.resource.HResource;
 import com.g2forge.enigma.web.html.convert.HTMLRenderer;
-import com.g2forge.enigma.web.html.html.Body;
-import com.g2forge.enigma.web.html.html.Div;
-import com.g2forge.enigma.web.html.html.Div.DivBuilder;
-import com.g2forge.enigma.web.html.html.HTML;
-import com.g2forge.enigma.web.html.html.Header;
-import com.g2forge.enigma.web.html.html.Image;
-import com.g2forge.enigma.web.html.html.Paragraph;
-import com.g2forge.enigma.web.html.html.Span;
+import com.g2forge.enigma.web.html.model.html.Body;
+import com.g2forge.enigma.web.html.model.html.Div;
+import com.g2forge.enigma.web.html.model.html.HTML;
+import com.g2forge.enigma.web.html.model.html.Header;
+import com.g2forge.enigma.web.html.model.html.Image;
+import com.g2forge.enigma.web.html.model.html.Paragraph;
+import com.g2forge.enigma.web.html.model.html.Span;
+import com.g2forge.enigma.web.html.model.html.Div.DivBuilder;
 
 public class TestHTML {
 	protected final HTMLRenderer renderer = new HTMLRenderer();

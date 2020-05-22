@@ -23,6 +23,11 @@
 			<artifactId>ax-reflection</artifactId>
 			<version>${alexandria.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>en-backend</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.eclipse.mylyn.docs/org.eclipse.mylyn.wikitext.markdown -->
 		<dependency>
