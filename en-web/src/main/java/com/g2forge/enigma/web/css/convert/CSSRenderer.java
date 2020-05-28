@@ -14,6 +14,7 @@ import com.g2forge.enigma.backend.convert.ARenderer;
 import com.g2forge.enigma.backend.convert.IExplicitRenderable;
 import com.g2forge.enigma.backend.convert.IRendering;
 import com.g2forge.enigma.backend.convert.textual.ATextualRenderer;
+import com.g2forge.enigma.backend.text.model.modifier.TextNestedModified;
 import com.g2forge.enigma.web.css.model.Block;
 import com.g2forge.enigma.web.css.model.ICSSRecord;
 import com.g2forge.enigma.web.css.model.ICSSStyle;
@@ -29,6 +30,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CSSRenderer extends ATextualRenderer<Object, ICSSRenderContext> {
 	protected class CSSRenderContext extends ARenderContext implements ICSSRenderContext {
+		protected CSSRenderContext(TextNestedModified.TextNestedModifiedBuilder builder) {
+			super(builder);
+		}
+
 		@Override
 		protected ICSSRenderContext getThis() {
 			return this;
@@ -118,8 +123,8 @@ public class CSSRenderer extends ATextualRenderer<Object, ICSSRenderContext> {
 	private static final IRendering<Object, ICSSRenderContext, IExplicitRenderable<? super ICSSRenderContext>> renderingStatic = new CSSRendering();
 
 	@Override
-	protected ICSSRenderContext createContext() {
-		return new CSSRenderContext();
+	protected ICSSRenderContext createContext(TextNestedModified.TextNestedModifiedBuilder builder) {
+		return new CSSRenderContext(builder);
 	}
 
 	@Override

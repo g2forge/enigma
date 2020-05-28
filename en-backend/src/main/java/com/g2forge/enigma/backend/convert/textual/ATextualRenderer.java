@@ -12,11 +12,13 @@ import com.g2forge.enigma.backend.text.model.modifier.TextNestedModified;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 public abstract class ATextualRenderer<R, C extends ITextualRenderContext<R, ? super C>> extends ARenderer<R, C> {
+	@RequiredArgsConstructor
 	protected abstract class ARenderContext implements ITextualRenderContext<R, C> {
 		@Getter(AccessLevel.PROTECTED)
-		protected final TextNestedModified.TextNestedModifiedBuilder builder = TextNestedModified.builder();
+		protected final TextNestedModified.TextNestedModifiedBuilder builder;
 
 		@Override
 		public C append(boolean bool) {
@@ -110,5 +112,16 @@ public abstract class ATextualRenderer<R, C extends ITextualRenderContext<R, ? s
 	protected String build(final C context) {
 		final ITextExpression text = context.build();
 		return getTextRenderer().render(text);
+	}
+
+	protected C createContext() {
+		return createContext(TextNestedModified.builder());
+	}
+
+	protected abstract C createContext(TextNestedModified.TextNestedModifiedBuilder builder);
+
+	public void render(TextNestedModified.TextNestedModifiedBuilder builder, R renderable) {
+		final C context = createContext(builder);
+		context.render(renderable, null);
 	}
 }
