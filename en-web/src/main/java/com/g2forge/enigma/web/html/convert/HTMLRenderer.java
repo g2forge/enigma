@@ -13,6 +13,7 @@ import com.g2forge.alexandria.java.type.function.TypeSwitch1;
 import com.g2forge.enigma.backend.convert.IExplicitRenderable;
 import com.g2forge.enigma.backend.convert.IRendering;
 import com.g2forge.enigma.backend.text.model.modifier.ITextModifier;
+import com.g2forge.enigma.backend.text.model.modifier.TextNestedModified;
 import com.g2forge.enigma.web.css.convert.CSSRenderer;
 import com.g2forge.enigma.web.css.convert.ICSSRenderContext;
 
@@ -67,6 +68,10 @@ public class HTMLRenderer extends CSSRenderer {
 	}
 
 	protected class HTMLRenderContext extends CSSRenderContext implements IHTMLRenderContext {
+		protected HTMLRenderContext(TextNestedModified.TextNestedModifiedBuilder builder) {
+			super(builder);
+		}
+
 		@Override
 		protected IHTMLRenderContext getThis() {
 			return this;
@@ -92,8 +97,8 @@ public class HTMLRenderer extends CSSRenderer {
 	private static final IRendering<Object, ICSSRenderContext, IExplicitRenderable<? super ICSSRenderContext>> renderingStatic = new HTMLRendering();
 
 	@Override
-	protected IHTMLRenderContext createContext() {
-		return new HTMLRenderContext();
+	protected IHTMLRenderContext createContext(TextNestedModified.TextNestedModifiedBuilder builder) {
+		return new HTMLRenderContext(builder);
 	}
 
 	@Override

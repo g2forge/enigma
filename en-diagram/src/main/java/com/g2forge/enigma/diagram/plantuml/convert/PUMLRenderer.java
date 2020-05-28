@@ -21,6 +21,7 @@ import com.g2forge.enigma.backend.convert.ARenderer;
 import com.g2forge.enigma.backend.convert.IExplicitRenderable;
 import com.g2forge.enigma.backend.convert.IRendering;
 import com.g2forge.enigma.backend.convert.textual.ATextualRenderer;
+import com.g2forge.enigma.backend.text.model.modifier.TextNestedModified;
 import com.g2forge.enigma.diagram.plantuml.model.IPUMLDiagram;
 import com.g2forge.enigma.diagram.plantuml.model.PUMLContent;
 import com.g2forge.enigma.diagram.plantuml.model.component.PUMLComponent;
@@ -52,6 +53,10 @@ import net.sourceforge.plantuml.SourceStringReader;
 @RequiredArgsConstructor
 public class PUMLRenderer extends ATextualRenderer<Object, IPUMLRenderContext> {
 	protected class PUMLRenderContext extends ARenderContext implements IPUMLRenderContext {
+		public PUMLRenderContext(TextNestedModified.TextNestedModifiedBuilder builder) {
+			super(builder);
+		}
+
 		@Override
 		protected IPUMLRenderContext getThis() {
 			return this;
@@ -250,8 +255,8 @@ public class PUMLRenderer extends ATextualRenderer<Object, IPUMLRenderContext> {
 	private static final IRendering<Object, IPUMLRenderContext, IExplicitRenderable<? super IPUMLRenderContext>> renderingStatic = new PUMLRendering();
 
 	@Override
-	protected PUMLRenderContext createContext() {
-		return new PUMLRenderContext();
+	protected PUMLRenderContext createContext(TextNestedModified.TextNestedModifiedBuilder builder) {
+		return new PUMLRenderContext(builder);
 	}
 
 	@Override

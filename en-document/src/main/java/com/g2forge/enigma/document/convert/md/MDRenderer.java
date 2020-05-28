@@ -12,6 +12,7 @@ import com.g2forge.enigma.backend.convert.ARenderer;
 import com.g2forge.enigma.backend.convert.IExplicitRenderable;
 import com.g2forge.enigma.backend.convert.IRendering;
 import com.g2forge.enigma.backend.convert.textual.ATextualRenderer;
+import com.g2forge.enigma.backend.text.model.modifier.TextNestedModified;
 import com.g2forge.enigma.document.model.Block;
 import com.g2forge.enigma.document.model.Definition;
 import com.g2forge.enigma.document.model.DocList;
@@ -36,6 +37,10 @@ public class MDRenderer extends ATextualRenderer<Object, IMDRenderContext> {
 		protected final Stack<LineBreakStrategy> lineBreakStrategies = new Stack<>();
 
 		protected final Stack<ICloseable> stack = new Stack<>();
+
+		public MDRenderContext(TextNestedModified.TextNestedModifiedBuilder builder) {
+			super(builder);
+		}
 
 		@Override
 		public LineBreakStrategy getLineBreakStrategy() {
@@ -164,8 +169,8 @@ public class MDRenderer extends ATextualRenderer<Object, IMDRenderContext> {
 	private static final IRendering<Object, IMDRenderContext, IExplicitRenderable<? super IMDRenderContext>> renderingStatic = new MDRendering();
 
 	@Override
-	protected IMDRenderContext createContext() {
-		return new MDRenderContext();
+	protected IMDRenderContext createContext(TextNestedModified.TextNestedModifiedBuilder builder) {
+		return new MDRenderContext(builder);
 	}
 
 	@Override

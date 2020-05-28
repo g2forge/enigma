@@ -5,6 +5,7 @@ import java.util.Map;
 import com.g2forge.alexandria.java.type.function.TypeSwitch1;
 import com.g2forge.enigma.backend.convert.IExplicitRenderable;
 import com.g2forge.enigma.backend.convert.IRendering;
+import com.g2forge.enigma.backend.text.model.modifier.TextNestedModified;
 import com.g2forge.enigma.bash.convert.BashRenderer;
 import com.g2forge.enigma.bash.convert.IBashRenderContext;
 
@@ -13,8 +14,8 @@ import lombok.Getter;
 
 public class BashTemplateRenderer extends BashRenderer {
 	protected class BashTemplateRenderContext extends BashRenderContext implements IBashTemplateRenderContext {
-		public BashTemplateRenderContext(Mode mode) {
-			super(mode);
+		public BashTemplateRenderContext(TextNestedModified.TextNestedModifiedBuilder builder, Mode mode) {
+			super(builder, mode);
 		}
 
 		@Override
@@ -43,8 +44,8 @@ public class BashTemplateRenderer extends BashRenderer {
 	}
 
 	@Override
-	protected BashRenderContext createContext() {
-		return new BashTemplateRenderContext(getMode());
+	protected BashRenderContext createContext(TextNestedModified.TextNestedModifiedBuilder builder) {
+		return new BashTemplateRenderContext(builder, getMode());
 	}
 
 	@Override
