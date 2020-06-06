@@ -1,0 +1,4 @@
+graph graph {
+	a -- b -- c;
+	b -- d;
+}

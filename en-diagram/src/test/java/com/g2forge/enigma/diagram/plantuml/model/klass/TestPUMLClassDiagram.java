@@ -2,11 +2,11 @@ package com.g2forge.enigma.diagram.plantuml.model.klass;
 
 import org.junit.Test;
 
-import com.g2forge.enigma.diagram.plantuml.model.ATestPUMLDiagram;
+import com.g2forge.enigma.diagram.plantuml.convert.ATestPUMLRenderer;
 import com.g2forge.enigma.diagram.plantuml.model.klass.PUMLClassDiagram.PUMLClassDiagramBuilder;
 import com.g2forge.enigma.diagram.plantuml.model.style.StringPUMLColor;
 
-public class TestPUMLClassDiagram extends ATestPUMLDiagram {
+public class TestPUMLClassDiagram extends ATestPUMLRenderer {
 	@Test
 	public void empty() {
 		assertDiagram("empty", PUMLClassDiagram.builder().build());
