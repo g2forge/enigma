@@ -2,9 +2,9 @@ package com.g2forge.enigma.diagram.plantuml.model.sequence;
 
 import org.junit.Test;
 
-import com.g2forge.enigma.diagram.plantuml.model.ATestPUMLDiagram;
+import com.g2forge.enigma.diagram.plantuml.convert.ATestPUMLRenderer;
 
-public class TestPUMLSequenceDiagram extends ATestPUMLDiagram {
+public class TestPUMLSequenceDiagram extends ATestPUMLRenderer {
 	@Test
 	public void alice() {
 		assertDiagram("alice", PUMLSequenceDiagram.builder().participant(new PUMLParticipant("alice")).build());

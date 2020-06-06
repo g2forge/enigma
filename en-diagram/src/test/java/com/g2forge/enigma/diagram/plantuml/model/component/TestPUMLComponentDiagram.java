@@ -2,9 +2,9 @@ package com.g2forge.enigma.diagram.plantuml.model.component;
 
 import org.junit.Test;
 
-import com.g2forge.enigma.diagram.plantuml.model.ATestPUMLDiagram;
+import com.g2forge.enigma.diagram.plantuml.convert.ATestPUMLRenderer;
 
-public class TestPUMLComponentDiagram extends ATestPUMLDiagram {
+public class TestPUMLComponentDiagram extends ATestPUMLRenderer {
 	@Test
 	public void empty() {
 		assertDiagram("empty", PUMLComponentDiagram.builder().build());
