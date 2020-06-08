@@ -13,15 +13,15 @@ import lombok.Singular;
 @Data
 @Builder(toBuilder = true)
 @RequiredArgsConstructor
-public class DotVertex implements IDotStatement, IDotAttributed {
-	public static class DotVertexBuilder implements IBuilder<DotVertex>, IDotAttributed.IDotAttributedBuilder<DotVertexBuilder> {}
+public class DotNode implements IDotStatement, IDotAttributed {
+	public static class DotNodeBuilder implements IBuilder<DotNode>, IDotAttributed.IDotAttributedBuilder<DotNodeBuilder> {}
 	
 	protected final String name;
 	
 	@Singular
 	protected final List<IDotAttribute> attributes;
 
-	public DotVertex(String name, IDotAttribute...attributes) {
+	public DotNode(String name, IDotAttribute...attributes) {
 		this(name, HCollection.asList(attributes));
 	}
 }

@@ -15,7 +15,7 @@ import lombok.Singular;
 public class DotGraph {
 	public static class DotGraphBuilder implements IBuilder<DotGraph> {
 		public DotGraphBuilder attribute$(String name, String value) {
-			return statement(new DotAttribute(name, value));
+			return statement(new StringDotAttribute(name, value));
 		}
 	}
 	

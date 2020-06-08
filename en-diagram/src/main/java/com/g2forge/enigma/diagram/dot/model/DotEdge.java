@@ -15,8 +15,8 @@ import lombok.Singular;
 public class DotEdge implements IDotStatement, IDotAttributed {
 	public static class DotEdgeBuilder implements IBuilder<DotEdge>, IDotAttributed.IDotAttributedBuilder<DotEdgeBuilder> {}
 
-	@Singular("vertex")
-	protected final List<String> vertices;
+	@Singular
+	protected final List<String> nodes;
 
 	@Singular
 	protected final List<IDotAttribute> attributes;

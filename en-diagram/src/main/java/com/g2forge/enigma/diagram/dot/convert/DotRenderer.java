@@ -13,10 +13,10 @@ import com.g2forge.enigma.backend.convert.IExplicitRenderable;
 import com.g2forge.enigma.backend.convert.IRendering;
 import com.g2forge.enigma.backend.convert.textual.ATextualRenderer;
 import com.g2forge.enigma.backend.text.model.modifier.TextNestedModified.TextNestedModifiedBuilder;
-import com.g2forge.enigma.diagram.dot.model.DotAttribute;
+import com.g2forge.enigma.diagram.dot.model.StringDotAttribute;
 import com.g2forge.enigma.diagram.dot.model.DotEdge;
 import com.g2forge.enigma.diagram.dot.model.DotGraph;
-import com.g2forge.enigma.diagram.dot.model.DotVertex;
+import com.g2forge.enigma.diagram.dot.model.DotNode;
 import com.g2forge.enigma.diagram.dot.model.IDotAttribute;
 import com.g2forge.enigma.diagram.dot.model.IDotAttributed;
 import com.g2forge.enigma.diagram.dot.model.IDotStatement;
@@ -96,21 +96,21 @@ public class DotRenderer extends ATextualRenderer<Object, IDotRenderContext> {
 				}
 			});
 
-			builder.add(DotVertex.class, e -> c -> {
+			builder.add(DotNode.class, e -> c -> {
 				c.append(e.getName());
 				attributes(e, c);
 			});
 			builder.add(DotEdge.class, e -> c -> {
 				boolean first = true;
-				for (String vertex : e.getVertices()) {
+				for (String nodeName : e.getNodes()) {
 					if (first) first = false;
 					else c.append(c.isDirected() ? " -> " : " -- ");
-					c.append(vertex);
+					c.append(nodeName);
 				}
 				attributes(e, c);
 			});
 
-			builder.add(DotAttribute.class, e -> c -> {
+			builder.add(StringDotAttribute.class, e -> c -> {
 				final String quoted = DotStringValueQuoteType.create().quote(QuoteControl.IfNeeded, e.getValue());
 				c.append(e.getName()).append('=').append(quoted);
 			});

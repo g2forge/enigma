@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 @Builder(toBuilder = true)
 @RequiredArgsConstructor
-public class DotAttribute implements IDotAttribute {
+public class StringDotAttribute implements IDotAttribute {
 	protected final String name;
 	
 	protected final String value;
