@@ -1,0 +1,5 @@
+digraph mixed {
+	a -> b -> c -> a [dir=none];
+	b -> c -> a;
+	c -> a [dir=back];
+}

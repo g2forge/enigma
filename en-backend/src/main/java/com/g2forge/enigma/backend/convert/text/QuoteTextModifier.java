@@ -1,4 +1,4 @@
-package com.g2forge.enigma.bash.convert.textmodifiers;
+package com.g2forge.enigma.backend.convert.text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +7,7 @@ import com.g2forge.alexandria.java.core.error.NotYetImplementedError;
 import com.g2forge.alexandria.java.core.helpers.HCollection;
 import com.g2forge.alexandria.java.function.IFunction1;
 import com.g2forge.alexandria.java.text.TextUpdate;
-import com.g2forge.alexandria.java.text.quote.BashQuoteType;
+import com.g2forge.alexandria.java.text.quote.IQuoteType;
 import com.g2forge.enigma.backend.text.model.modifier.ITextModifier;
 
 import lombok.Builder;
@@ -17,8 +17,8 @@ import lombok.RequiredArgsConstructor;
 @Data
 @Builder(toBuilder = true)
 @RequiredArgsConstructor
-public class BashQuoteModifier implements ITextModifier {
-	protected final BashQuoteType quoteType;
+public class QuoteTextModifier implements ITextModifier {
+	protected final IQuoteType quoteType;
 
 	@Override
 	public List<? extends List<? extends TextUpdate<?>>> computeUpdates(List<CharSequence> list) {
