@@ -1,0 +1,5 @@
+digraph labels {
+	a [label="A!"];
+	b [label="B!"];
+	a -> b [label="edge"];
+}

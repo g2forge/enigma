@@ -13,21 +13,28 @@ import lombok.Singular;
 @Data
 @Builder(toBuilder = true)
 @RequiredArgsConstructor
-public class DotEdge implements IDotStatement, IDotAttributed {
-	public static class DotEdgeBuilder implements IBuilder<DotEdge>, IDotAttributed.IDotAttributedBuilder<DotEdgeBuilder> {}
+public class DotNode implements IDotStatement, IDotAttributed {
+	public static class DotNodeBuilder implements IBuilder<DotNode>, IDotAttributed.IDotAttributedBuilder<DotNodeBuilder> {}
 
-	@Singular
-	protected final List<String> nodes;
+	protected final String name;
 
 	@DotAttribute
 	protected final String label;
 
-	@DotAttribute("dir")
-	protected final DotEdgeDirection direction;
+	@DotAttribute
+	protected final DotNodeShape shape;
 
 	@DotAttribute
 	protected final String style;
 
 	@Singular
 	protected final List<IDotAttribute> attributes;
+
+	public DotNode(String name) {
+		this(name, null);
+	}
+
+	public DotNode(String name, String label) {
+		this(name, label, null, null, null);
+	}
 }

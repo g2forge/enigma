@@ -7,7 +7,7 @@ public interface IDotAttributed {
 		public B attribute(IDotAttribute attribute);
 
 		public default B attribute$(String name, String value) {
-			return attribute(new DotAttribute(name, value));
+			return attribute(new StringDotAttribute(name, value));
 		}
 	}
 

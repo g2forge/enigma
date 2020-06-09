@@ -15,11 +15,11 @@ import com.g2forge.enigma.backend.ITextAppender;
 import com.g2forge.enigma.backend.convert.ARenderer;
 import com.g2forge.enigma.backend.convert.IExplicitRenderable;
 import com.g2forge.enigma.backend.convert.IRendering;
+import com.g2forge.enigma.backend.convert.text.ControlQuoteTextModifier;
+import com.g2forge.enigma.backend.convert.text.QuoteTextModifier;
 import com.g2forge.enigma.backend.convert.textual.ATextualRenderer;
 import com.g2forge.enigma.backend.text.model.IOperator;
 import com.g2forge.enigma.backend.text.model.modifier.TextNestedModified;
-import com.g2forge.enigma.bash.convert.textmodifiers.BashQuoteModifier;
-import com.g2forge.enigma.bash.convert.textmodifiers.BashTokenModifier;
 import com.g2forge.enigma.bash.model.BashScript;
 import com.g2forge.enigma.bash.model.expression.BashCommandSubstitution;
 import com.g2forge.enigma.bash.model.expression.BashExpansion;
@@ -122,7 +122,7 @@ public class BashRenderer extends ATextualRenderer<Object, IBashRenderContext> {
 		@Override
 		public ICloseable quote() {
 			final ICloseable state = getState().open(Mode.Token);
-			final ICloseable modifier = getBuilder().open(new BashQuoteModifier(BashQuoteType.BashDoubleExpand));
+			final ICloseable modifier = getBuilder().open(new QuoteTextModifier(BashQuoteType.BashDoubleExpand));
 			return () -> {
 				modifier.close();
 				state.close();
@@ -139,7 +139,7 @@ public class BashRenderer extends ATextualRenderer<Object, IBashRenderContext> {
 			if (getState().get().equals(Mode.Token)) return () -> {};
 			final ICloseable state = getState().open(Mode.Token);
 			if ((quoteControl == null) || QuoteControl.Never.equals(quoteControl)) return state;
-			final ICloseable modifier = getBuilder().open(new BashTokenModifier(quoteType, quoteControl));
+			final ICloseable modifier = getBuilder().open(new ControlQuoteTextModifier(quoteType, quoteControl));
 			return () -> {
 				modifier.close();
 				state.close();

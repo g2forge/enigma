@@ -1,4 +1,4 @@
-package com.g2forge.enigma.bash.convert.textmodifiers;
+package com.g2forge.enigma.backend.convert.text;
 
 import java.util.List;
 
@@ -6,7 +6,7 @@ import com.g2forge.alexandria.java.core.enums.EnumException;
 import com.g2forge.alexandria.java.core.error.NotYetImplementedError;
 import com.g2forge.alexandria.java.core.helpers.HCollection;
 import com.g2forge.alexandria.java.text.TextUpdate;
-import com.g2forge.alexandria.java.text.quote.BashQuoteType;
+import com.g2forge.alexandria.java.text.quote.IQuoteType;
 import com.g2forge.alexandria.java.text.quote.QuoteControl;
 import com.g2forge.enigma.backend.text.model.modifier.ITextModifier;
 
@@ -17,8 +17,8 @@ import lombok.RequiredArgsConstructor;
 @Data
 @Builder(toBuilder = true)
 @RequiredArgsConstructor
-public class BashTokenModifier implements ITextModifier {
-	protected final BashQuoteType quoteType;
+public class ControlQuoteTextModifier implements ITextModifier {
+	protected final IQuoteType quoteType;
 
 	protected final QuoteControl quoteControl;
 
@@ -31,7 +31,7 @@ public class BashTokenModifier implements ITextModifier {
 			case IfNeeded:
 				if (!isRequiresQuote(list)) return null;
 			case Always:
-				return new BashQuoteModifier(getQuoteType()).computeUpdates(list);
+				return new QuoteTextModifier(getQuoteType()).computeUpdates(list);
 			default:
 				throw new EnumException(QuoteControl.class, getQuoteControl());
 		}
