@@ -8,10 +8,18 @@ import com.g2forge.alexandria.java.text.escape.IEscapeType;
 import com.g2forge.alexandria.java.text.escape.SingleCharacterEscaper;
 import com.g2forge.alexandria.java.text.quote.IQuoteType;
 
+import lombok.Getter;
+
 public class DotStringValueQuoteType implements IQuoteType, ISingleton {
 	protected static final DotStringValueQuoteType INSTANCE = new DotStringValueQuoteType();
 
-	protected static final Pattern PATTERN = Pattern.compile("([_a-zA-Z\200-\377][_0-9a-zA-Z\200-\377]*)|(-?(\\.[0-9]+|[0-9]+(\\.[0-9]*)?))");
+	@Getter
+	protected static final String characterRangeFirst = "_a-zA-Z\200-\377";
+	
+	@Getter
+	protected static final String characterRangeRemainder = getCharacterRangeFirst() + "0-9";
+
+	protected static final Pattern PATTERN = Pattern.compile("([" + getCharacterRangeFirst() + "][" + getCharacterRangeRemainder() + "]*)|(-?(\\.[0-9]+|[0-9]+(\\.[0-9]*)?))");
 
 	public static DotStringValueQuoteType create() {
 		return INSTANCE;
