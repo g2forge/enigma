@@ -15,7 +15,7 @@ public class DotStringValueQuoteType implements IQuoteType, ISingleton {
 
 	@Getter
 	protected static final String characterRangeFirst = "_a-zA-Z\200-\377";
-	
+
 	@Getter
 	protected static final String characterRangeRemainder = getCharacterRangeFirst() + "0-9";
 
