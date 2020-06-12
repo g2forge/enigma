@@ -98,6 +98,7 @@ public class DotRenderer extends ATextualRenderer<Object, IDotRenderContext> {
 				return IFunction1.create((T attributed) -> {
 					final Object value = field.getAccessor(attributed).get0();
 					if (annotation.skipNull() && (value == null)) return null;
+					if (value instanceof String) return new StringDotAttribute(name, (String) value);
 					return new ObjectDotAttribute(name, value);
 				});
 			}).collect(Collectors.toList());
@@ -159,7 +160,8 @@ public class DotRenderer extends ATextualRenderer<Object, IDotRenderContext> {
 
 			builder.add(StringDotAttribute.class, e -> c -> {
 				c.append(e.getName()).append('=');
-				try (ICloseable quote = c.quote(QuoteControl.Always)) {
+				if (e.getValue().length() < 1) c.append("\"\"");
+				else try (ICloseable quote = c.quote(QuoteControl.Always)) {
 					c.render(e.getValue(), String.class);
 				}
 			});
