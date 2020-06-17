@@ -29,7 +29,7 @@ public class DotStringValueQuoteType implements IQuoteType, ISingleton {
 
 	@Override
 	public IEscapeType getEscapeType() {
-		return new EscapeType(new SingleCharacterEscaper("\\", null, "\"", null, -1));
+		return new EscapeType(new SingleCharacterEscaper("\\", null, "\"\n", "\"n", -1));
 	}
 
 	@Override
