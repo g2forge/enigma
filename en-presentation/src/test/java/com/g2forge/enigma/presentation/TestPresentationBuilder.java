@@ -7,8 +7,12 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.g2forge.alexandria.java.function.IConsumer1;
+import com.g2forge.alexandria.java.io.HBinaryIO;
+import com.g2forge.alexandria.java.io.HTextIO;
 import com.g2forge.alexandria.java.io.file.HZip;
 import com.g2forge.alexandria.java.io.file.TempDirectory;
+import com.g2forge.alexandria.media.HMedia;
+import com.g2forge.alexandria.media.IMediaType;
 import com.g2forge.enigma.document.model.Block;
 import com.g2forge.enigma.document.model.DocList;
 import com.g2forge.enigma.document.model.Emphasis;
@@ -28,7 +32,10 @@ public class TestPresentationBuilder {
 
 				test.accept(actual);
 				actual.write(actualActual);
-				Assert.assertTrue(HZip.isEqual(actualActual, expectedPath));
+				Assert.assertTrue(HZip.isEqual(name -> {
+					final IMediaType mediaType = HMedia.getMediaType(name);
+					return ((mediaType != null) && mediaType.isText()) ? HTextIO::isEqual : HBinaryIO::isEqual;
+				}, actualActual, expectedPath).get());
 			}
 		}
 	}
