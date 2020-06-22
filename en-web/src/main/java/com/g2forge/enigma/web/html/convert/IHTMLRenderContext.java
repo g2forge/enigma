@@ -1,15 +1,8 @@
 package com.g2forge.enigma.web.html.convert;
 
-import java.lang.reflect.Type;
-
 import com.g2forge.alexandria.java.close.ICloseable;
+import com.g2forge.enigma.web.css.convert.ICSSRenderContext;
 
-public interface IHTMLRenderContext {
-	public StringBuilder getBuilder();
-
-	public IExplicitHTMLElement toExplicit(Object object, Type type);
-
-	public void newline();
-
-	public ICloseable indent();
+public interface IHTMLRenderContext extends ICSSRenderContext {
+	public ICloseable openTag(String tag, boolean inline);
 }

@@ -1,8 +1,7 @@
 package com.g2forge.enigma.web.css.convert;
 
-import java.lang.reflect.Type;
-
 import com.g2forge.alexandria.java.core.helpers.HCollector;
+import com.g2forge.alexandria.java.function.IConsumer2;
 import com.g2forge.alexandria.java.function.IFunction1;
 import com.g2forge.alexandria.java.reflect.JavaScope;
 import com.g2forge.alexandria.java.text.casing.CamelCase;
@@ -10,25 +9,53 @@ import com.g2forge.alexandria.java.text.casing.SnakeCase;
 import com.g2forge.alexandria.java.type.function.TypeSwitch1;
 import com.g2forge.alexandria.reflection.object.HReflection;
 import com.g2forge.alexandria.reflection.object.IJavaFieldReflection;
-import com.g2forge.enigma.web.css.Block;
-import com.g2forge.enigma.web.css.ICSSRecord;
-import com.g2forge.enigma.web.css.ICSSStyle;
-import com.g2forge.enigma.web.css.color.Color;
-import com.g2forge.enigma.web.css.distance.Distance;
+import com.g2forge.enigma.backend.ITextAppender;
+import com.g2forge.enigma.backend.convert.ARenderer;
+import com.g2forge.enigma.backend.convert.IExplicitRenderable;
+import com.g2forge.enigma.backend.convert.IRendering;
+import com.g2forge.enigma.backend.convert.textual.ATextualRenderer;
+import com.g2forge.enigma.backend.text.model.modifier.TextNestedModified;
+import com.g2forge.enigma.web.css.model.Block;
+import com.g2forge.enigma.web.css.model.ICSSRecord;
+import com.g2forge.enigma.web.css.model.ICSSStyle;
+import com.g2forge.enigma.web.css.model.color.Color;
+import com.g2forge.enigma.web.css.model.distance.Distance;
 
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-public class CSSRenderer {
-	@Data
-	protected static class CSSRenderContext implements ICSSRenderContext {
-		protected static CSSRenderer css = new CSSRenderer();
+@Getter
+@RequiredArgsConstructor
+public class CSSRenderer extends ATextualRenderer<Object, ICSSRenderContext> {
+	protected class CSSRenderContext extends ARenderContext implements ICSSRenderContext {
+		protected CSSRenderContext(TextNestedModified.TextNestedModifiedBuilder builder) {
+			super(builder);
+		}
 
-		protected static final IFunction1<Object, IExplicitCSSRenderable> toExplicit = new TypeSwitch1.FunctionBuilder<Object, IExplicitCSSRenderable>().with(builder -> {
+		@Override
+		protected ICSSRenderContext getThis() {
+			return this;
+		}
+	}
+
+	protected static class CSSRendering extends ARenderer.ARendering<Object, ICSSRenderContext, IExplicitRenderable<? super ICSSRenderContext>> {
+		@Override
+		protected void extend(TypeSwitch1.FunctionBuilder<Object, IExplicitRenderable<? super ICSSRenderContext>> builder) {
+			builder.add(IExplicitCSSRenderable.class, e -> c -> e.render(c));
+			ITextAppender.addToBuilder(builder, new ITextAppender.IExplicitFactory<ICSSRenderContext, IExplicitRenderable<? super ICSSRenderContext>>() {
+				@Override
+				public <T> IFunction1<? super T, ? extends IExplicitRenderable<? super ICSSRenderContext>> create(IConsumer2<? super ICSSRenderContext, ? super T> consumer) {
+					return e -> c -> consumer.accept(c, e);
+				}
+			});
+
 			builder.add(Block.class, e -> c -> {
 				boolean first = true;
 				for (ICSSStyle style : e.getStyles()) {
-					if (!first) c.getBuilder().append("; ");
-					c.toExplicit(style, ICSSStyle.class).render(c);
+					if (!first) c.append("; ");
+					c.render(style, ICSSStyle.class);
 					first = false;
 				}
 			});
@@ -39,24 +66,24 @@ public class CSSRenderer {
 				else return new EnumExplicitCSSRenderable(e);
 			});
 
-			builder.add(Color.class, e -> c -> c.getBuilder().append("rgb(").append(e.getR()).append(',').append(e.getG()).append(',').append(e.getB()).append(')'));
-			builder.add(Distance.class, e -> c -> c.getBuilder().append(e.getAmount()).append(e.getUnit().name().toLowerCase()));
+			builder.add(Color.class, e -> c -> c.append("rgb(").append(e.getR()).append(',').append(e.getG()).append(',').append(e.getB()).append(')'));
+			builder.add(Distance.class, e -> c -> c.append(e.getAmount()).append(e.getUnit().name().toLowerCase()));
+		}
+	}
 
-			builder.add(String.class, e -> context -> context.getBuilder().append(e));
-			builder.add(Boolean.class, e -> context -> context.getBuilder().append(e));
-			builder.add(Integer.class, e -> context -> context.getBuilder().append(e));
-			builder.add(Long.class, e -> context -> context.getBuilder().append(e));
-			builder.add(Float.class, e -> context -> context.getBuilder().append(e));
-			builder.add(Double.class, e -> context -> context.getBuilder().append(e));
-		}).build();
+	protected static class EnumExplicitCSSRenderable implements IExplicitCSSRenderable {
+		protected final Enum<? extends ICSSRenderable> element;
 
-		protected final StringBuilder builder;
-
-		protected final String newline;
+		@SuppressWarnings("unchecked")
+		public EnumExplicitCSSRenderable(Enum<?> element) {
+			if (!(element instanceof ICSSRenderable)) throw new IllegalArgumentException(String.format("Enumeration element \"%1$s\" of \"%2$s\" is not a CSS renderable!", element, element.getClass()));
+			this.element = (Enum<? extends ICSSRenderable>) element;
+		}
 
 		@Override
-		public IExplicitCSSRenderable toExplicit(final Object element, Type type) {
-			return toExplicit.apply(element);
+		public void render(ICSSRenderContext context) {
+			final String value = SnakeCase.DASH.toString(CamelCase.create().fromString(element.name()));
+			context.append(value);
 		}
 	}
 
@@ -73,23 +100,7 @@ public class CSSRenderer {
 		public void render(ICSSRenderContext context) {
 			final String property = SnakeCase.DASH.toString(CamelCase.create().fromString(element.getClass().getSimpleName()));
 			final String value = SnakeCase.DASH.toString(CamelCase.create().fromString(element.name()));
-			context.getBuilder().append(property).append(": ").append(value);
-		}
-	}
-
-	protected static class EnumExplicitCSSRenderable implements IExplicitCSSRenderable {
-		protected final Enum<? extends ICSSRenderable> element;
-
-		@SuppressWarnings("unchecked")
-		public EnumExplicitCSSRenderable(Enum<?> element) {
-			if (!(element instanceof ICSSRenderable)) throw new IllegalArgumentException(String.format("Enumeration element \"%1$s\" of \"%2$s\" is not a CSS renderable!", element, element.getClass()));
-			this.element = (Enum<? extends ICSSRenderable>) element;
-		}
-
-		@Override
-		public void render(ICSSRenderContext context) {
-			final String value = SnakeCase.DASH.toString(CamelCase.create().fromString(element.name()));
-			context.getBuilder().append(value);
+			context.append(property).append(": ").append(value);
 		}
 	}
 
@@ -99,21 +110,25 @@ public class CSSRenderer {
 
 		@Override
 		public void render(ICSSRenderContext context) {
-			final StringBuilder builder = context.getBuilder();
 			final String property = SnakeCase.DASH.toString(CamelCase.create().fromString(record.getClass().getSimpleName()));
-			builder.append(property).append(": ");
+			context.append(property).append(": ");
 
 			final IJavaFieldReflection<ICSSRecord, ?> field = HReflection.toReflection(record).getFields(JavaScope.Inherited, null).collect(HCollector.toOne());
 			final Object value = field.getAccessor(record).get0();
-			context.toExplicit(value, field.getType().getFieldType().getJavaType()).render(context);
+			context.render(value, field.getType().getFieldType().getJavaType());
 		}
 	}
 
-	public String render(ICSSRenderable element) {
-		final StringBuilder retVal = new StringBuilder();
-		final CSSRenderContext context = new CSSRenderContext(retVal, "\n");
-		context.toExplicit(element, null).render(context);
-		return retVal.toString();
+	@Getter(lazy = true, value = AccessLevel.PROTECTED)
+	private static final IRendering<Object, ICSSRenderContext, IExplicitRenderable<? super ICSSRenderContext>> renderingStatic = new CSSRendering();
+
+	@Override
+	protected ICSSRenderContext createContext(TextNestedModified.TextNestedModifiedBuilder builder) {
+		return new CSSRenderContext(builder);
 	}
 
+	@Override
+	protected IRendering<? super Object, ? extends ICSSRenderContext, ? extends IExplicitRenderable<? super ICSSRenderContext>> getRendering() {
+		return getRenderingStatic();
+	}
 }

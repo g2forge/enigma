@@ -12,7 +12,7 @@ import org.eclipse.mylyn.wikitext.parser.markup.MarkupLanguage;
 
 import com.g2forge.alexandria.java.function.IConsumer1;
 import com.g2forge.alexandria.java.io.RuntimeIOException;
-import com.g2forge.enigma.document.Block;
+import com.g2forge.enigma.document.model.Block;
 
 import lombok.Data;
 import lombok.Getter;

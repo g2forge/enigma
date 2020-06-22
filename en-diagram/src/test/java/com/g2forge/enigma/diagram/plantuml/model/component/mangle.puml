@@ -1,0 +1,4 @@
+[A]
+[B Extended] as B_Extended
+
+A -[hidden]> B_Extended

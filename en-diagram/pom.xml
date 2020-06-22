@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>en-diagram</artifactId>
@@ -9,7 +10,7 @@
 		<version>0.0.8-SNAPSHOT</version>
 		<relativePath>../en-project/pom.xml</relativePath>
 	</parent>
-	
+
 	<name>Enigma Diagram</name>
 	<description>Models and renderers for the programmatic generation of diagrams.</description>
 
@@ -19,8 +20,13 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.g2forge.enigma</groupId>
-			<artifactId>en-stringtemplate</artifactId>
+			<groupId>com.g2forge.alexandria</groupId>
+			<artifactId>ax-reflection</artifactId>
+			<version>${alexandria.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>en-backend</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

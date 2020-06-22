@@ -1,11 +1,5 @@
 package com.g2forge.enigma.web.css.convert;
 
-import java.lang.reflect.Type;
+import com.g2forge.enigma.backend.convert.textual.ITextualRenderContext;
 
-public interface ICSSRenderContext {
-	public StringBuilder getBuilder();
-
-	public String getNewline();
-
-	public IExplicitCSSRenderable toExplicit(Object object, Type type);
-}
+public interface ICSSRenderContext extends ITextualRenderContext<Object, ICSSRenderContext> {}

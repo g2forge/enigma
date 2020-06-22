@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import com.g2forge.alexandria.test.HAssert;
 import com.g2forge.enigma.web.html.convert.HTMLRenderer;
-import com.g2forge.enigma.web.html.html.Table;
+import com.g2forge.enigma.web.html.model.html.Table;
 
 public class TestTable {
 	protected static final HTMLRenderer renderer = new HTMLRenderer();
