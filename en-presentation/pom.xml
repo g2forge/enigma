@@ -23,6 +23,12 @@
 			<artifactId>en-document</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.g2forge.alexandria</groupId>
+			<artifactId>ax-media</artifactId>
+			<version>${alexandria.version}</version>
+			<scope>test</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>org.apache.poi</groupId>
