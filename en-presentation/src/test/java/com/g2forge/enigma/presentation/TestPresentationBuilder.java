@@ -28,7 +28,7 @@ public class TestPresentationBuilder {
 
 				test.accept(actual);
 				actual.write(actualActual);
-				Assert.assertTrue(HZip.isEqual(actualActual, expectedPath));
+				Assert.assertTrue(HZip.isEqual(null, actualActual, expectedPath).get());
 			}
 		}
 	}
