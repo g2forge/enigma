@@ -14,7 +14,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-public abstract class ATextualRenderer<R, C extends ITextualRenderContext<R, ? super C>> extends ARenderer<R, C> {
+public abstract class ATextualRenderer<R, C extends ITextualRenderContext<R, ? super C>> extends ARenderer<R, C> implements ITextualRenderer<R> {
 	@RequiredArgsConstructor
 	protected abstract class ARenderContext implements ITextualRenderContext<R, C> {
 		@Getter(AccessLevel.PROTECTED)
