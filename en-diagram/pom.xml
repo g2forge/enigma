@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.g2forge.enigma</groupId>
 		<artifactId>en-project</artifactId>
-		<version>0.0.8</version>
+		<version>0.0.9-SNAPSHOT</version>
 		<relativePath>../en-project/pom.xml</relativePath>
 	</parent>
 
@@ -34,8 +34,4 @@
 			<version>${plantuml.version}</version>
 		</dependency>
 	</dependencies>
-
-  <scm>
-    <tag>0.0.8</tag>
-  </scm>
 </project>
