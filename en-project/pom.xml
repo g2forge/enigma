@@ -1,23 +1,22 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.g2forge.enigma</groupId>
 	<artifactId>en-project</artifactId>
-	<version>0.0.9-SNAPSHOT</version>
+	<version>0.0.10-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<parent>
 		<groupId>com.g2forge.alexandria</groupId>
 		<artifactId>ax-project</artifactId>
-		<version>0.0.15-SNAPSHOT</version>
+		<version>0.0.16-SNAPSHOT</version>
 	</parent>
 
 	<properties>
 		<stringtemplate.version>4.0.8</stringtemplate.version>
 		<antlr.version>4.8-1</antlr.version>
 
-		<alexandria.version>0.0.15-SNAPSHOT</alexandria.version>
+		<alexandria.version>0.0.16-SNAPSHOT</alexandria.version>
 
 		<enigma.organization>g2forge</enigma.organization>
 		<enigma.name>Enigma</enigma.name>
@@ -41,11 +40,6 @@
 			<url>https://github.com/${enigma.organization}/${enigma.repository}/blob/${project.version}/LICENSE</url>
 		</license>
 	</licenses>
-	<scm>
-		<connection>scm:git:git://github.com/${enigma.organization}/${enigma.repository}.git</connection>
-		<developerConnection>scm:git:ssh://github.com:${enigma.organization}/${enigma.repository}.git</developerConnection>
-		<url>http://github.com/${enigma.organization}/${enigma.repository}/tree/${project.version}</url>
-	</scm>
 
 	<build>
 		<plugins>
