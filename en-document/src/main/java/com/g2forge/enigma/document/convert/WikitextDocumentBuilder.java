@@ -129,6 +129,8 @@ public class WikitextDocumentBuilder extends DocumentBuilder {
 				return Emphasis.Type.Code;
 			case MONOSPACE:
 				return Emphasis.Type.Monospace;
+			case DELETED:
+				return Emphasis.Type.Strikethrough;
 			default:
 				throw new NotYetImplementedError(String.format("Span type \"%1$s\" is not supported yet!", type));
 		}
