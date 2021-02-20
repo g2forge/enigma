@@ -15,13 +15,26 @@ public class TestWikitext {
 
 	protected final WikitextParser parser = WikitextParser.getMarkdown();
 
-	@Test
-	public void emphasis() {
-		final String text = "*Text*";
-		final IDocElement dom = Block.builder().type(Block.Type.Document).content(Block.builder().type(Block.Type.Paragraph).content(new Emphasis(Emphasis.Type.Emphasis, new Text("Text"))).build()).build();
+	protected void assertEmphasis(final String text, final Emphasis.Type type) {
+		final IDocElement dom = Block.builder().type(Block.Type.Document).content(Block.builder().type(Block.Type.Paragraph).content(new Emphasis(type, new Text("Text"))).build()).build();
 
 		Assert.assertEquals(dom, parser.parse(text));
 		Assert.assertEquals(text, renderer.render(dom));
+	}
+
+	@Test
+	public void emphasisCode() {
+		assertEmphasis("`Text`", Emphasis.Type.Code);
+	}
+
+	@Test
+	public void emphasisEmphasis() {
+		assertEmphasis("*Text*", Emphasis.Type.Emphasis);
+	}
+
+	@Test
+	public void emphasisStrikethrough() {
+		assertEmphasis("~~Text~~", Emphasis.Type.Strikethrough);
 	}
 
 	@Test
