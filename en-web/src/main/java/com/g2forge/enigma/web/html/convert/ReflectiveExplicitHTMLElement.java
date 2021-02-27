@@ -1,5 +1,6 @@
 package com.g2forge.enigma.web.html.convert;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
@@ -81,8 +82,8 @@ class ReflectiveExplicitHTMLElement implements IExplicitHTMLRenderable {
 				else if (explicit) this.tag = annotation.value();
 				else if (generator) {
 					try {
-						this.tag = annotation.generator().newInstance().apply(element);
-					} catch (InstantiationException | IllegalAccessException exception) {
+						this.tag = annotation.generator().getDeclaredConstructor().newInstance().apply(element);
+					} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException exception) {
 						throw new ReflectionException(exception);
 					}
 				} else this.tag = element.getClass().getSimpleName().toLowerCase();
