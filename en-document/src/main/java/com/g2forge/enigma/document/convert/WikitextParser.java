@@ -1,17 +1,19 @@
 package com.g2forge.enigma.document.convert;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 import org.eclipse.mylyn.wikitext.markdown.MarkdownLanguage;
 import org.eclipse.mylyn.wikitext.parser.MarkupParser;
 import org.eclipse.mylyn.wikitext.parser.markup.MarkupLanguage;
 
-import com.g2forge.alexandria.java.function.IConsumer1;
 import com.g2forge.alexandria.java.io.RuntimeIOException;
+import com.g2forge.alexandria.java.io.dataaccess.IDataSource;
+import com.g2forge.alexandria.java.io.dataaccess.PathDataSource;
+import com.g2forge.alexandria.java.io.dataaccess.StringDataSource;
+import com.g2forge.alexandria.java.type.ref.ITypeRef;
 import com.g2forge.enigma.document.model.Block;
 
 import lombok.Data;
@@ -24,34 +26,22 @@ public class WikitextParser {
 
 	protected final MarkupLanguage language;
 
-	protected Block parse(IConsumer1<MarkupParser> consumer) {
+	public Block parse(IDataSource source) {
 		final WikitextDocumentBuilder builder = new WikitextDocumentBuilder();
 		final MarkupParser parser = new MarkupParser(getLanguage(), builder);
-		consumer.accept(parser);
+		try {
+			parser.parse(source.getReader(ITypeRef.of(Reader.class)));
+		} catch (IOException e) {
+			throw new RuntimeIOException(e);
+		}
 		return builder.getDocument();
 	}
 
 	public Block parse(Path path) throws IOException {
-		return parse(parser -> {
-			try (final BufferedReader reader = Files.newBufferedReader(path)) {
-				parser.parse(reader);
-			} catch (IOException exception) {
-				throw new RuntimeIOException(exception);
-			}
-		});
+		return parse(new PathDataSource(path, StandardOpenOption.READ));
 	}
 
-	public Block parse(Reader content) throws IOException {
-		return parse(parser -> {
-			try {
-				parser.parse(content);
-			} catch (IOException exception) {
-				throw new RuntimeIOException(exception);
-			}
-		});
-	}
-
-	public Block parse(String content) {
-		return parse(parser -> parser.parse(content));
+	public Block parse(String string) {
+		return parse(new StringDataSource(string));
 	}
 }
