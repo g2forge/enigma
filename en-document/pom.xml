@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>en-document</artifactId>
@@ -9,10 +11,6 @@
 		<version>0.0.10-SNAPSHOT</version>
 		<relativePath>../en-project/pom.xml</relativePath>
 	</parent>
-
-	<properties>
-		<mylyndocs.version>3.0.38</mylyndocs.version>
-	</properties>
 
 	<name>Enigma Document</name>
 	<description>Models, parsers and renderers for common documentation formats. This library is helpful for generating documentation and translating formats like MD, wikitext and office documents.</description>
