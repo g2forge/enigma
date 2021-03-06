@@ -15,7 +15,7 @@
 	</parent>
 
 	<properties>
-		<stringtemplate.version>4.0.8</stringtemplate.version>
+		<stringtemplate.version>4.3.1</stringtemplate.version>
 		<antlr.version>4.8-1</antlr.version>
 		<mylyndocs.version>3.0.38</mylyndocs.version>
 
