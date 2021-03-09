@@ -12,7 +12,7 @@ import org.stringtemplate.v4.StringRenderer;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class JavaStringRenderer implements AttributeRenderer {
+public class JavaStringRenderer implements AttributeRenderer<Object> {
 	protected final StringRenderer string = new StringRenderer();
 
 	protected final NumberRenderer number = new NumberRenderer();

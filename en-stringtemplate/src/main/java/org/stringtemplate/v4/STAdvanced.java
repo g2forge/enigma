@@ -10,11 +10,6 @@ import java.io.Writer;
 import java.util.Locale;
 import java.util.Map;
 
-import org.stringtemplate.v4.AutoIndentWriter;
-import org.stringtemplate.v4.Interpreter;
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STErrorListener;
-import org.stringtemplate.v4.STWriter;
 import org.stringtemplate.v4.misc.ErrorManager;
 
 /**
