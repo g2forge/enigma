@@ -165,7 +165,13 @@ public class STGroupJava extends STGroup {
 			return loadTemplateFile("/", fileName, fs);
 		} finally {
 			this.errMgr = prior;
-			if (!buffer.errors.isEmpty()) { throw new RuntimeException("One or more ST errors while loading the template \"" + templateName + "\"!"); }
+			if (!buffer.errors.isEmpty()) {
+				// If, while we were running, someone else defined the template, then use that (even if it's NOT_FOUND)
+				final CompiledST parallel = templates.get(name);
+				if (parallel != null) return parallel;
+
+				throw new RuntimeException("One or more ST errors while loading the template \"" + templateName + "\":\n" + buffer.errors.stream().map(Object::toString).collect(HCollector.joining("\n")));
+			}
 		}
 	}
 
