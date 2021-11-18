@@ -67,6 +67,24 @@
 				</executions>
 			</plugin>
 			<plugin>
+				<!-- Duplicate the invocation from ax-root to force ordering against antlr4 above -->
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok-maven-plugin</artifactId>
+				<version>${lombok-maven.version}</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>delombok</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<addOutputDirectory>false</addOutputDirectory>
+					<sourceDirectory>src/main/java</sourceDirectory>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
 				<version>3.0.0</version>
