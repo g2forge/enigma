@@ -146,7 +146,7 @@
 			</distributionManagement>
 			<repositories>
 				<repository>
-					<id>github</id>
+					<id>github-g2forge</id>
 					<url>https://maven.pkg.github.com/g2forge/*</url>
 					<releases>
 						<enabled>true</enabled>

@@ -21,6 +21,6 @@ jobs:
         cache: 'maven'
     - name: Build with Maven
       # Maven deploy on changes (or manual run) to master, otherwise just package it
-      run: mvn -B ${{ (((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (github.ref == 'refs/heads/master')) && 'deploy' || 'package' }} --file pom.xml -Prelease,release-snapshot
+      run: mvn -s "${GITHUB_WORKSPACE}/.github/workflows/maven-settings.xml" -B ${{ (((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (github.ref == 'refs/heads/master')) && 'deploy' || 'package' }} --file pom.xml -Prelease,release-snapshot
       env:
         GITHUB_TOKEN: ${{ github.token }}
