@@ -14,7 +14,7 @@
 	<description>Library for the programmatic construction of presentations. Based on Apache POI, this library does not require that you understand office document formats, and provides a simplified abstraction.</description>
 
 	<properties>
-		<poi.version>3.17</poi.version>
+		<poi.version>4.1.1</poi.version>
 	</properties>
 
 	<dependencies>
