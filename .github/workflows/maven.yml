@@ -13,11 +13,11 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-java@v2
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@v3
       with:
         distribution: 'adopt'
-        java-version: 11
+        java-version: 17
         cache: 'maven'
     - name: Build with Maven
       # Maven deploy on changes (or manual run) to master, otherwise just package it
