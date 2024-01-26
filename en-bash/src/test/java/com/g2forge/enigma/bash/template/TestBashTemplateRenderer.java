@@ -2,9 +2,9 @@ package com.g2forge.enigma.bash.template;
 
 import org.junit.Test;
 
-import com.g2forge.alexandria.adt.associative.map.HMap;
 import com.g2forge.alexandria.adt.associative.map.MapBuilder;
 import com.g2forge.alexandria.java.adt.name.IStringNamed;
+import com.g2forge.alexandria.java.core.helpers.HMap;
 import com.g2forge.alexandria.test.HAssert;
 import com.g2forge.enigma.bash.convert.BashRenderer;
 import com.g2forge.enigma.bash.model.expression.BashExpansion;
