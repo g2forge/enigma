@@ -13,8 +13,8 @@
 	</parent>
 
 	<properties>
-		<stringtemplate.version>4.3.1</stringtemplate.version>
-		<antlr.version>4.8-1</antlr.version>
+		<stringtemplate.version>4.3.4</stringtemplate.version>
+		<antlr.version>4.13.1</antlr.version>
 		<mylyndocs.version>3.0.38</mylyndocs.version>
 
 		<alexandria.version>0.0.19-SNAPSHOT</alexandria.version>
