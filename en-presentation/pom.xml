@@ -1,5 +1,4 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>en-presentation</artifactId>
 
@@ -14,7 +13,7 @@
 	<description>Library for the programmatic construction of presentations. Based on Apache POI, this library does not require that you understand office document formats, and provides a simplified abstraction.</description>
 
 	<properties>
-		<poi.version>4.1.1</poi.version>
+		<poi.version>5.4.0</poi.version>
 	</properties>
 
 	<dependencies>
