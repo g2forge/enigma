@@ -1,7 +1,9 @@
 package com.g2forge.enigma.presentation;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,6 +26,8 @@ import com.g2forge.enigma.presentation.slide.SlideContent1;
 import com.g2forge.enigma.presentation.slide.SlideTitle;
 
 public class TestPresentationBuilder {
+	protected static final Path REGENERATION_DIRECTORY = null;
+
 	protected void assertPresentationEquals(final String expected, final IConsumer1<PresentationBuilder> test) throws IOException {
 		try (final TempDirectory temp = new TempDirectory()) {
 			try (final PresentationBuilder actual = new PresentationBuilder()) {
@@ -32,6 +36,7 @@ public class TestPresentationBuilder {
 
 				test.accept(actual);
 				actual.write(actualActual);
+				if (REGENERATION_DIRECTORY != null) Files.copy(actualActual, REGENERATION_DIRECTORY.resolve(expected));
 				Assert.assertTrue(HZip.isEqual(name -> {
 					final IMediaType mediaType = HMedia.getMediaType(name);
 					return ((mediaType != null) && mediaType.isText()) ? HTextIO::isEqual : HBinaryIO::isEqual;
