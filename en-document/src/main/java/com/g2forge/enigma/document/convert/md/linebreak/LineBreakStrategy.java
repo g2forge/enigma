@@ -1,16 +1,18 @@
-package com.g2forge.enigma.document.convert.md;
+package com.g2forge.enigma.document.convert.md.linebreak;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.g2forge.alexandria.java.core.enums.EnumException;
+import com.g2forge.enigma.document.convert.md.IMDRenderContext;
 import com.g2forge.enigma.document.model.Block;
+import com.g2forge.enigma.document.model.IDocListItem;
 
-public enum LineBreakStrategy {
+public enum LineBreakStrategy implements ILineBreakStrategy {
 	None,
 	Item {
 		@Override
-		public void beforeItem(IMDRenderContext context, boolean first) {
+		public void beforeItem(IMDRenderContext context, boolean first, IDocListItem item) {
 			if (!first) context.newline().newline();
 		}
 	},
@@ -28,20 +30,25 @@ public enum LineBreakStrategy {
 		}
 	};
 
-	public static LineBreakStrategy fromBlockType(Block.Type type) {
+	public static ILineBreakStrategy fromBlockType(IMDRenderContext context, Block.Type type) {
+		final LineBreakStrategy base;
 		switch (type) {
 			case Document:
 			case Block:
-				return Item;
+				base = Item;
+				break;
 			case Paragraph:
 			case ListItem:
-				return Period;
+				base = Period;
+				break;
 			default:
 				throw new EnumException(Block.Type.class, type);
 		}
+		if (context.getIndentLevel() > 0) return new ListLineBreakStrategy(base);
+		return base;
 	}
 
-	public void beforeItem(IMDRenderContext context, boolean first) {}
+	public void beforeItem(IMDRenderContext context, boolean first, IDocListItem item) {}
 
 	public void text(IMDRenderContext context, String text) {
 		context.append(text);

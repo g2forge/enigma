@@ -4,8 +4,10 @@ import java.util.Stack;
 
 import com.g2forge.alexandria.java.close.ICloseable;
 import com.g2forge.alexandria.java.core.enums.EnumException;
+import com.g2forge.alexandria.java.function.IConsumer1;
 import com.g2forge.alexandria.java.function.IConsumer2;
 import com.g2forge.alexandria.java.function.IFunction1;
+import com.g2forge.alexandria.java.function.ISupplier;
 import com.g2forge.alexandria.java.type.function.TypeSwitch1;
 import com.g2forge.enigma.backend.ITextAppender;
 import com.g2forge.enigma.backend.convert.ARenderer;
@@ -13,6 +15,8 @@ import com.g2forge.enigma.backend.convert.IExplicitRenderable;
 import com.g2forge.enigma.backend.convert.IRendering;
 import com.g2forge.enigma.backend.convert.textual.ATextualRenderer;
 import com.g2forge.enigma.backend.text.model.modifier.TextNestedModified;
+import com.g2forge.enigma.document.convert.md.linebreak.ILineBreakStrategy;
+import com.g2forge.enigma.document.convert.md.linebreak.LineBreakStrategy;
 import com.g2forge.enigma.document.model.Block;
 import com.g2forge.enigma.document.model.Definition;
 import com.g2forge.enigma.document.model.DocList;
@@ -34,23 +38,19 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MDRenderer extends ATextualRenderer<Object, IMDRenderContext> {
 	protected class MDRenderContext extends ARenderContext implements IMDRenderContext {
-		protected final Stack<LineBreakStrategy> lineBreakStrategies = new Stack<>();
-
 		protected final Stack<ICloseable> stack = new Stack<>();
+
+		@Getter
+		protected ILineBreakStrategy lineBreakStrategy = LineBreakStrategy.None;
+
+		@Getter
+		protected int sectionLevel = 1;
+
+		@Getter
+		protected int indentLevel;
 
 		public MDRenderContext(TextNestedModified.TextNestedModifiedBuilder builder) {
 			super(builder);
-		}
-
-		@Override
-		public LineBreakStrategy getLineBreakStrategy() {
-			if (lineBreakStrategies.isEmpty()) return LineBreakStrategy.None;
-			return lineBreakStrategies.peek();
-		}
-
-		@Override
-		public int getSectionLevel() {
-			return stack.size() + 1;
 		}
 
 		@Override
@@ -58,27 +58,37 @@ public class MDRenderer extends ATextualRenderer<Object, IMDRenderContext> {
 			return this;
 		}
 
-		@Override
-		public ICloseable openLineBreakStrategy(LineBreakStrategy strategy) {
-			lineBreakStrategies.push(strategy);
-			final int size = lineBreakStrategies.size();
-			return () -> {
-				if (lineBreakStrategies.size() != size) throw new IllegalStateException();
-				lineBreakStrategies.pop();
-			};
-		}
-
-		@Override
-		public ICloseable openSection() {
+		protected <T> ICloseable open(ISupplier<T> start, IConsumer1<T> stop) {
+			final T value = start.get();
 			final ICloseable retVal = new ICloseable() {
 				@Override
 				public void close() {
 					if (stack.peek() != this) throw new IllegalArgumentException();
 					stack.pop();
+					stop.accept(value);
 				}
 			};
 			stack.push(retVal);
 			return retVal;
+		}
+
+		@Override
+		public ICloseable openLineBreakStrategy(ILineBreakStrategy strategy) {
+			return open(() -> {
+				final ILineBreakStrategy retVal = lineBreakStrategy;
+				lineBreakStrategy = strategy;
+				return retVal;
+			}, prev -> lineBreakStrategy = prev);
+		}
+
+		@Override
+		public ICloseable openSection() {
+			return open(() -> sectionLevel++, prev -> sectionLevel = prev);
+		}
+
+		@Override
+		public ICloseable openIndent() {
+			return open(() -> indentLevel++, prev -> indentLevel = prev);
 		}
 	}
 
@@ -127,11 +137,11 @@ public class MDRenderer extends ATextualRenderer<Object, IMDRenderContext> {
 			});
 
 			builder.add(Block.class, md -> c -> {
-				try (final ICloseable strategy = c.openLineBreakStrategy(LineBreakStrategy.fromBlockType(md.getType()))) {
+				try (final ICloseable strategy = c.openLineBreakStrategy(LineBreakStrategy.fromBlockType(c, md.getType()))) {
 					boolean first = true;
 					for (IBlock content : md.getContents()) {
 						if (first) first = false;
-						else c.getLineBreakStrategy().beforeItem(c, first);
+						else c.getLineBreakStrategy().beforeItem(c, first, content);
 						c.render(content, IBlock.class);
 					}
 				}
@@ -139,6 +149,7 @@ public class MDRenderer extends ATextualRenderer<Object, IMDRenderContext> {
 			builder.add(DocList.class, md -> c -> {
 				final java.util.List<IDocListItem> items = md.getItems();
 				for (int i = 0; i < items.size(); i++) {
+					for (int j = 0; j < c.getIndentLevel(); j++) c.append("    ");
 					switch (md.getMarker()) {
 						case Ordered:
 							c.append("* ");
@@ -147,7 +158,9 @@ public class MDRenderer extends ATextualRenderer<Object, IMDRenderContext> {
 							c.append(String.format("%1$d. ", i + 1));
 							break;
 					}
-					c.render(items.get(i), IBlock.class);
+					try (ICloseable indent = c.openIndent()) {
+						c.render(items.get(i), IBlock.class);
+					}
 					if (i < (items.size() - 1)) c.newline();
 				}
 			});
