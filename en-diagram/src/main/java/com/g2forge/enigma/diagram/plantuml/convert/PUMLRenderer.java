@@ -282,7 +282,7 @@ public class PUMLRenderer extends ATextualRenderer<Object, IPUMLRenderContext> {
 		final String string = render(content);
 		final SourceStringReader reader = new SourceStringReader(string);
 		try (final OutputStream os = new BufferedOutputStream(new FileOutputStream(retVal.toFile()))) {
-			reader.generateImage(os, new FileFormatOption(format));
+			reader.outputImage(os, new FileFormatOption(format));
 		}
 		return retVal;
 	}
