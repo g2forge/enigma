@@ -3,13 +3,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.g2forge.enigma</groupId>
 	<artifactId>en-project</artifactId>
-	<version>0.0.12-SNAPSHOT</version>
+	<version>0.0.13-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<parent>
 		<groupId>com.g2forge.alexandria</groupId>
 		<artifactId>ax-project</artifactId>
-		<version>0.0.19-SNAPSHOT</version>
+		<version>0.0.20-SNAPSHOT</version>
 	</parent>
 
 	<properties>
@@ -17,7 +17,7 @@
 		<antlr.version>4.13.1</antlr.version>
 		<mylyndocs.version>3.0.38</mylyndocs.version>
 
-		<alexandria.version>0.0.19-SNAPSHOT</alexandria.version>
+		<alexandria.version>0.0.20-SNAPSHOT</alexandria.version>
 
 		<enigma.organization>g2forge</enigma.organization>
 		<enigma.name>Enigma</enigma.name>
@@ -45,7 +45,8 @@
 		<connection>scm:git:git://github.com/${enigma.organization}/${enigma.repository}.git</connection>
 		<developerConnection>scm:git:ssh://github.com:${enigma.organization}/${enigma.repository}.git</developerConnection>
 		<url>http://github.com/${enigma.organization}/${enigma.repository}/tree/${project.version}</url>
-	</scm>
+	  <tag>HEAD</tag>
+  </scm>
 
 	<build>
 		<plugins>
